@@ -34,7 +34,7 @@ const educationCollection = defineCollection({
         courseType: z.string().optional(),
         tags: z.array(z.string()).default([]),
         // New fields for structured content
-        type: z.enum(['course', 'subject', 'unit']).optional().default('course'),
+        type: z.enum(['course', 'subject', 'module', 'unit']).optional().default('course'),
         order: z.number().optional(),
         parent: z.string().optional(),
         subject: z.string().optional(),

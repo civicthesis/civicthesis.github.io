@@ -15,7 +15,9 @@ const item = Astro.props;
 const { Content, headings } = await item.render();
 
 const isCourseContent =
-    item.data.type === "unit" || item.data.type === "subject";
+    item.data.type === "unit" ||
+    item.data.type === "subject" ||
+    item.data.type === "module";
 const courseTag = item.data.tags ? item.data.tags[0] : "Data Science";
 ---
 
@@ -54,7 +56,7 @@ const courseTag = item.data.tags ? item.data.tags[0] : "Data Science";
     .prose :global(h4),
     .prose :global(h5),
     .prose :global(h6) {
-        font-family: "Playfair Display", serif;
+        font-family: var(--font-serif);
         font-weight: 700;
         color: var(--color-heading);
     }

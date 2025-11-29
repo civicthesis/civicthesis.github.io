@@ -1,0 +1,95 @@
+---
+title: "Week 4: Introduction to Calculus"
+description: "Limits, Continuity, and the Derivative."
+pubDate: 2024-01-24
+tags: ["Data Science", "Mathematics"]
+
+type: "module"
+order: 4
+subject: "mathematics-1"
+---
+
+import HandDrawnBox from "../../../../../components/HandDrawnBox.astro";
+import CinematicText from "../../../../../components/CinematicText.astro";
+import CinematicCard from "../../../../../components/CinematicCard.astro";
+
+<CinematicText 
+  text="CALCULUS" 
+  font="cinematic" 
+  animation="glitch" 
+  shadow="soft"
+  className="text-5xl text-center mb-12 text-rose-600"
+/>
+
+## The Concept of a Limit
+
+Calculus is the study of change. At its core lies the **Limit**.
+
+<CinematicText 
+  text="Approaching... but never touching." 
+  font="serif" 
+  animation="blur-reveal" 
+  className="text-xl text-center italic my-6 text-gray-500"
+/>
+
+<HandDrawnBox title="Definition" variant="note">
+  We say $\lim_{x \to c} f(x) = L$ if we can make $f(x)$ arbitrarily close to $L$ by taking $x$ sufficiently close to $c$.
+</HandDrawnBox>
+
+### Visualizing Limits
+
+Imagine walking towards a door. You take steps that are half the distance to the door.
+1. 1/2 way there.
+2. 3/4 way there.
+3. 7/8 way there.
+
+You get infinitely close, but theoretically, you never hit the door. That's a limit.
+
+## Continuity
+
+A function is continuous if you can draw its graph without lifting your pen.
+
+<CinematicCard theme="neon" title="Conditions for Continuity">
+  <p>A function $f(x)$ is continuous at $x=c$ if:</p>
+  <ol class="list-decimal list-inside mt-4 space-y-2">
+    <li>$f(c)$ is defined.</li>
+    <li>$\lim_{x \to c} f(x)$ exists.</li>
+    <li>$\lim_{x \to c} f(x) = f(c)$.</li>
+  </ol>
+</CinematicCard>
+
+## The Derivative
+
+The derivative measures the **instantaneous rate of change**.
+
+<CinematicText 
+  text="SLOPE OF THE TANGENT" 
+  font="bold-sans" 
+  animation="shake" 
+  color="#f59e0b"
+  className="text-2xl text-center my-8"
+/>
+
+$$f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$$
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
+    <CinematicCard theme="paper" title="Velocity">
+        If $s(t)$ is position, then $s'(t)$ is velocity.
+    </CinematicCard>
+    <CinematicCard theme="paper" title="Acceleration">
+        If $v(t)$ is velocity, then $v'(t)$ is acceleration.
+    </CinematicCard>
+</div>
+
+## Conclusion of Part 1
+
+You have now completed the first module of Mathematics 1. We've covered Logic, Sets, Functions, and the basics of Calculus.
+
+<CinematicText 
+  text="LEVEL UP" 
+  font="cinematic" 
+  animation="scale-up" 
+  shadow="neon"
+  color="#10b981"
+  className="text-4xl text-center mt-12"
+/>

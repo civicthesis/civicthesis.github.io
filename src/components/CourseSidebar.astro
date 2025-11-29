@@ -17,28 +17,65 @@ const courseItems = allEducation.filter((item) => {
 });
 
 // Organize into hierarchy
-const subjects = courseItems.filter((item) => item.data.type === "subject");
+const subjects = courseItems.filter(
+    (item) => item.data.type === "subject" || item.data.type === "course",
+);
+const modules = courseItems.filter((item) => item.data.type === "module");
 const units = courseItems.filter((item) => item.data.type === "unit");
 
 // Sort subjects by order
 subjects.sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
 
-// Map units to subjects
+// Map hierarchy
 const structure = subjects.map((subject) => {
-    const subjectUnits = units.filter(
-        (unit) =>
-            unit.data.subject === subject.slug.split("/").pop() ||
-            unit.data.parent === subject.slug ||
-            unit.data.tags.includes(subject.data.title),
+    // Find modules belonging to this subject
+    const subjectModules = modules.filter(
+        (mod) =>
+            mod.data.subject === (subject.slug.split("/").pop() || "") ||
+            mod.data.parent === subject.slug,
     );
-    subjectUnits.sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
+    subjectModules.sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
 
-    // Check if this subject contains the active unit
-    const isActive = subjectUnits.some((unit) => unit.slug === currentSlug);
+    // Get slugs of all modules in this subject to check against
+    const moduleSlugs = subjectModules.map((m) => m.slug);
+
+    // Find direct units (if any) - exclude those that belong to a module
+    const directUnits = units.filter(
+        (unit) =>
+            (unit.data.subject === (subject.slug.split("/").pop() || "") ||
+                unit.data.parent === subject.slug) &&
+            !moduleSlugs.includes(unit.data.parent),
+    );
+    directUnits.sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
+
+    // Map modules with their units
+    const mappedModules = subjectModules.map((mod) => {
+        const moduleUnits = units.filter(
+            (unit) => unit.data.parent === mod.slug,
+        );
+        moduleUnits.sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
+
+        const isModuleActive =
+            moduleUnits.some((unit) => unit.slug === currentSlug) ||
+            mod.slug === currentSlug;
+
+        return {
+            module: mod,
+            units: moduleUnits,
+            isActive: isModuleActive,
+        };
+    });
+
+    // Check if this subject contains the active unit/module
+    const isActive =
+        mappedModules.some((m) => m.isActive) ||
+        directUnits.some((u) => u.slug === currentSlug) ||
+        subject.slug === currentSlug;
 
     return {
         subject,
-        units: subjectUnits,
+        modules: mappedModules,
+        directUnits,
         isActive,
     };
 });
@@ -66,7 +103,7 @@ const structure = subjects.map((subject) => {
     </div>
     <nav class="sidebar-nav">
         {
-            structure.map(({ subject, units, isActive }) => (
+            structure.map(({ subject, modules, directUnits, isActive }) => (
                 <details class="subject-group" open={isActive}>
                     <summary class="subject-summary">
                         <span class="subject-title">{subject.data.title}</span>
@@ -86,24 +123,87 @@ const structure = subjects.map((subject) => {
                         </svg>
                     </summary>
 
-                    {units.length > 0 && (
-                        <ul class="unit-list">
-                            {units.map((unit) => (
-                                <li class="unit-item">
-                                    <a
-                                        href={`/education/${unit.slug}`}
-                                        class={
-                                            currentSlug === unit.slug
-                                                ? "active"
-                                                : ""
-                                        }
-                                    >
-                                        {unit.data.title}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+                    <div class="subject-content">
+                        {/* Modules */}
+                        {modules.map(
+                            ({ module, units, isActive: isModuleActive }) => (
+                                <details
+                                    class="module-group"
+                                    open={isModuleActive}
+                                >
+                                    <summary class="module-summary">
+                                        <span class="module-title">
+                                            {module.data.title}
+                                        </span>
+                                        <svg
+                                            class="chevron-small"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <polyline points="6 9 12 15 18 9" />
+                                        </svg>
+                                    </summary>
+                                    <ul class="unit-list">
+                                        {/* Module Link itself */}
+                                        <li class="unit-item">
+                                            <a
+                                                href={`/education/${module.slug}`}
+                                                class={
+                                                    currentSlug === module.slug
+                                                        ? "active"
+                                                        : ""
+                                                }
+                                            >
+                                                Overview
+                                            </a>
+                                        </li>
+                                        {units.map((unit) => (
+                                            <li class="unit-item">
+                                                <a
+                                                    href={`/education/${unit.slug}`}
+                                                    class={
+                                                        currentSlug ===
+                                                        unit.slug
+                                                            ? "active"
+                                                            : ""
+                                                    }
+                                                >
+                                                    {unit.data.title}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </details>
+                            ),
+                        )}
+
+                        {/* Direct Units */}
+                        {directUnits.length > 0 && (
+                            <ul class="unit-list direct-units">
+                                {directUnits.map((unit) => (
+                                    <li class="unit-item">
+                                        <a
+                                            href={`/education/${unit.slug}`}
+                                            class={
+                                                currentSlug === unit.slug
+                                                    ? "active"
+                                                    : ""
+                                            }
+                                        >
+                                            {unit.data.title}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
                 </details>
             ))
         }
@@ -162,7 +262,7 @@ const structure = subjects.map((subject) => {
     }
 
     .sidebar-header h3 {
-        font-family: "Playfair Display", serif;
+        font-family: var(--font-serif);
         font-size: 1.5rem;
         font-weight: 700;
         margin: 0;
@@ -304,6 +404,65 @@ const structure = subjects.map((subject) => {
         height: 6px;
         border-radius: 50%;
         background-color: var(--color-primary);
+    }
+
+    .subject-content {
+        padding-bottom: 0.5rem;
+    }
+
+    .module-group {
+        margin: 0.25rem 0.5rem;
+        border-left: 1px solid var(--color-border);
+    }
+
+    .module-summary {
+        list-style: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 0.75rem;
+        color: var(--color-text);
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border-radius: 6px;
+        user-select: none;
+    }
+
+    .module-summary:hover {
+        background-color: var(--color-surface);
+        color: var(--color-primary);
+    }
+
+    .module-summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .chevron-small {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: var(--color-text-muted);
+        width: 12px;
+        height: 12px;
+    }
+
+    details[open] .chevron-small {
+        transform: rotate(180deg);
+        color: var(--color-primary);
+    }
+
+    /* Adjust unit list for nested modules */
+    .module-group .unit-list {
+        padding-left: 0.5rem;
+    }
+
+    .module-group .unit-item a {
+        padding-left: 1.5rem;
+        font-size: 0.8rem;
+    }
+
+    .module-group .unit-item::before {
+        left: 0.75rem;
     }
 
     /* @media (max-width: 1024px) {

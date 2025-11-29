@@ -1,0 +1,92 @@
+---
+title: "Week 1: Introduction & Logic"
+description: "Introduction to Mathematical Logic, Propositions, and Truth Tables."
+pubDate: 2024-01-03
+tags: ["Data Science", "Mathematics"]
+
+type: "module"
+order: 1
+subject: "mathematics-1"
+---
+
+import HandDrawnBox from "../../../../../components/HandDrawnBox.astro";
+import CinematicText from "../../../../../components/CinematicText.astro";
+import CinematicCard from "../../../../../components/CinematicCard.astro";
+
+<CinematicText 
+  text="MATHEMATICAL LOGIC" 
+  font="cinematic" 
+  animation="blur-reveal" 
+  className="text-4xl text-center mb-8"
+/>
+
+## What is a Proposition?
+
+In mathematics, we deal with statements that are either **True** or **False**. These are called propositions.
+
+<CinematicCard theme="paper" title="Definition">
+  <p>A <strong>proposition</strong> is a declarative statement that is either true or false, but not both.</p>
+  <div class="scribble-highlight mt-4 inline-block">Key Concept</div>
+</CinematicCard>
+
+### Examples
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
+    <CinematicCard theme="noir" title="Valid Propositions">
+        <ul>
+            <li>The sun rises in the East. (True)</li>
+            <li>2 + 2 = 5. (False)</li>
+            <li>New Delhi is the capital of India. (True)</li>
+        </ul>
+    </CinematicCard>
+    <CinematicCard theme="neon" title="Not Propositions">
+        <ul>
+            <li>What is your name? (Question)</li>
+            <li>Close the door. (Command)</li>
+            <li>x + 2 = 5. (Depends on x)</li>
+        </ul>
+    </CinematicCard>
+</div>
+
+## Logical Connectives
+
+We can combine propositions using logical connectives.
+
+<CinematicText 
+  text="AND, OR, NOT" 
+  font="bold-sans" 
+  animation="glitch" 
+  color="#ef4444"
+  className="text-3xl text-center my-8"
+/>
+
+<HandDrawnBox title="Truth Tables" variant="tip">
+  Let $p$ and $q$ be two propositions.
+  
+  | $p$ | $q$ | $p \land q$ (AND) | $p \lor q$ (OR) | $\neg p$ (NOT) |
+  |---|---|---|---|---|
+  | T | T | T | T | F |
+  | T | F | F | T | F |
+  | F | T | F | T | T |
+  | F | F | F | F | T |
+</HandDrawnBox>
+
+## Implication ($p \implies q$)
+
+This is one of the most important connectives. It is read as "if $p$, then $q$".
+
+<CinematicText 
+  text="IF P THEN Q" 
+  font="mono" 
+  animation="tracking-in" 
+  shadow="soft"
+  className="text-2xl text-center my-8"
+/>
+
+<div style="margin: 3rem 0; text-align: center; padding: 2rem; background: #fff1f2; border-radius: 20px; border: 2px dashed #fb7185;">
+  <h3 style="color: #e11d48; margin-top: 0;">The Promise Analogy</h3>
+  <p style="color: #be123c;">Think of $p \implies q$ as a promise.</p>
+  <p>If I promise ($p$) to give you candy, and I give you candy ($q$), I kept my promise (True).</p>
+  <p>If I promise ($p$), but don't give you candy (not $q$), I broke my promise (False).</p>
+  <p>If I didn't promise (not $p$), whether I give you candy or not, I didn't break any promise (True).</p>
+</div>

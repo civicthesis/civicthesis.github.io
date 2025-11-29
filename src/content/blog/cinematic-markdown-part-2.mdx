@@ -1,0 +1,81 @@
+---
+title: "Cinematic Markdown: Advanced Techniques"
+description: "Take your storytelling further with glitch effects, 3D shadows, and kinetic typography."
+pubDate: 2025-12-01
+author: "Aryan"
+image: "/favicon.png"
+tags: ["design", "animation", "astro", "cinematic"]
+---
+
+import CinematicText from '../../components/CinematicText.astro';
+import CinematicCard from '../../components/CinematicCard.astro';
+
+In Part 1, we explored the basics of cinematic text. Now, let's push the boundaries with advanced animations and styles.
+
+## 1. The Glitch Effect
+
+Perfect for cyberpunk or sci-fi themes. This effect mimics a digital signal distortion.
+
+<CinematicText 
+  text="SYSTEM FAILURE" 
+  font="mono" 
+  animation="glitch" 
+  color="#ef4444"
+  className="text-4xl font-bold text-center my-12"
+/>
+
+## 2. 3D Shadows
+
+Give your text weight and presence.
+
+<CinematicText 
+  text="HEAVY IMPACT" 
+  font="bold-sans" 
+  shadow="3d" 
+  animation="scale-up"
+  className="text-5xl text-center my-12 text-white"
+/>
+
+## 3. Elegant Reveals
+
+For a more sophisticated look, use the "tracking-in" animation which expands the letter spacing as the text fades in.
+
+<CinematicText 
+  text="Elegance is the only beauty that never fades." 
+  font="cinematic" 
+  animation="tracking-in" 
+  shadow="soft"
+  className="text-2xl text-center my-12 italic"
+/>
+
+## 4. Kinetic Energy
+
+Sometimes you need to shake things up.
+
+<CinematicText 
+  text="WARNING: UNSTABLE" 
+  font="mono" 
+  animation="shake" 
+  color="#eab308"
+  className="text-3xl font-bold text-center my-12"
+/>
+
+## Combining Effects
+
+You can mix and match fonts, animations, and shadows to create unique styles.
+
+<CinematicCard theme="neon" title="NEO-TOKYO">
+  <CinematicText 
+    text="WAKE UP" 
+    font="bold-sans" 
+    animation="glitch" 
+    shadow="neon"
+    color="#22d3ee"
+    className="text-4xl mb-4"
+  />
+  <p>The city never sleeps. Neither do the data streams.</p>
+</CinematicCard>
+
+## Conclusion
+
+With these new tools, your Markdown content can be as dynamic as a motion picture. Experiment with different combinations to find your unique voice.

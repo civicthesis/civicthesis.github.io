@@ -11,18 +11,49 @@ type: "course"
 
 import SubjectCard from "../../../components/SubjectCard.astro";
 
-## Welcome to the Data Science Program
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 2rem; margin: 2rem 0;">
+    <SubjectCard 
+        title="Mathematics 1" 
+        href="/education/data-science/mathematics-1" 
+        color="#ef4444" 
+        icon="∑"
+    />
+    <SubjectCard 
+        title="Statistics 1" 
+        href="/education/data-science/statistics-1" 
+        color="#f59e0b" 
+        icon="📊"
+    />
+    <SubjectCard 
+        title="Computational Thinking" 
+        href="/education/data-science/computational-thinking" 
+        color="#10b981" 
+        icon="🧠"
+    />
+    <SubjectCard 
+        title="English 1" 
+        href="/education/data-science/english-1" 
+        color="#3b82f6" 
+        icon="Aa"
+    />
+     <SubjectCard 
+        title="Mathematics 2" 
+        href="/education/data-science/mathematics-2" 
+        color="#ef4444" 
+        icon="∫"
+    />
+---
+title: "Data Science"
+description: "A comprehensive 4-year BS Degree program in Data Science and Applications."
+pubDate: 2024-01-01
+image: ""
+institution: "IIT Madras"
+courseType: "Degree"
+tags: ["Data Science", "IIT Madras"]
+type: "course"
+---
 
-This program is designed to create a strong foundation in Data Science and Applications.
-
-## Curriculum Structure
-
-The curriculum is divided into three levels:
-1.  **Foundation Level** (8 courses)
-2.  **Diploma Level** (6 courses + 2 projects)
-3.  **Degree Level** (Advanced electives)
-
-## Foundation Level Subjects
+import SubjectCard from "../../../components/SubjectCard.astro";
 
 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 2rem; margin: 2rem 0;">
     <SubjectCard 
@@ -62,15 +93,16 @@ The curriculum is divided into three levels:
         icon="📈"
     />
     <SubjectCard 
-        title="Intro to Python" 
-        href="/education/data-science/python" 
-        color="#10b981" 
-        icon="🐍"
-    />
-    <SubjectCard 
         title="English 2" 
         href="/education/data-science/english-2" 
         color="#3b82f6" 
         icon="¶"
     />
 </div>
+
+## Curriculum Structure
+
+The curriculum is divided into three levels:
+1.  **Foundation Level** (8 courses)
+2.  **Diploma Level** (6 courses + 2 projects)
+3.  **Degree Level** (Advanced electives)

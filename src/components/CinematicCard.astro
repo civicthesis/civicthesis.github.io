@@ -1,0 +1,103 @@
+---
+interface Props {
+    title?: string;
+    theme?: "neon" | "noir" | "paper";
+    className?: string;
+}
+
+const { title, theme = "paper", className = "" } = Astro.props;
+---
+
+<div class={`cinematic-card ${theme} ${className}`}>
+    {title && <h3 class="card-title">{title}</h3>}
+    <div class="card-content">
+        <slot />
+    </div>
+</div>
+
+<style>
+    .cinematic-card {
+        padding: 2rem;
+        margin: 2rem 0;
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+        transition:
+            transform 0.3s ease,
+            box-shadow 0.3s ease;
+    }
+
+    .cinematic-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-title {
+        font-family: "Playfair Display", serif;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+    }
+
+    /* Theme: Paper (Hand-drawn look) */
+    .cinematic-card.paper {
+        background: #fff;
+        border: 2px solid #1a1a1a;
+        border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
+        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+    }
+
+    :global([data-theme="dark"]) .cinematic-card.paper {
+        background: #1f2023;
+        border-color: #e2e8f0;
+        box-shadow: 4px 4px 0px rgba(255, 255, 255, 0.1);
+    }
+
+    /* Theme: Neon (Cyberpunk look) */
+    .cinematic-card.neon {
+        background: #0f172a;
+        border: 1px solid #3b82f6;
+        box-shadow:
+            0 0 10px rgba(59, 130, 246, 0.3),
+            inset 0 0 20px rgba(59, 130, 246, 0.1);
+        color: #e2e8f0;
+    }
+
+    .cinematic-card.neon .card-title {
+        color: #60a5fa;
+        text-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+        font-family: "Fira Code", monospace;
+        text-transform: uppercase;
+    }
+
+    .cinematic-card.neon:hover {
+        box-shadow:
+            0 0 20px rgba(59, 130, 246, 0.5),
+            inset 0 0 30px rgba(59, 130, 246, 0.2);
+    }
+
+    /* Theme: Noir (Black & White cinematic) */
+    .cinematic-card.noir {
+        background: #000;
+        color: #fff;
+        border: 1px solid #333;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .cinematic-card.noir .card-title {
+        font-family: "Montserrat", sans-serif;
+        letter-spacing: 0.2em;
+        border-bottom: 1px solid #fff;
+        padding-bottom: 0.5rem;
+        display: inline-block;
+    }
+
+    :global([data-theme="light"]) .cinematic-card.noir {
+        background: #f5f5f5;
+        color: #000;
+        border: 1px solid #ccc;
+    }
+    :global([data-theme="light"]) .cinematic-card.noir .card-title {
+        border-bottom: 1px solid #000;
+    }
+</style>

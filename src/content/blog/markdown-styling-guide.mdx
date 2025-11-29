@@ -1,0 +1,226 @@
+---
+title: "Mastering Markdown Styling in Astro"
+description: "A comprehensive guide to styling text, headings, and layouts using Markdown, MDX, and HTML/CSS in your Astro blog."
+pubDate: 2025-11-29
+author: "Aryan"
+image: "/favicon.png"
+tags: ["markdown", "css", "design", "guide"]
+---
+
+Markdown is a powerful tool for writing content, but sometimes standard formatting isn't enough. You might want to change font families, add colors, or create unique layouts. In this guide, we'll explore how to push the boundaries of Markdown in Astro.
+
+## 1. Standard Markdown Styling
+
+Let's start with the basics. Astro supports all standard Markdown syntax out of the box.
+
+### Headings
+
+Headings are crucial for structure.
+
+```markdown
+# Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+###### Heading 6
+```
+
+# Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+###### Heading 6
+
+### Text Formatting
+
+Emphasis and importance.
+
+```markdown
+**Bold Text**
+*Italic Text*
+***Bold and Italic***
+~~Strikethrough~~
+```
+
+**Bold Text**
+*Italic Text*
+***Bold and Italic***
+~~Strikethrough~~
+
+### Lists
+
+Organize your thoughts.
+
+**Unordered List:**
+```markdown
+- Item 1
+- Item 2
+  - Sub-item A
+  - Sub-item B
+```
+
+- Item 1
+- Item 2
+  - Sub-item A
+  - Sub-item B
+
+**Ordered List:**
+```markdown
+1. First Step
+2. Second Step
+3. Third Step
+```
+
+1. First Step
+2. Second Step
+3. Third Step
+
+### Blockquotes
+
+For highlighting quotes or important notes.
+
+```markdown
+> This is a blockquote.
+>
+> It can span multiple lines.
+```
+
+> This is a blockquote.
+>
+> It can span multiple lines.
+
+---
+
+## 2. Advanced HTML & CSS Styling
+
+Since MDX allows us to use HTML directly, we can apply inline styles to achieve specific looks that standard Markdown doesn't support.
+
+### Custom Fonts
+
+You can change the font family for specific sections of text using the `style` attribute.
+
+```html
+<span style="font-family: 'Courier New', monospace;">This is Monospace text.</span>
+<span style="font-family: 'Georgia', serif;">This is Serif text.</span>
+<span style="font-family: 'Comic Sans MS', cursive;">This is Cursive text.</span>
+<span style="font-family: 'Impact', sans-serif;">This is Impact text.</span>
+```
+
+<p>
+  <span style="font-family: 'Courier New', monospace;">This is Monospace text.</span><br/>
+  <span style="font-family: 'Georgia', serif;">This is Serif text.</span><br/>
+  <span style="font-family: 'Comic Sans MS', cursive;">This is Cursive text.</span><br/>
+  <span style="font-family: 'Impact', sans-serif;">This is Impact text.</span>
+</p>
+
+### Text Colors
+
+Add some splash of color to your content.
+
+```html
+<span style="color: #ef4444;">Red Text</span>
+<span style="color: #3b82f6;">Blue Text</span>
+<span style="color: #10b981;">Green Text</span>
+<span style="color: #f59e0b;">Amber Text</span>
+```
+
+<p>
+  <span style="color: #ef4444;">Red Text</span><br/>
+  <span style="color: #3b82f6;">Blue Text</span><br/>
+  <span style="color: #10b981;">Green Text</span><br/>
+  <span style="color: #f59e0b;">Amber Text</span>
+</p>
+
+### Background Colors & Highlights
+
+You can also change the background color.
+
+```html
+<span style="background-color: #fef3c7; color: #92400e; padding: 0.2rem 0.4rem; border-radius: 4px;">Highlighted text</span>
+```
+
+<span style="background-color: #fef3c7; color: #92400e; padding: 0.2rem 0.4rem; border-radius: 4px;">Highlighted text</span>
+
+### Font Sizes
+
+Adjust the size of your text for emphasis.
+
+```html
+<span style="font-size: 0.8rem;">Small Text</span>
+<span style="font-size: 1.2rem;">Large Text</span>
+<span style="font-size: 1.5rem;">Extra Large Text</span>
+```
+
+<p>
+  <span style="font-size: 0.8rem;">Small Text</span><br/>
+  <span style="font-size: 1.2rem;">Large Text</span><br/>
+  <span style="font-size: 1.5rem;">Extra Large Text</span>
+</p>
+
+---
+
+## 3. Custom Components in MDX
+
+One of the best features of Astro and MDX is the ability to use custom components or complex HTML structures.
+
+### The "Scribble" Effect
+
+We can use the custom classes defined in our global CSS to create hand-drawn effects.
+
+```html
+<div class="scribble-box">
+  <h3>Hand-Drawn Box</h3>
+  <p>This box looks like it was drawn with a marker!</p>
+</div>
+```
+
+<div class="scribble-box">
+  <h3>Hand-Drawn Box</h3>
+  <p>This box looks like it was drawn with a marker!</p>
+</div>
+
+### Highlight Animation
+
+```html
+This is a <span class="scribble-highlight">highlighted</span> word.
+```
+
+This is a <span class="scribble-highlight">highlighted</span> word.
+
+### Circle Emphasis
+
+```html
+Don't forget to <span class="scribble-circle">circle</span> the important parts.
+```
+
+Don't forget to <span class="scribble-circle">circle</span> the important parts.
+
+---
+
+## 4. Code Blocks
+
+Displaying code is essential for technical blogs.
+
+```javascript
+// This is a code block
+function helloWorld() {
+  console.log("Hello, World!");
+}
+```
+
+You can also specify the language for syntax highlighting:
+
+````markdown
+```python
+def hello_world():
+    print("Hello, World!")
+```
+````
+
+---
+
+## Conclusion
+
+By combining standard Markdown with HTML and CSS, you can create rich, visually appealing content in your Astro blog. Experiment with different styles to find what works best for your brand!
