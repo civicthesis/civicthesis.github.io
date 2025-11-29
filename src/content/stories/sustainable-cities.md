@@ -2,7 +2,7 @@
 title: "The Future of Urban Living: Sustainable Cities"
 description: "How modern architecture and green technology are reshaping our metropolitan landscapes for a better tomorrow."
 pubDate: 2023-11-15
-image: "https://images.unsplash.com/photo-1449824913929-2b3a6413827c?auto=format&fit=crop&q=80&w=2070"
+image: "https://i.ytimg.com/vi/T6mK-Ukr_ts/maxresdefault.jpg"
 tags: ["Environment", "Urban"]
 ---
 
