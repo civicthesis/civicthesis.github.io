@@ -1,0 +1,101 @@
+---
+title: "Getting Discovered: Indexing Your Astro Site"
+description: "A step-by-step guide to generating sitemaps and submitting them to Google."
+pubDate: 2024-04-01
+author: "Aryan"
+image: ""
+tags: ["Astro", "SEO", "Google"]
+---
+
+import CinematicText from "../../components/CinematicText.astro";
+import HandDrawnBox from "../../components/HandDrawnBox.astro";
+import Mermaid from "../../components/Mermaid.astro";
+import TypewriterCode from "../../components/TypewriterCode.astro";
+
+<CinematicText 
+  text="The Path to Discovery" 
+  font="cinematic" 
+  animation="blur-reveal" 
+  className="text-5xl text-center mb-12"
+/>
+
+You've built it. You've deployed it. Now, how do you get people to find it?
+The answer lies in **Search Engine Optimization (SEO)**, and the first step is telling Google exactly what pages exist on your site.
+
+## The Indexing Flow
+
+Here is how the discovery process works:
+
+<Mermaid code={`
+graph LR
+    A[Google Bot] -->|Reads| B[robots.txt]
+    B -->|Points to| C[sitemap.xml]
+    C -->|Lists| D[All Your Pages]
+    D -->|Indexed by| E[Google Search]
+    style E fill:#f9f,stroke:#333,stroke-width:2px
+`} />
+
+## Step 1: The Map (Sitemap)
+
+Astro has an official integration that makes generating a sitemap automatic.
+
+First, install the integration:
+
+<TypewriterCode 
+    lang="bash"
+    code="npx astro add sitemap"
+/>
+
+Then, open your `astro.config.mjs`. It is **crucial** that you define your `site` URL here, otherwise the sitemap cannot be generated.
+
+```javascript
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
+
+export default defineConfig({
+  site: 'https://your-awesome-site.com', // <--- IMPORTANT!
+  integrations: [sitemap()],
+});
+```
+
+<HandDrawnBox title="Why the Site URL?" variant="note">
+  The sitemap needs absolute URLs (e.g., `https://example.com/blog/post-1`) so Google knows exactly where to send users. Astro uses the `site` config to build these.
+</HandDrawnBox>
+
+## Step 2: The Signpost (robots.txt)
+
+Now we need a signpost to tell search bots where the map is. Create a file named `robots.txt` in your `public/` folder.
+
+```text
+User-agent: *
+Allow: /
+
+sitemap: https://your-awesome-site.com/sitemap-index.xml
+```
+
+This tells **all** bots (`User-agent: *`) that they are allowed to crawl the site, and provides the direct link to your sitemap.
+
+## Step 3: Verification
+
+Run a build of your site to verify everything is working.
+
+<TypewriterCode 
+    lang="bash"
+    code="npm run build"
+/>
+
+Check your `dist/` folder. You should see a `sitemap-index.xml` and `sitemap-0.xml`.
+
+## Step 4: Submission (Google Search Console)
+
+Finally, we need to hand-deliver this map to Google.
+
+1.  Go to [Google Search Console](https://search.google.com/search-console).
+2.  Add your property (domain).
+3.  In the sidebar, click on **Sitemaps**.
+4.  Enter `sitemap-index.xml` and click **Submit**.
+
+<HandDrawnBox title="Success!" variant="tip">
+  Google will now periodically crawl your sitemap and add your new pages to its index automatically. You're officially on the map!
+</HandDrawnBox>

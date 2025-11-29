@@ -172,350 +172,71 @@ p {
     padding: 0;
 }
 
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* List Styling */
+.prose ul,
+.prose ol {
+    margin: var(--spacing-md) 0;
+    padding-left: var(--spacing-lg);
 }
 
-.animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
+.prose li {
+    margin-bottom: var(--spacing-sm);
+    padding-left: var(--spacing-sm);
 }
 
-/* Brand Typography */
-.civic {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    color: var(--color-logo-text);
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
+/* Custom Ordered List */
+.prose ol {
+    counter-reset: item;
+    list-style: none;
+    padding-left: 0;
 }
 
-.thesis {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-weight: 600;
-    color: var(--color-secondary);
-}
-
-/* Hand-drawn / Scribble Styles */
-.scribble-box {
-    border: 2px solid var(--color-text);
-    border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
-    padding: var(--spacing-md);
+.prose ol>li {
     position: relative;
-    background: transparent;
-    transition: all 0.3s ease;
+    padding-left: 2.5rem;
 }
 
-.scribble-box:hover {
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    transform: scale(1.01);
-}
-
-.scribble-circle {
-    position: relative;
-    display: inline-block;
-}
-
-.scribble-circle::before {
-    content: '';
+.prose ol>li::before {
+    content: counter(item) ".";
+    counter-increment: item;
     position: absolute;
-    top: -10%;
-    left: -10%;
-    width: 120%;
-    height: 120%;
-    border: 3px solid #ef4444;
-    /* Red marker */
-    border-radius: 68% 32% 75% 25% / 55% 28% 72% 45%;
-    transform: rotate(-5deg);
-    pointer-events: none;
-    animation: drawCircle 0.8s ease-out forwards;
-}
-
-.scribble-highlight {
-    position: relative;
-    z-index: 1;
-    white-space: nowrap;
-}
-
-.scribble-highlight::before {
-    content: '';
-    position: absolute;
-    top: 10%;
-    left: -5px;
-    right: -5px;
-    bottom: 10%;
-    background-color: rgba(253, 224, 71, 0.6);
-    /* Yellow highlighter */
-    z-index: -1;
-    transform: rotate(-1deg);
-    border-radius: 20% 80% 20% 80% / 80% 20% 80% 20%;
-    animation: highlight 0.5s ease-out forwards;
-    transform-origin: left center;
-}
-
-/* Diagram Layout */
-.diagram-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-lg);
-    justify-content: center;
-    align-items: center;
-    margin: var(--spacing-xl) 0;
-    font-family: 'Kalam', cursive, var(--font-sans);
-    /* Fallback to sans if Kalam not loaded */
-}
-
-.diagram-node {
-    max-width: 250px;
-    text-align: center;
-}
-
-.diagram-arrow {
-    font-size: 2rem;
-    color: var(--color-text);
-    animation: wiggle 2s ease-in-out infinite;
-}
-
-/* Animations */
-@keyframes drawCircle {
-    0% {
-        clip-path: polygon(0 0, 0 0, 0 0);
-    }
-
-    100% {
-        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-    }
-}
-
-@keyframes highlight {
-    0% {
-        transform: scaleX(0) rotate(-1deg);
-    }
-
-    100% {
-        transform: scaleX(1) rotate(-1deg);
-    }
-}
-
-@keyframes wiggle {
-
-    0%,
-    100% {
-        transform: rotate(0deg);
-    }
-
-    25% {
-        transform: rotate(5deg);
-    }
-
-    75% {
-        transform: rotate(-5deg);
-    }
-}
-
-/* Dark mode adjustments for scribbles */
-[data-theme="dark"] .scribble-box {
-    border-color: var(--color-text);
-}
-
-.prose a {
-    color: var(--color-primary);
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 2px;
-}
-
-.prose a:hover {
-    background-color: var(--color-secondary);
-    color: var(--color-text);
-    text-decoration: none;
-}
-
-.prose blockquote {
-    border-left: 4px solid var(--color-secondary);
-    padding-left: var(--spacing-md);
-    font-style: italic;
-    margin: var(--spacing-lg) 0;
-}
-
-.prose code {
+    left: 0;
+    top: 0;
     font-family: var(--font-mono);
-    background-color: var(--color-code-bg);
-    padding: 0.2em 0.4em;
-    border-radius: 4px;
-    font-size: 0.9em;
-}
-
-.prose pre {
-    background-color: var(--color-code-bg);
-    padding: var(--spacing-md);
-    border-radius: 8px;
-    overflow-x: auto;
-    margin: var(--spacing-lg) 0;
-}
-
-.prose pre code {
-    background-color: transparent;
-    padding: 0;
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
-}
-
-/* Brand Typography */
-.civic {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    color: var(--color-logo-text);
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-}
-
-.thesis {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-weight: 600;
     color: var(--color-secondary);
+    font-weight: bold;
+    width: 1.5rem;
+    text-align: right;
 }
 
-/* Hand-drawn / Scribble Styles */
-.scribble-box {
-    border: 2px solid var(--color-text);
-    border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
-    padding: var(--spacing-md);
+/* Custom Unordered List */
+.prose ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.prose ul>li {
     position: relative;
-    background: transparent;
-    transition: all 0.3s ease;
+    padding-left: 2rem;
 }
 
-.scribble-box:hover {
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    transform: scale(1.01);
-}
-
-.scribble-circle {
-    position: relative;
-    display: inline-block;
-}
-
-.scribble-circle::before {
-    content: '';
+.prose ul>li::before {
+    content: "→";
     position: absolute;
-    top: -10%;
-    left: -10%;
-    width: 120%;
-    height: 120%;
-    border: 3px solid #ef4444;
-    /* Red marker */
-    border-radius: 68% 32% 75% 25% / 55% 28% 72% 45%;
-    transform: rotate(-5deg);
-    pointer-events: none;
-    animation: drawCircle 0.8s ease-out forwards;
+    left: 0;
+    color: var(--color-primary);
+    /* Dark in light mode */
+    font-family: 'Kalam', cursive, sans-serif;
+    font-weight: bold;
+    font-size: 1.5em;
+    line-height: 1;
+    transform: rotate(-2deg);
+    transition: color 0.3s ease;
 }
 
-.scribble-highlight {
-    position: relative;
-    z-index: 1;
-    white-space: nowrap;
-}
-
-.scribble-highlight::before {
-    content: '';
-    position: absolute;
-    top: 10%;
-    left: -5px;
-    right: -5px;
-    bottom: 10%;
-    background-color: rgba(253, 224, 71, 0.6);
-    /* Yellow highlighter */
-    z-index: -1;
-    transform: rotate(-1deg);
-    border-radius: 20% 80% 20% 80% / 80% 20% 80% 20%;
-    animation: highlight 0.5s ease-out forwards;
-    transform-origin: left center;
-}
-
-/* Diagram Layout */
-.diagram-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-lg);
-    justify-content: center;
-    align-items: center;
-    margin: var(--spacing-xl) 0;
-    font-family: 'Kalam', cursive, var(--font-sans);
-    /* Fallback to sans if Kalam not loaded */
-}
-
-.diagram-node {
-    max-width: 250px;
-    text-align: center;
-}
-
-.diagram-arrow {
-    font-size: 2rem;
-    color: var(--color-text);
-    animation: wiggle 2s ease-in-out infinite;
-}
-
-/* Animations */
-@keyframes drawCircle {
-    0% {
-        clip-path: polygon(0 0, 0 0, 0 0);
-    }
-
-    100% {
-        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-    }
-}
-
-@keyframes highlight {
-    0% {
-        transform: scaleX(0) rotate(-1deg);
-    }
-
-    100% {
-        transform: scaleX(1) rotate(-1deg);
-    }
-}
-
-@keyframes wiggle {
-
-    0%,
-    100% {
-        transform: rotate(0deg);
-    }
-
-    25% {
-        transform: rotate(5deg);
-    }
-
-    75% {
-        transform: rotate(-5deg);
-    }
+[data-theme="dark"] .prose ul>li::before {
+    color: var(--color-secondary);
+    /* Gold in dark mode */
 }
 
 /* Colorful Math */
@@ -538,385 +259,7 @@ p {
     /* Blue relations */
 }
 
-/* Animations */
-.math-animate-float {
-    animation: float 3s ease-in-out infinite;
-}
-
-.prose code {
-    font-family: var(--font-mono);
-    background-color: var(--color-code-bg);
-    padding: 0.2em 0.4em;
-    border-radius: 4px;
-    font-size: 0.9em;
-}
-
-.prose pre {
-    background-color: var(--color-code-bg);
-    padding: var(--spacing-md);
-    border-radius: 8px;
-    overflow-x: auto;
-    margin: var(--spacing-lg) 0;
-}
-
-.prose pre code {
-    background-color: transparent;
-    padding: 0;
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
-}
-
-/* Brand Typography */
-.civic {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    color: var(--color-logo-text);
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-}
-
-.thesis {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-weight: 600;
-    color: var(--color-secondary);
-}
-
-/* Hand-drawn / Scribble Styles */
-.scribble-box {
-    border: 2px solid var(--color-text);
-    border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
-    padding: var(--spacing-md);
-    position: relative;
-    background: transparent;
-    transition: all 0.3s ease;
-}
-
-.scribble-box:hover {
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    transform: scale(1.01);
-}
-
-.scribble-circle {
-    position: relative;
-    display: inline-block;
-}
-
-.scribble-circle::before {
-    content: '';
-    position: absolute;
-    top: -10%;
-    left: -10%;
-    width: 120%;
-    height: 120%;
-    border: 3px solid #ef4444;
-    /* Red marker */
-    border-radius: 68% 32% 75% 25% / 55% 28% 72% 45%;
-    transform: rotate(-5deg);
-    pointer-events: none;
-    animation: drawCircle 0.8s ease-out forwards;
-}
-
-.scribble-highlight {
-    position: relative;
-    z-index: 1;
-    white-space: nowrap;
-}
-
-.scribble-highlight::before {
-    content: '';
-    position: absolute;
-    top: 10%;
-    left: -5px;
-    right: -5px;
-    bottom: 10%;
-    background-color: rgba(253, 224, 71, 0.6);
-    /* Yellow highlighter */
-    z-index: -1;
-    transform: rotate(-1deg);
-    border-radius: 20% 80% 20% 80% / 80% 20% 80% 20%;
-    animation: highlight 0.5s ease-out forwards;
-    transform-origin: left center;
-}
-
-/* Diagram Layout */
-.diagram-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-lg);
-    justify-content: center;
-    align-items: center;
-    margin: var(--spacing-xl) 0;
-    font-family: 'Kalam', cursive, var(--font-sans);
-    /* Fallback to sans if Kalam not loaded */
-}
-
-.diagram-node {
-    max-width: 250px;
-    text-align: center;
-}
-
-.diagram-arrow {
-    font-size: 2rem;
-    color: var(--color-text);
-    animation: wiggle 2s ease-in-out infinite;
-}
-
-/* Animations */
-@keyframes drawCircle {
-    0% {
-        clip-path: polygon(0 0, 0 0, 0 0);
-    }
-
-    100% {
-        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-    }
-}
-
-@keyframes highlight {
-    0% {
-        transform: scaleX(0) rotate(-1deg);
-    }
-
-    100% {
-        transform: scaleX(1) rotate(-1deg);
-    }
-}
-
-@keyframes wiggle {
-
-    0%,
-    100% {
-        transform: rotate(0deg);
-    }
-
-    25% {
-        transform: rotate(5deg);
-    }
-
-    75% {
-        transform: rotate(-5deg);
-    }
-}
-
-/* Colorful Math */
-.math-colorful .katex {
-    color: var(--color-primary);
-}
-
-.math-colorful .mord.mathnormal {
-    color: #ef4444;
-    /* Red variables */
-}
-
-.math-colorful .mbin {
-    color: #eab308;
-    /* Yellow operators */
-}
-
-.math-colorful .mrel {
-    color: #3b82f6;
-    /* Blue relations */
-}
-
-/* Animations */
-.math-animate-float {
-    animation: float 3s ease-in-out infinite;
-}
-
-.math-animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes float {
-
-    0%,
-    100% {
-        transform: translateY(0px);
-    }
-
-    50% {
-        transform: translateY(-10px);
-    }
-}
-
-/* Cinematic Utilities */
-.font-cinematic {
-    font-family: 'Playfair Display', serif;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    font-weight: 600;
-}
-
-/* Brand Typography */
-.civic {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    color: var(--color-logo-text);
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-}
-
-.thesis {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-weight: 600;
-    color: var(--color-secondary);
-}
-
-/* Hand-drawn / Scribble Styles */
-.scribble-box {
-    border: 2px solid var(--color-text);
-    border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
-    padding: var(--spacing-md);
-    position: relative;
-    background: transparent;
-    transition: all 0.3s ease;
-}
-
-.scribble-box:hover {
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    transform: scale(1.01);
-}
-
-.scribble-circle {
-    position: relative;
-    display: inline-block;
-}
-
-.scribble-circle::before {
-    content: '';
-    position: absolute;
-    top: -10%;
-    left: -10%;
-    width: 120%;
-    height: 120%;
-    border: 3px solid #ef4444;
-    /* Red marker */
-    border-radius: 68% 32% 75% 25% / 55% 28% 72% 45%;
-    transform: rotate(-5deg);
-    pointer-events: none;
-    animation: drawCircle 0.8s ease-out forwards;
-}
-
-.scribble-highlight {
-    position: relative;
-    z-index: 1;
-    white-space: nowrap;
-}
-
-.scribble-highlight::before {
-    content: '';
-    position: absolute;
-    top: 10%;
-    left: -5px;
-    right: -5px;
-    bottom: 10%;
-    background-color: rgba(253, 224, 71, 0.6);
-    /* Yellow highlighter */
-    z-index: -1;
-    transform: rotate(-1deg);
-    border-radius: 20% 80% 20% 80% / 80% 20% 80% 20%;
-    animation: highlight 0.5s ease-out forwards;
-    transform-origin: left center;
-}
-
-/* Diagram Layout */
-.diagram-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-lg);
-    justify-content: center;
-    align-items: center;
-    margin: var(--spacing-xl) 0;
-    font-family: 'Kalam', cursive, var(--font-sans);
-    /* Fallback to sans if Kalam not loaded */
-}
-
-.diagram-node {
-    max-width: 250px;
-    text-align: center;
-}
-
-.diagram-arrow {
-    font-size: 2rem;
-    color: var(--color-text);
-    animation: wiggle 2s ease-in-out infinite;
-}
-
-/* Animations */
-@keyframes drawCircle {
-    0% {
-        clip-path: polygon(0 0, 0 0, 0 0);
-    }
-
-    100% {
-        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-    }
-}
-
-@keyframes highlight {
-    0% {
-        transform: scaleX(0) rotate(-1deg);
-    }
-
-    100% {
-        transform: scaleX(1) rotate(-1deg);
-    }
-}
-
-@keyframes wiggle {
-
-    0%,
-    100% {
-        transform: rotate(0deg);
-    }
-
-    25% {
-        transform: rotate(5deg);
-    }
-
-    75% {
-        transform: rotate(-5deg);
-    }
-}
-
-/* Colorful Math */
-.math-colorful .katex {
-    color: var(--color-primary);
-}
-
-.math-colorful .mord.mathnormal {
-    color: #ef4444;
-    /* Red variables */
-}
-
-.math-colorful .mbin {
-    color: #eab308;
-    /* Yellow operators */
-}
-
-.math-colorful .mrel {
-    color: #3b82f6;
-    /* Blue relations */
-}
-
-/* Animations */
+/* Math Animations */
 .math-animate-float {
     animation: float 3s ease-in-out infinite;
 }
@@ -999,6 +342,155 @@ p {
     60% {
         transform: translate3d(4px, 0, 0);
     }
+}
+
+/* Brand Typography */
+.civic {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: var(--color-logo-text);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.thesis {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 600;
+    color: var(--color-secondary);
+}
+
+/* Hand-drawn / Scribble Styles */
+.scribble-box {
+    border: 2px solid var(--color-text);
+    border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
+    padding: var(--spacing-md);
+    position: relative;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.scribble-box:hover {
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    transform: scale(1.01);
+}
+
+.scribble-circle {
+    position: relative;
+    display: inline-block;
+}
+
+.scribble-circle::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 120%;
+    border: 3px solid #ef4444;
+    /* Red marker */
+    border-radius: 68% 32% 75% 25% / 55% 28% 72% 45%;
+    transform: rotate(-5deg);
+    pointer-events: none;
+    animation: drawCircle 0.8s ease-out forwards;
+}
+
+.scribble-highlight {
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+.scribble-highlight::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: -5px;
+    right: -5px;
+    bottom: 10%;
+    background-color: rgba(253, 224, 71, 0.6);
+    /* Yellow highlighter */
+    z-index: -1;
+    transform: rotate(-1deg);
+    border-radius: 20% 80% 20% 80% / 80% 20% 80% 20%;
+    animation: highlight 0.5s ease-out forwards;
+    transform-origin: left center;
+}
+
+/* Diagram Layout */
+.diagram-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    justify-content: center;
+    align-items: center;
+    margin: var(--spacing-xl) 0;
+    font-family: 'Kalam', cursive, var(--font-sans);
+    /* Fallback to sans if Kalam not loaded */
+}
+
+.diagram-node {
+    max-width: 250px;
+    text-align: center;
+}
+
+.diagram-arrow {
+    font-size: 2rem;
+    color: var(--color-text);
+    animation: wiggle 2s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes drawCircle {
+    0% {
+        clip-path: polygon(0 0, 0 0, 0 0);
+    }
+
+    100% {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+}
+
+@keyframes highlight {
+    0% {
+        transform: scaleX(0) rotate(-1deg);
+    }
+
+    100% {
+        transform: scaleX(1) rotate(-1deg);
+    }
+}
+
+@keyframes wiggle {
+
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(5deg);
+    }
+
+    75% {
+        transform: rotate(-5deg);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
 }
 
 /* Video Embed Styles */

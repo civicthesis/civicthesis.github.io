@@ -1,0 +1,96 @@
+---
+title: "Indexing GitHub Pages: The Subdomain Guide"
+description: "How to verify and index your Astro site when hosting on a GitHub project page."
+pubDate: 2024-04-05
+author: "Aryan"
+image: ""
+tags: ["Astro", "SEO", "GitHub", "Google"]
+---
+
+import CinematicText from "../../components/CinematicText.astro";
+import HandDrawnBox from "../../components/HandDrawnBox.astro";
+import Mermaid from "../../components/Mermaid.astro";
+import TypewriterCode from "../../components/TypewriterCode.astro";
+
+<CinematicText 
+  text="The Subdomain Challenge" 
+  font="cinematic" 
+  animation="slide-up" 
+  className="text-5xl text-center mb-12"
+/>
+
+Hosting on GitHub Pages is great, but if you are using a project site (e.g., `username.github.io/my-project`), things get a little tricky with SEO.
+
+You can't verify ownership of the entire `github.io` domain (obviously), so you need to tell Google specifically about your little corner of it.
+
+## The Verification Flow
+
+<Mermaid code={`
+graph TD
+    A[Search Console] -->|Select Property Type| B{URL Prefix}
+    B -->|Enter Full URL| C[https://user.github.io/repo]
+    C -->|Verify Method| D[HTML Tag]
+    D -->|Add Tag to| E[Layout.astro]
+    E -->|Deploy & Verify| F[Success!]
+    style F fill:#9f9,stroke:#333,stroke-width:2px
+`} />
+
+## Step 1: Astro Configuration
+
+First, ensure Astro knows about your subdirectory. This is critical for generating correct sitemap links.
+
+```javascript
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
+
+export default defineConfig({
+  site: 'https://your-username.github.io',
+  base: '/your-repo-name', // <--- The Magic Ingredient
+  integrations: [sitemap()],
+});
+```
+
+<HandDrawnBox title="Check Your Sitemap" variant="warning">
+  After building, check your `sitemap-0.xml`. The URLs MUST look like `https://user.github.io/repo/page`, not just `https://user.github.io/page`. The `base` config fixes this.
+</HandDrawnBox>
+
+## Step 2: Google Search Console
+
+This is where most people get stuck.
+
+1.  Go to **Google Search Console**.
+2.  Click **Add Property**.
+3.  **STOP!** Do not use the "Domain" option on the left.
+4.  Choose **URL Prefix** on the right.
+5.  Enter your **full URL**: `https://your-username.github.io/your-repo-name`.
+
+## Step 3: Verification
+
+Since you can't change DNS records for `github.io`, you must use the **HTML Tag** method.
+
+1.  Copy the meta tag Google gives you: `<meta name="google-site-verification" content="..." />`.
+2.  Paste it into the `<head>` of your main `Layout.astro` file.
+
+```astro
+<!-- src/layouts/Layout.astro -->
+<head>
+    <!-- ... other tags ... -->
+    <meta name="google-site-verification" content="YOUR_CODE_HERE" />
+</head>
+```
+
+## Step 4: Deploy and Verify
+
+1.  Push your changes to GitHub.
+2.  Wait for the deployment to finish.
+3.  Go back to Search Console and click **Verify**.
+
+Once verified, you can submit your sitemap URL: `https://your-username.github.io/your-repo-name/sitemap-index.xml`.
+
+<CinematicText 
+  text="Mission Accomplished" 
+  font="cinematic" 
+  animation="glitch" 
+  className="text-3xl text-center mt-12"
+/>
