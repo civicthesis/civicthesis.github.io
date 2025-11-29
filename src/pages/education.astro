@@ -1,0 +1,87 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import EducationCard from "../components/EducationCard.astro";
+
+const educationItems = await getCollection("education");
+const sortedItems = educationItems.sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<Layout title="Education | Civic Thesis">
+    <main>
+        <div class="container">
+            <header class="page-header">
+                <h1>Education</h1>
+                <p class="subtitle">
+                    Analysis, notes, and insights on courses and institutions.
+                </p>
+            </header>
+
+            <div class="education-grid">
+                {
+                    sortedItems.map((item) => (
+                        <EducationCard
+                            title={item.data.title}
+                            description={item.data.description}
+                            date={item.data.pubDate}
+                            image={item.data.image}
+                            institution={item.data.institution}
+                            courseType={item.data.courseType}
+                            tags={item.data.tags}
+                            href={`/education/${item.slug}`}
+                        />
+                    ))
+                }
+            </div>
+        </div>
+    </main>
+</Layout>
+
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    .page-header {
+        padding: 4rem 0;
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 3.5rem;
+        font-weight: 700;
+        font-style: italic;
+        margin-bottom: 1rem;
+        color: var(--color-heading);
+    }
+
+    .subtitle {
+        font-size: 1.2rem;
+        color: var(--color-text-muted);
+        line-height: 1.6;
+    }
+
+    .education-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+        padding-bottom: 6rem;
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        .education-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

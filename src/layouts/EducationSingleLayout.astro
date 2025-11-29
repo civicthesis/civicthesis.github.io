@@ -1,0 +1,201 @@
+---
+import Layout from "./Layout.astro";
+import { formatDate } from "../utils";
+import OptimizedImage from "../components/OptimizedImage.astro";
+
+interface Props {
+    title: string;
+    description: string;
+    pubDate: Date;
+    image?: string;
+    institution?: string;
+    courseType?: string;
+}
+
+const { title, description, pubDate, image, institution, courseType } =
+    Astro.props;
+---
+
+<Layout title={title}>
+    <main>
+        <article class="education-article">
+            <header class="education-header">
+                <div class="container">
+                    <div class="meta">
+                        {
+                            institution && courseType && (
+                                <span class="institution-badge">
+                                    {institution} • {courseType}
+                                </span>
+                            )
+                        }
+                        <time datetime={pubDate.toISOString()}>
+                            {formatDate(pubDate)}
+                        </time>
+                    </div>
+                    <h1>{title}</h1>
+                    <p class="description">{description}</p>
+                </div>
+                {
+                    image && (
+                        <div class="hero-image-wrapper">
+                            <OptimizedImage
+                                src={image}
+                                alt={title}
+                                style="clean"
+                                animation="zoom-in"
+                                class="education-hero-image"
+                            />
+                        </div>
+                    )
+                }
+            </header>
+
+            <div class="container content-container">
+                <div class="prose">
+                    <slot />
+                </div>
+            </div>
+        </article>
+    </main>
+</Layout>
+
+<style>
+    .education-article {
+        padding-bottom: 6rem;
+    }
+
+    .education-header {
+        padding: 6rem 0 4rem;
+        text-align: center;
+        background: linear-gradient(
+            to bottom,
+            var(--color-bg) 0%,
+            var(--color-surface) 100%
+        );
+        border-bottom: 1px solid var(--color-border);
+        margin-bottom: 4rem;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    .content-container {
+        max-width: 800px;
+    }
+
+    .meta {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        color: var(--color-text-muted);
+        font-size: 0.95rem;
+        font-weight: 500;
+        flex-wrap: wrap;
+    }
+
+    .institution-badge {
+        background: var(--color-primary-muted);
+        color: var(--color-primary);
+        padding: 0.25rem 0.85rem;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.02em;
+    }
+
+    h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 3.5rem;
+        font-weight: 700;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+        color: var(--color-heading);
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .description {
+        font-size: 1.35rem;
+        color: var(--color-text);
+        max-width: 750px;
+        margin: 0 auto;
+        line-height: 1.6;
+        opacity: 0.9;
+    }
+
+    .hero-image-wrapper {
+        margin-top: 4rem;
+        max-width: 1100px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0 1.5rem;
+    }
+
+    /* Target the OptimizedImage component styles */
+    :global(.education-hero-image) {
+        width: 100%;
+        max-height: 500px;
+        object-fit: cover;
+        border-radius: 16px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .prose {
+        font-size: 1.15rem;
+        line-height: 1.8;
+        color: var(--color-text);
+    }
+
+    .prose :global(h2) {
+        font-family: "Playfair Display", serif;
+        font-size: 2.25rem;
+        margin-top: 3.5rem;
+        margin-bottom: 1.5rem;
+        color: var(--color-heading);
+        border-bottom: 2px solid var(--color-border);
+        padding-bottom: 0.5rem;
+    }
+
+    .prose :global(h3) {
+        font-size: 1.5rem;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--color-heading);
+        font-weight: 700;
+    }
+
+    .prose :global(p) {
+        margin-bottom: 1.75rem;
+    }
+
+    .prose :global(ul),
+    .prose :global(ol) {
+        margin-bottom: 1.75rem;
+        padding-left: 1.5rem;
+    }
+
+    .prose :global(li) {
+        margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        .education-header {
+            padding: 4rem 0 3rem;
+        }
+
+        .hero-image-wrapper {
+            margin-top: 2.5rem;
+        }
+    }
+</style>

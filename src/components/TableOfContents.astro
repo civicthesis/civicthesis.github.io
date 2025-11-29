@@ -1,0 +1,100 @@
+---
+import type { MarkdownHeading } from "astro";
+
+interface Props {
+    headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+
+// Filter out h1 (title) and keep only h2 and h3
+const toc = headings.filter((h) => h.depth > 1 && h.depth <= 3);
+---
+
+<nav class="toc">
+    <h3 class="toc-title">On This Page</h3>
+    <ul class="toc-list">
+        {
+            toc.map((heading) => (
+                <li class={`toc-item depth-${heading.depth}`}>
+                    <a href={`#${heading.slug}`}>{heading.text}</a>
+                </li>
+            ))
+        }
+    </ul>
+</nav>
+
+<style>
+    .toc {
+        position: sticky;
+        top: 6rem; /* Adjust based on header height + padding */
+        max-height: calc(100vh - 8rem);
+        overflow-y: auto;
+        padding-left: 1.5rem;
+        border-left: 1px solid var(--color-border);
+    }
+
+    @media (max-width: 1024px) {
+        .toc {
+            position: static;
+            height: 100%;
+            max-height: none;
+            padding-left: 0;
+            border-left: none;
+        }
+    }
+
+    .toc-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 1rem;
+        color: var(--color-heading);
+    }
+
+    .toc-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .toc-item a {
+        color: var(--color-text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.2s ease;
+        display: block;
+        line-height: 1.4;
+    }
+
+    .toc-item a:hover {
+        color: var(--color-primary);
+    }
+
+    .toc-item.depth-3 {
+        padding-left: 1rem;
+        font-size: 0.85rem;
+    }
+
+    /* Scrollbar styling */
+    .toc::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .toc::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .toc::-webkit-scrollbar-thumb {
+        background: var(--color-border);
+        border-radius: 4px;
+    }
+
+    .toc::-webkit-scrollbar-thumb:hover {
+        background: var(--color-text-muted);
+    }
+</style>

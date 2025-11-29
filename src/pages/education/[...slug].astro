@@ -1,0 +1,48 @@
+---
+import { getCollection } from "astro:content";
+import CourseLayout from "../../layouts/CourseLayout.astro";
+import EducationSingleLayout from "../../layouts/EducationSingleLayout.astro";
+
+export async function getStaticPaths() {
+    const educationItems = await getCollection("education");
+    return educationItems.map((item) => ({
+        params: { slug: item.slug },
+        props: item,
+    }));
+}
+
+const item = Astro.props;
+const { Content, headings } = await item.render();
+
+const isCourseContent =
+    item.data.type === "unit" || item.data.type === "subject";
+const courseTag = item.data.tags ? item.data.tags[0] : "Data Science";
+---
+
+{
+    isCourseContent ? (
+        <CourseLayout
+            title={item.data.title}
+            currentSlug={item.slug}
+            courseTag={courseTag}
+            courseTitle={courseTag}
+            headings={headings}
+        >
+            <article class="prose">
+                <h1>{item.data.title}</h1>
+                <Content />
+            </article>
+        </CourseLayout>
+    ) : (
+        <EducationSingleLayout
+            title={item.data.title}
+            description={item.data.description}
+            pubDate={item.data.pubDate}
+            image={item.data.image}
+            institution={item.data.institution}
+            courseType={item.data.courseType}
+        >
+            <Content />
+        </EducationSingleLayout>
+    )
+}

@@ -8,6 +8,7 @@ interface Props {
 	description?: string;
 	image?: string;
 	type?: "website" | "article";
+	fullWidth?: boolean;
 }
 
 const {
@@ -15,6 +16,7 @@ const {
 	description = "A minimal, modern blog.",
 	image = "/favicon.png",
 	type = "website",
+	fullWidth = false,
 } = Astro.props;
 
 const canonicalURL = new URL(
@@ -91,7 +93,7 @@ const socialImageURL = new URL(image, Astro.url);
 	</head>
 	<body>
 		<Header />
-		<main class="container">
+		<main class={fullWidth ? "" : "container"}>
 			<slot />
 		</main>
 		<Footer />

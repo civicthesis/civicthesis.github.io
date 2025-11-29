@@ -1,0 +1,323 @@
+---
+import { getCollection } from "astro:content";
+
+interface Props {
+    currentSlug: string;
+    courseTag: string;
+    courseTitle?: string;
+}
+
+const { currentSlug, courseTag, courseTitle = courseTag } = Astro.props;
+
+const allEducation = await getCollection("education");
+
+// Filter items for this course
+const courseItems = allEducation.filter((item) => {
+    return item.data.tags.includes(courseTag) || item.data.title === courseTag;
+});
+
+// Organize into hierarchy
+const subjects = courseItems.filter((item) => item.data.type === "subject");
+const units = courseItems.filter((item) => item.data.type === "unit");
+
+// Sort subjects by order
+subjects.sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
+
+// Map units to subjects
+const structure = subjects.map((subject) => {
+    const subjectUnits = units.filter(
+        (unit) =>
+            unit.data.subject === subject.slug.split("/").pop() ||
+            unit.data.parent === subject.slug ||
+            unit.data.tags.includes(subject.data.title),
+    );
+    subjectUnits.sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
+
+    // Check if this subject contains the active unit
+    const isActive = subjectUnits.some((unit) => unit.slug === currentSlug);
+
+    return {
+        subject,
+        units: subjectUnits,
+        isActive,
+    };
+});
+---
+
+<aside class="course-sidebar">
+    <div class="sidebar-header">
+        <a href="/education" class="back-link">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><line x1="19" y1="12" x2="5" y2="12"></line><polyline
+                    points="12 19 5 12 12 5"></polyline></svg
+            >
+            Back to Education
+        </a>
+        <h3>{courseTitle}</h3>
+    </div>
+    <nav class="sidebar-nav">
+        {
+            structure.map(({ subject, units, isActive }) => (
+                <details class="subject-group" open={isActive}>
+                    <summary class="subject-summary">
+                        <span class="subject-title">{subject.data.title}</span>
+                        <svg
+                            class="chevron"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </summary>
+
+                    {units.length > 0 && (
+                        <ul class="unit-list">
+                            {units.map((unit) => (
+                                <li class="unit-item">
+                                    <a
+                                        href={`/education/${unit.slug}`}
+                                        class={
+                                            currentSlug === unit.slug
+                                                ? "active"
+                                                : ""
+                                        }
+                                    >
+                                        {unit.data.title}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </details>
+            ))
+        }
+    </nav>
+</aside>
+
+<style>
+    .course-sidebar {
+        width: 300px;
+        flex-shrink: 0;
+        background: var(--color-bg);
+        border-right: 1px solid var(--color-border);
+        height: calc(100vh - 80px);
+        position: sticky;
+        top: 80px;
+        overflow-y: auto;
+        padding: 1.5rem 1rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Scrollbar Styling */
+    .course-sidebar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .course-sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .course-sidebar::-webkit-scrollbar-thumb {
+        background: var(--color-border);
+        border-radius: 10px;
+    }
+
+    .sidebar-header {
+        margin-bottom: 2rem;
+        padding: 0 0.5rem 1rem;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .back-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--color-text-muted);
+        text-decoration: none;
+        margin-bottom: 0.75rem;
+        transition: color 0.2s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .back-link:hover {
+        color: var(--color-primary);
+    }
+
+    .sidebar-header h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--color-heading);
+        line-height: 1.2;
+    }
+
+    .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .subject-group {
+        border-radius: 8px;
+        transition: background-color 0.2s ease;
+    }
+
+    .subject-group[open] {
+        background-color: var(
+            --color-surface
+        ); /* Subtle background when open */
+    }
+
+    .subject-summary {
+        list-style: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 0.75rem;
+        color: var(--color-heading);
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        border-radius: 8px;
+        user-select: none;
+    }
+
+    .subject-summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .subject-summary:hover {
+        color: var(--color-primary);
+        background-color: var(--color-surface);
+    }
+
+    .subject-title {
+        letter-spacing: 0.01em;
+    }
+
+    .chevron {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: var(--color-text-muted);
+        width: 14px;
+        height: 14px;
+    }
+
+    details[open] .chevron {
+        transform: rotate(180deg);
+        color: var(--color-primary);
+    }
+
+    .unit-list {
+        list-style: none;
+        padding: 0.25rem 0 0.75rem 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+        position: relative;
+    }
+
+    .unit-item {
+        position: relative;
+    }
+
+    .unit-item a {
+        display: block;
+        padding: 0.5rem 0.75rem 0.5rem 2.25rem; /* Indented */
+        font-size: 0.85rem;
+        color: var(--color-text-muted);
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border-radius: 6px;
+        line-height: 1.4;
+        position: relative;
+        margin: 0 0.5rem;
+    }
+
+    /* Vertical line connecting units */
+    .unit-item::before {
+        content: "";
+        position: absolute;
+        left: 1.25rem; /* Align with indentation */
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: var(--color-border);
+        opacity: 0.5;
+    }
+
+    /* Hide top part of line for first item */
+    .unit-item:first-child::before {
+        top: 0.7rem;
+    }
+
+    /* Hide bottom part of line for last item */
+    .unit-item:last-child::before {
+        bottom: auto;
+        height: 0.7rem;
+    }
+
+    .unit-item a:hover {
+        color: var(--color-text);
+        background: rgba(0, 0, 0, 0.03); /* Very subtle hover */
+    }
+
+    /* Dark mode adjustment for hover */
+    :global([data-theme="dark"]) .unit-item a:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .unit-item a.active {
+        color: var(--color-primary);
+        background: var(--color-primary-muted);
+        font-weight: 600;
+    }
+
+    /* Active dot indicator */
+    .unit-item a.active::after {
+        content: "";
+        position: absolute;
+        left: 0.75rem; /* Position relative to padding */
+        top: 50%;
+        transform: translateY(-50%);
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: var(--color-primary);
+    }
+
+    /* @media (max-width: 1024px) {
+        .course-sidebar {
+            display: none;
+        }
+    } */
+    /* Sidebar visibility is now handled by the parent container in CourseLayout */
+    @media (max-width: 1024px) {
+        .course-sidebar {
+            width: 300px; /* Ensure width in drawer */
+            height: 100%;
+            border-right: none;
+            top: 0;
+        }
+    }
+</style>
