@@ -1,47 +1,31 @@
 ---
 interface Props {
     title?: string;
-    variant?: "default" | "note" | "tip" | "warning";
+    variant?: "default" | "note" | "tip" | "warning" | "danger";
     color?: string;
 }
 
 const { title, variant = "default", color } = Astro.props;
 
-const variants = {
-    default: {
-        bg: "#f3f4f6",
-        border: "#4b5563",
-        icon: "📝",
-    },
-    note: {
-        bg: "#eff6ff", // blue-50
-        border: "#3b82f6", // blue-500
-        icon: "💡",
-    },
-    tip: {
-        bg: "#f0fdf4", // green-50
-        border: "#22c55e", // green-500
-        icon: "✨",
-    },
-    warning: {
-        bg: "#fefce8", // yellow-50
-        border: "#eab308", // yellow-500
-        icon: "⚠️",
-    },
+const icons = {
+    default: "📝",
+    note: "💡",
+    tip: "✨",
+    warning: "⚠️",
+    danger: "🔥",
 };
 
-const style = variants[variant];
-const customStyle = color ? { ...style, border: color } : style;
+const icon = icons[variant] || icons.default;
 ---
 
 <div
-    class="hand-drawn-box"
-    style={`--box-bg: ${customStyle.bg}; --box-border: ${customStyle.border};`}
+    class={`hand-drawn-box ${variant}`}
+    style={color ? `--box-border: ${color};` : ""}
 >
     {
         title && (
             <div class="box-header">
-                <span class="icon">{customStyle.icon}</span>
+                <span class="icon">{icon}</span>
                 <span class="title">{title}</span>
             </div>
         )
@@ -64,6 +48,57 @@ const customStyle = color ? { ...style, border: color } : style;
         transition:
             transform 0.2s ease,
             box-shadow 0.2s ease;
+        color: var(--color-text);
+    }
+
+    /* Default Variant */
+    .hand-drawn-box.default {
+        --box-bg: #f3f4f6;
+        --box-border: #4b5563;
+    }
+    :global([data-theme="dark"]) .hand-drawn-box.default {
+        --box-bg: #1f2937;
+        --box-border: #9ca3af;
+    }
+
+    /* Note Variant */
+    .hand-drawn-box.note {
+        --box-bg: #eff6ff;
+        --box-border: #3b82f6;
+    }
+    :global([data-theme="dark"]) .hand-drawn-box.note {
+        --box-bg: #1e3a8a;
+        --box-border: #60a5fa;
+    }
+
+    /* Tip Variant */
+    .hand-drawn-box.tip {
+        --box-bg: #f0fdf4;
+        --box-border: #22c55e;
+    }
+    :global([data-theme="dark"]) .hand-drawn-box.tip {
+        --box-bg: #14532d;
+        --box-border: #4ade80;
+    }
+
+    /* Warning Variant */
+    .hand-drawn-box.warning {
+        --box-bg: #fefce8;
+        --box-border: #eab308;
+    }
+    :global([data-theme="dark"]) .hand-drawn-box.warning {
+        --box-bg: #713f12;
+        --box-border: #facc15;
+    }
+
+    /* Danger Variant */
+    .hand-drawn-box.danger {
+        --box-bg: #fff1f2;
+        --box-border: #fb7185;
+    }
+    :global([data-theme="dark"]) .hand-drawn-box.danger {
+        --box-bg: #881337;
+        --box-border: #f43f5e;
     }
 
     .hand-drawn-box:hover {

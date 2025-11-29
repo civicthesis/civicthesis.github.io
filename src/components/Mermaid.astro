@@ -45,7 +45,41 @@ const content = code || (await Astro.slots.render("default"));
     import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
 
     class MermaidDiagram extends HTMLElement {
+        constructor() {
+            super();
+            this.observer = null;
+            this.renderDiagram = this.renderDiagram.bind(this);
+        }
+
         async connectedCallback() {
+            // Initial render
+            await this.renderDiagram();
+
+            // Watch for theme changes
+            this.observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (
+                        mutation.type === "attributes" &&
+                        mutation.attributeName === "data-theme"
+                    ) {
+                        this.renderDiagram();
+                    }
+                });
+            });
+
+            this.observer.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ["data-theme"],
+            });
+        }
+
+        disconnectedCallback() {
+            if (this.observer) {
+                this.observer.disconnect();
+            }
+        }
+
+        async renderDiagram() {
             let code = this.dataset.code;
             if (!code) return;
 
@@ -61,30 +95,37 @@ const content = code || (await Astro.slots.render("default"));
 
             const isDark =
                 document.documentElement.getAttribute("data-theme") === "dark";
-            const primaryColor = getComputedStyle(document.documentElement)
-                .getPropertyValue("--color-primary")
-                .trim();
-            const secondaryColor = getComputedStyle(document.documentElement)
-                .getPropertyValue("--color-secondary")
-                .trim();
-            const textColor = getComputedStyle(document.documentElement)
-                .getPropertyValue("--color-text")
-                .trim();
-            const borderColor = getComputedStyle(document.documentElement)
-                .getPropertyValue("--color-border")
-                .trim();
-            const bgColor = getComputedStyle(document.documentElement)
-                .getPropertyValue("--color-bg")
-                .trim();
+
+            // Get current CSS variables with fallbacks
+            const style = getComputedStyle(document.documentElement);
+            const primaryColor =
+                style.getPropertyValue("--color-primary").trim() ||
+                (isDark ? "#ffffff" : "#000000");
+            const secondaryColor =
+                style.getPropertyValue("--color-secondary").trim() || "#888888";
+            const textColor =
+                style.getPropertyValue("--color-text").trim() ||
+                (isDark ? "#ffffff" : "#000000");
+            const borderColor =
+                style.getPropertyValue("--color-border").trim() || "#cccccc";
+            const bgColor =
+                style.getPropertyValue("--color-bg").trim() ||
+                (isDark ? "#1a1a1a" : "#ffffff");
+            const surfaceColor =
+                style.getPropertyValue("--color-surface").trim() ||
+                (isDark ? "#2a2a2a" : "#f5f5f5");
 
             try {
+                // Re-initialize with new theme variables
                 mermaid.initialize({
                     startOnLoad: false,
                     theme: "base",
                     securityLevel: "loose",
                     fontFamily: '"Kalam", cursive',
                     themeVariables: {
-                        primaryColor: isDark ? "#333" : "#fff",
+                        darkMode: isDark,
+                        background: bgColor,
+                        primaryColor: isDark ? surfaceColor : "#fff",
                         primaryTextColor: textColor,
                         primaryBorderColor: textColor,
                         lineColor: textColor,
@@ -99,19 +140,25 @@ const content = code || (await Astro.slots.render("default"));
                         clusterBorder: textColor,
                         defaultLinkColor: textColor,
                         titleColor: textColor,
-                        edgeLabelBackground: bgColor,
+                        edgeLabelBackground: isDark ? surfaceColor : "#fff",
+                        nodeTextColor: textColor,
 
                         // Sequence Diagram specific
                         actorBorder: textColor,
-                        actorBkg: primaryColor,
+                        actorBkg: isDark ? surfaceColor : "#fff",
+                        actorTextColor: textColor,
+                        actorLineColor: textColor,
                         signalColor: textColor,
                         signalTextColor: textColor,
-                        labelBoxBkgColor: bgColor,
+                        labelBoxBkgColor: isDark ? surfaceColor : "#fff",
                         labelBoxBorderColor: textColor,
                         loopTextColor: textColor,
+                        noteBkgColor: isDark ? surfaceColor : "#fff",
+                        noteBorderColor: textColor,
+                        noteTextColor: textColor,
 
                         // Gantt specific
-                        sectionBkgColor: isDark ? "#222" : "#f9f9f9",
+                        sectionBkgColor: isDark ? surfaceColor : "#f9f9f9",
                         altSectionBkgColor: bgColor,
                         sectionBkgColor2: bgColor,
                         taskBorderColor: textColor,
@@ -126,18 +173,21 @@ const content = code || (await Astro.slots.render("default"));
                 });
 
                 const id = "mermaid-" + Math.random().toString(36).substr(2, 9);
-                const { svg } = await mermaid.render(id, code);
+                container.innerHTML = "";
 
+                const { svg } = await mermaid.render(id, code);
                 container.innerHTML = svg;
 
-                // Post-process SVG for extra hand-drawn feel (optional)
+                // Post-process SVG
                 const svgElement = container.querySelector("svg");
                 if (svgElement) {
                     svgElement.style.maxWidth = "100%";
                     svgElement.style.height = "auto";
+                    svgElement.style.color = textColor;
                 }
 
-                if (loading) loading.remove();
+                if (loading) loading.style.display = "none";
+                container.style.opacity = "1";
             } catch (error) {
                 console.error("Mermaid rendering error:", error);
                 if (container)
