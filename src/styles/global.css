@@ -28,7 +28,7 @@
 [data-theme="dark"] {
     /* Color Palette - Dark Mode */
     --color-bg: #1F2023;
-    /* Dark Charcoal from Image */
+    /* Dark Charcoal */
     --color-text: #e2e8f0;
     --color-primary: #ffffff;
     /* White for primary elements in dark mode */
@@ -112,6 +112,10 @@ p {
 }
 
 /* Layout Utilities */
+.hidden {
+    display: none !important;
+}
+
 .container {
     width: 100%;
     max-width: 800px;
@@ -225,7 +229,6 @@ p {
     position: absolute;
     left: 0;
     color: var(--color-primary);
-    /* Dark in light mode */
     font-family: 'Kalam', cursive, sans-serif;
     font-weight: bold;
     font-size: 1.5em;
@@ -236,7 +239,6 @@ p {
 
 [data-theme="dark"] .prose ul>li::before {
     color: var(--color-secondary);
-    /* Gold in dark mode */
 }
 
 /* Colorful Math */
@@ -246,17 +248,14 @@ p {
 
 .math-colorful .mord.mathnormal {
     color: #ef4444;
-    /* Red variables */
 }
 
 .math-colorful .mbin {
     color: #eab308;
-    /* Yellow operators */
 }
 
 .math-colorful .mrel {
     color: #3b82f6;
-    /* Blue relations */
 }
 
 /* Math Animations */
@@ -291,6 +290,7 @@ p {
 .text-gradient-gold {
     background: linear-gradient(to right, #C5A059, #fcd34d, #C5A059);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     background-size: 200% auto;
     animation: shine 3s linear infinite;
@@ -344,6 +344,22 @@ p {
     }
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
 /* Brand Typography */
 .civic {
     font-family: 'Montserrat', sans-serif;
@@ -388,7 +404,6 @@ p {
     width: 120%;
     height: 120%;
     border: 3px solid #ef4444;
-    /* Red marker */
     border-radius: 68% 32% 75% 25% / 55% 28% 72% 45%;
     transform: rotate(-5deg);
     pointer-events: none;
@@ -409,7 +424,6 @@ p {
     right: -5px;
     bottom: 10%;
     background-color: rgba(253, 224, 71, 0.6);
-    /* Yellow highlighter */
     z-index: -1;
     transform: rotate(-1deg);
     border-radius: 20% 80% 20% 80% / 80% 20% 80% 20%;
@@ -426,7 +440,6 @@ p {
     align-items: center;
     margin: var(--spacing-xl) 0;
     font-family: 'Kalam', cursive, var(--font-sans);
-    /* Fallback to sans if Kalam not loaded */
 }
 
 .diagram-node {
@@ -477,22 +490,6 @@ p {
     }
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
-}
-
 /* Video Embed Styles */
 .video-container-wrapper {
     margin: 2rem 0;
@@ -513,7 +510,6 @@ p {
 .video-container {
     position: relative;
     padding-bottom: 56.25%;
-    /* 16:9 Aspect Ratio */
     height: 0;
     overflow: hidden;
     border-radius: 8px;
