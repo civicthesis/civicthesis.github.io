@@ -10,13 +10,80 @@ import Search from "./Search.astro";
       <span class="thesis">Thesis</span>
     </a>
 
-    <nav>
-      <a href="/">Blog</a>
-      <a href="/stories">Stories</a>
-      <a href="/education">Education</a>
+    <div class="header-actions">
+      <!-- Search is always visible -->
       <Search />
-      <ThemeToggle />
-    </nav>
+
+      <!-- Desktop Navigation -->
+      <nav class="desktop-nav">
+        <a href="/">Blog</a>
+        <a href="/stories">Stories</a>
+        <a href="/education">Education</a>
+        <ThemeToggle />
+      </nav>
+
+      <!-- Mobile Menu Button -->
+      <button
+        id="mobile-menu-btn"
+        class="mobile-menu-btn"
+        aria-label="Open Menu"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu" class="mobile-menu">
+    <div class="mobile-menu-content">
+      <div class="mobile-header">
+        <span class="mobile-title">Menu</span>
+        <button
+          id="close-menu-btn"
+          class="close-menu-btn"
+          aria-label="Close Menu"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <nav class="mobile-nav">
+        <a href="/">Blog</a>
+        <a href="/stories">Stories</a>
+        <a href="/education">Education</a>
+        <div class="mobile-theme-toggle">
+          <span>Theme</span>
+          <ThemeToggle />
+        </div>
+      </nav>
+    </div>
+    <div class="mobile-backdrop"></div>
   </div>
 </header>
 
@@ -29,6 +96,9 @@ import Search from "./Search.astro";
     position: sticky;
     top: 0;
     z-index: 40;
+    transition:
+      background-color 0.3s ease,
+      border-color 0.3s ease;
   }
 
   .header-content {
@@ -44,6 +114,7 @@ import Search from "./Search.astro";
     gap: 0.4rem;
     line-height: 1;
     text-decoration: none;
+    z-index: 50;
   }
 
   .civic {
@@ -63,32 +134,201 @@ import Search from "./Search.astro";
     color: var(--color-secondary);
   }
 
-  nav {
+  .header-actions {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
+    gap: 1.5rem;
   }
 
-  nav a {
+  /* Desktop Nav */
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .desktop-nav a {
     font-weight: 600;
     font-size: 0.95rem;
+    color: var(--color-text);
+    position: relative;
   }
 
-  nav a:hover {
+  .desktop-nav a:hover {
     color: var(--color-primary);
   }
 
-  header {
-    margin-bottom: var(--spacing-xl);
+  .desktop-nav a::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: var(--color-secondary);
+    transition: width 0.3s ease;
   }
 
+  .desktop-nav a:hover::after {
+    width: 100%;
+  }
+
+  /* Mobile Menu Button */
+  .mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text);
+    padding: 0.5rem;
+  }
+
+  /* Mobile Menu */
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 100;
+    visibility: hidden;
+    opacity: 0;
+    transition:
+      visibility 0s linear 0.3s,
+      opacity 0.3s ease;
+  }
+
+  .mobile-menu.open {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 0s;
+  }
+
+  .mobile-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 101;
+  }
+
+  .mobile-menu-content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80%;
+    max-width: 300px;
+    height: 100%;
+    background: var(--color-bg);
+    z-index: 102;
+    padding: 2rem;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -5px 0 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .mobile-menu.open .mobile-menu-content {
+    transform: translateX(0);
+  }
+
+  .mobile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mobile-title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .close-menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text);
+    padding: 0.5rem;
+  }
+
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .mobile-nav a {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .mobile-theme-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  /* Responsive Styles */
   @media (max-width: 768px) {
-    header {
-      margin-bottom: 0;
+    .desktop-nav {
+      display: none;
     }
+
+    .mobile-menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .civic,
     .thesis {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
+    }
+
+    .header-actions {
+      gap: 0.75rem;
+    }
+
+    /* Ensure logo doesn't break */
+    .logo {
+      gap: 0.25rem;
     }
   }
 </style>
+
+<script>
+  const menuBtn = document.getElementById("mobile-menu-btn");
+  const closeBtn = document.getElementById("close-menu-btn");
+  const mobileMenu = document.getElementById("mobile-menu");
+  const backdrop = document.querySelector(".mobile-backdrop");
+
+  function toggleMenu() {
+    mobileMenu?.classList.toggle("open");
+    document.body.style.overflow = mobileMenu?.classList.contains("open")
+      ? "hidden"
+      : "";
+  }
+
+  menuBtn?.addEventListener("click", toggleMenu);
+  closeBtn?.addEventListener("click", toggleMenu);
+  backdrop?.addEventListener("click", toggleMenu);
+
+  // Close menu when clicking a link
+  const mobileLinks = document.querySelectorAll(".mobile-nav a");
+  mobileLinks.forEach((link) => {
+    link.addEventListener("click", toggleMenu);
+  });
+</script>

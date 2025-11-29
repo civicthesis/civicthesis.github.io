@@ -52,6 +52,21 @@
           class="close-trigger"
         >
           <span class="esc-hint">ESC</span>
+          <svg
+            class="close-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
         </button>
       </div>
       <div class="search-body">
@@ -110,6 +125,8 @@
     align-items: center;
     gap: 0.5rem;
     transition: all 0.2s ease;
+    z-index: 50; /* Ensure it's clickable */
+    position: relative;
   }
 
   .search-trigger:hover {
@@ -193,6 +210,7 @@
   .search-icon {
     color: var(--color-primary);
     opacity: 0.8;
+    flex-shrink: 0;
   }
 
   #search-input {
@@ -204,12 +222,16 @@
     outline: none;
     font-family: var(--font-sans);
     font-weight: 500;
+    min-width: 0; /* Prevent overflow */
   }
 
   #search-input::placeholder {
     color: var(--color-text);
     opacity: 0.4;
     font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .esc-hint {
@@ -221,6 +243,13 @@
     padding: 0.2rem 0.4rem;
     border-radius: 4px;
     transition: all 0.2s ease;
+    display: block;
+  }
+
+  .close-icon {
+    display: none;
+    color: var(--color-text);
+    opacity: 0.6;
   }
 
   .close-trigger:hover .esc-hint {
@@ -228,11 +257,19 @@
     border-color: var(--color-text);
   }
 
+  .close-trigger:hover .close-icon {
+    opacity: 1;
+  }
+
   .close-trigger {
     background: none;
     border: none;
     cursor: pointer;
     padding: 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* Search Body */
@@ -260,9 +297,7 @@
   }
 
   .results-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    opacity: 0.7;
   }
 
   /* Search Footer */
@@ -374,14 +409,34 @@
     box-shadow: 0 0 40px rgba(197, 160, 89, 0.15); /* Gold glow */
   }
 
-  :global([data-theme="dark"]) .search-shortcut {
-    background: rgba(255, 255, 255, 0.1);
-  }
+  @media (max-width: 768px) {
+    .search-shortcut {
+      display: none;
+    }
 
-  :global([data-theme="dark"]) :global(.search-result-item.selected) {
-    background-color: rgba(197, 160, 89, 0.15);
+    .search-trigger {
+      padding: 0.75rem; /* Larger touch target */
+    }
+
+    .search-header {
+      padding: 1rem;
+      gap: 0.75rem;
+    }
+
+    #search-input {
+      font-size: 1.1rem;
+    }
+
+    .esc-hint {
+      display: none;
+    }
+
+    .close-icon {
+      display: block;
+    }
   }
 </style>
+
 <script>
   // Dynamic import for Fuse.js to avoid build issues and reduce initial bundle size
   let Fuse: any;
@@ -437,8 +492,12 @@
   };
 
   const openSearch = async (e?: Event) => {
+    console.log("Opening search modal...");
     if (e) e.preventDefault();
-    if (!modal) return;
+    if (!modal) {
+      console.error("Search modal not found!");
+      return;
+    }
 
     modal.classList.remove("hidden");
     // Force reflow
@@ -554,7 +613,13 @@
   };
 
   // Initialize
-  searchBtn?.addEventListener("click", openSearch);
+  if (searchBtn) {
+    searchBtn.addEventListener("click", openSearch);
+    console.log("Search button listener attached");
+  } else {
+    console.error("Search button not found during initialization");
+  }
+
   closeBtn?.addEventListener("click", closeSearch);
   input?.addEventListener("input", handleSearch);
   document.addEventListener("keydown", handleKeydown);
