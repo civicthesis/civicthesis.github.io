@@ -1,0 +1,88 @@
+---
+title: "Embedding Maps and Graphs"
+description: "A guide to adding beautiful, animated maps and mathematical graphs to your Astro blog."
+pubDate: 2024-03-15
+author: "Aryan"
+image: ""
+tags: ["Astro", "Design", "Data Visualization"]
+---
+
+import MapEmbed from "../../components/MapEmbed.astro";
+import EquationGraph from "../../components/EquationGraph.astro";
+import CinematicText from "../../components/CinematicText.astro";
+
+<CinematicText 
+  text="Visualizing the World" 
+  font="cinematic" 
+  animation="blur-reveal" 
+  className="text-4xl text-center mb-12"
+/>
+
+In modern web design, static images often aren't enough. We need interactive, dynamic, and visually appealing ways to present data, whether it's a geographical location or a mathematical concept.
+
+This post demonstrates two new components we've added to our design system: `MapEmbed` for locations and `EquationGraph` for math.
+
+## 1. Cinematic Maps
+
+Standard Google Maps embeds can look jarring. We've wrapped them in a `MapEmbed` component that adds:
+- Rounded corners and a subtle "cinematic" border.
+- A smooth slide-up animation on scroll.
+- Dark mode support.
+
+### Example: IIT Madras Campus
+
+<MapEmbed 
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.003673430632!2d80.2209772759888!3d12.99159351487777!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a526761fc250297%3A0x8401a88e7602a94e!2sIIT%20Madras!5e0!3m2!1sen!2sin!4v1709228000000!5m2!1sen!2sin"
+    title="Indian Institute of Technology Madras"
+    height="450px"
+/>
+
+## 2. Mathematical Graphs
+
+For our data science courses, we often need to visualize functions. Instead of using static images, we can use SVG to draw them dynamically. The `EquationGraph` component:
+- Generates SVG paths from mathematical functions.
+- Animates the drawing of the line.
+- Includes a responsive grid.
+
+### Sine Wave
+
+The classic sine wave, fundamental to signal processing.
+
+<EquationGraph 
+    function="sin" 
+    title="y = sin(x)" 
+    color="#ef4444"
+/>
+
+### Quadratic Function
+
+A parabola, representing $y = x^2$.
+
+<EquationGraph 
+    function="quadratic" 
+    domain={[-3, 3]}
+    range={[-1, 10]}
+    title="y = x²" 
+    color="#3b82f6"
+/>
+
+### Custom Expression
+
+We can even plot custom expressions like a damped sine wave: $y = \sin(x) \cdot e^{-0.1x}$.
+
+<EquationGraph 
+    expression="Math.sin(x) * Math.exp(-0.1 * x)"
+    domain={[0, 20]}
+    range={[-1, 1]}
+    title="Damped Oscillation" 
+    color="#10b981"
+/>
+
+## Implementation Details
+
+These components are built using **Astro** and **Vanilla CSS**.
+
+- **Maps**: Use an `iframe` wrapped in a styled `div`. An `IntersectionObserver` triggers the entry animation.
+- **Graphs**: Use an SVG `<path>` element. The `d` attribute is calculated in the component script. The drawing animation is achieved using `stroke-dasharray` and `stroke-dashoffset`.
+
+This approach keeps our site fast (no heavy charting libraries for simple plots) and beautiful.

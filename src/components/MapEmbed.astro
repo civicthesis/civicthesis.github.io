@@ -1,0 +1,94 @@
+---
+interface Props {
+    src: string;
+    title?: string;
+    height?: string;
+    className?: string;
+}
+
+const { src, title, height = "400px", className = "" } = Astro.props;
+---
+
+<div class={`map-embed-wrapper ${className}`}>
+    <div class="map-frame" style={`height: ${height};`}>
+        <iframe
+            src={src}
+            width="100%"
+            height="100%"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title={title || "Map"}></iframe>
+    </div>
+    {title && <div class="map-caption">{title}</div>}
+</div>
+
+<style>
+    .map-embed-wrapper {
+        margin: 3rem 0;
+        opacity: 0;
+        transform: translateY(20px);
+        transition:
+            opacity 0.8s ease-out,
+            transform 0.8s ease-out;
+    }
+
+    .map-embed-wrapper.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .map-frame {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow:
+            0 10px 30px -5px rgba(0, 0, 0, 0.2),
+            0 0 0 1px rgba(0, 0, 0, 0.05);
+        background: var(--color-surface);
+        position: relative;
+    }
+
+    /* Cinematic border effect */
+    .map-frame::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 16px;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+        pointer-events: none;
+    }
+
+    .map-caption {
+        margin-top: 1rem;
+        text-align: center;
+        font-family: var(--font-serif);
+        font-style: italic;
+        color: var(--color-text-muted);
+        font-size: 0.95rem;
+    }
+
+    :global([data-theme="dark"]) .map-frame {
+        box-shadow:
+            0 10px 30px -5px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(255, 255, 255, 0.1);
+    }
+</style>
+
+<script>
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        },
+        { threshold: 0.1 },
+    );
+
+    document.querySelectorAll(".map-embed-wrapper").forEach((el) => {
+        observer.observe(el);
+    });
+</script>

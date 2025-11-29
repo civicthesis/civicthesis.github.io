@@ -1,0 +1,198 @@
+---
+interface Props {
+    function?: string; // Preset name: 'sin', 'cos', 'quadratic', 'cubic'
+    expression?: string; // JS expression string using 'x', e.g., 'Math.sin(x) * x'
+    domain?: [number, number];
+    range?: [number, number];
+    color?: string;
+    grid?: boolean;
+    title?: string;
+    height?: number;
+    width?: number;
+}
+
+const {
+    function: funcName = "sin",
+    expression,
+    domain = [-Math.PI * 2, Math.PI * 2],
+    range = [-2, 2],
+    color = "var(--color-primary)",
+    grid = true,
+    title,
+    height = 300,
+    width = 600,
+} = Astro.props;
+
+// Generate path data
+const points = 200;
+const [minX, maxX] = domain;
+const [minY, maxY] = range;
+
+const getY = (x: number) => {
+    if (expression) {
+        try {
+            // Safe-ish evaluation for simple math expressions
+            // In a real app, use a math parser library
+            return new Function("x", `return ${expression}`)(x);
+        } catch (e) {
+            return 0;
+        }
+    }
+
+    switch (funcName) {
+        case "sin":
+            return Math.sin(x);
+        case "cos":
+            return Math.cos(x);
+        case "quadratic":
+            return x * x;
+        case "cubic":
+            return x * x * x;
+        case "sigmoid":
+            return 1 / (1 + Math.exp(-x));
+        default:
+            return Math.sin(x);
+    }
+};
+
+// Coordinate mapping
+const mapX = (x: number) => ((x - minX) / (maxX - minX)) * width;
+const mapY = (y: number) => height - ((y - minY) / (maxY - minY)) * height;
+
+let pathData = "";
+for (let i = 0; i <= points; i++) {
+    const x = minX + (i / points) * (maxX - minX);
+    const y = getY(x);
+
+    // Clamp y to avoid drawing way outside
+    // const clampedY = Math.max(minY, Math.min(maxY, y));
+
+    const px = mapX(x);
+    const py = mapY(y);
+
+    if (i === 0) {
+        pathData += `M ${px} ${py}`;
+    } else {
+        pathData += ` L ${px} ${py}`;
+    }
+}
+
+// Grid generation
+const xTicks = 10;
+const yTicks = 5;
+const gridLines = [];
+
+if (grid) {
+    // Vertical lines
+    for (let i = 0; i <= xTicks; i++) {
+        const x = (i / xTicks) * width;
+        gridLines.push(
+            `<line x1="${x}" y1="0" x2="${x}" y2="${height}" stroke="var(--color-border)" stroke-width="1" opacity="0.3" />`,
+        );
+    }
+    // Horizontal lines
+    for (let i = 0; i <= yTicks; i++) {
+        const y = (i / yTicks) * height;
+        gridLines.push(
+            `<line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="var(--color-border)" stroke-width="1" opacity="0.3" />`,
+        );
+    }
+    // Axes
+    const zeroX = mapX(0);
+    const zeroY = mapY(0);
+    if (zeroX >= 0 && zeroX <= width) {
+        gridLines.push(
+            `<line x1="${zeroX}" y1="0" x2="${zeroX}" y2="${height}" stroke="var(--color-text)" stroke-width="2" opacity="0.5" />`,
+        );
+    }
+    if (zeroY >= 0 && zeroY <= height) {
+        gridLines.push(
+            `<line x1="0" y1="${zeroY}" x2="${width}" y2="${zeroY}" stroke="var(--color-text)" stroke-width="2" opacity="0.5" />`,
+        );
+    }
+}
+---
+
+<div class="equation-graph-wrapper">
+    <div
+        class="graph-container"
+        style={`max-width: ${width}px; aspect-ratio: ${width}/${height};`}
+    >
+        <svg
+            viewBox={`0 0 ${width} ${height}`}
+            preserveAspectRatio="xMidYMid meet"
+            class="graph-svg"
+        >
+            {grid && <g set:html={gridLines.join("")} />}
+            <path
+                d={pathData}
+                fill="none"
+                stroke={color}
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="function-path"></path>
+        </svg>
+    </div>
+    {title && <div class="graph-caption">{title}</div>}
+</div>
+
+<style>
+    .equation-graph-wrapper {
+        margin: 3rem 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .graph-container {
+        width: 100%;
+        background: var(--color-surface);
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow:
+            inset 0 2px 4px rgba(0, 0, 0, 0.05),
+            0 1px 2px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--color-border);
+        overflow: hidden;
+    }
+
+    .function-path {
+        stroke-dasharray: 2000;
+        stroke-dashoffset: 2000;
+        transition: stroke-dashoffset 2s ease-in-out;
+    }
+
+    .equation-graph-wrapper.visible .function-path {
+        stroke-dashoffset: 0;
+    }
+
+    .graph-caption {
+        margin-top: 0.75rem;
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        color: var(--color-text-muted);
+        background: var(--color-bg);
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        border: 1px solid var(--color-border);
+    }
+</style>
+
+<script>
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        },
+        { threshold: 0.3 },
+    );
+
+    document.querySelectorAll(".equation-graph-wrapper").forEach((el) => {
+        observer.observe(el);
+    });
+</script>
