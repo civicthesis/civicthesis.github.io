@@ -1,0 +1,83 @@
+---
+title: "The Future of Civic Tech"
+description: "Exploring how technology is reshaping civic engagement and urban planning through data visualization and open dialogue."
+pubDate: 2023-11-28
+author: "Aryan"
+tags: ["civic-tech", "data", "urban-planning"]
+---
+import Chart from '../../components/Chart.astro';
+
+## Reimagining Urban Spaces
+
+The intersection of technology and urban planning is creating new opportunities for citizens to engage with their cities. By leveraging open data, we can visualize complex issues and drive informed decision-making.
+
+### Urban Density Trends
+
+Here is a visualization of urban density trends over the last decade:
+
+<Chart 
+  type="line"
+  data={{
+    labels: ['2014', '2016', '2018', '2020', '2022', '2024'],
+    datasets: [{
+      label: 'Population Density (per sq km)',
+      data: [1200, 1350, 1400, 1550, 1700, 1850],
+      borderColor: '#D32F2F',
+      backgroundColor: 'rgba(211, 47, 47, 0.1)',
+      fill: true,
+      tension: 0.4
+    }, {
+      label: 'Green Space Ratio',
+      data: [45, 42, 40, 38, 35, 30],
+      borderColor: '#FFC107',
+      backgroundColor: 'rgba(255, 193, 7, 0.1)',
+      fill: true,
+      tension: 0.4
+    }]
+  }}
+/>
+
+> "The city is not a problem to be solved, but a reality to be experienced." - Jane Jacobs
+
+## Digital Democracy
+
+We are seeing a shift towards digital platforms that facilitate public discourse.
+
+### Voter Turnout by Age Group
+
+<Chart 
+  type="bar"
+  data={{
+    labels: ['18-24', '25-34', '35-44', '45-54', '55-64', '65+'],
+    datasets: [{
+      label: 'Voter Turnout (%)',
+      data: [42, 55, 63, 68, 72, 75],
+      backgroundColor: [
+        '#FF5252',
+        '#FF7B7B',
+        '#FFA4A4',
+        '#FFC107',
+        '#FFD54F',
+        '#FFE082'
+      ],
+      borderWidth: 0
+    }]
+  }}
+/>
+
+## Video Insight
+
+Watch this insightful talk on the importance of human-centric design in smart cities:
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 12px; margin: 2rem 0;">
+  <iframe 
+    src="https://www.youtube.com/embed/Brq7tqN8y2Q" 
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+    allowfullscreen>
+  </iframe>
+</div>
+
+## Conclusion
+
+As we move forward, it is crucial to balance technological advancement with human needs.

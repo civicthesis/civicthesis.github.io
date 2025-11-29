@@ -1,0 +1,145 @@
+---
+title: "Ultimate Tables: Outlines, Fonts & Scroll Effects"
+description: "The final chapter. Sketchy outlines, custom fonts, and animations that react to your scroll."
+pubDate: 2023-12-21
+author: "Aryan"
+image: "/logo.png"
+tags: ["astro", "design", "tables", "animation"]
+---
+
+We've covered styles and colors. Now, let's get into the details: **Outlines**, **Fonts**, and **Scroll Animations**.
+
+## 1. Sketchy Outlines
+
+The `sketchy-outline` style gives you that hand-drawn border without the messiness of the full sketchy style. It's clean but organic.
+
+<CustomTable 
+  headers={['Phase', 'Deliverable']}
+  rows={[
+    ['Discovery', 'User Research Report'],
+    ['Design', 'Figma Prototypes'],
+    ['Dev', 'Production Code']
+  ]}
+  style="sketchy-outline"
+  font="hand-drawn"
+/>
+
+## 2. Sketchy Colorful Outline
+
+Combine the organic border with your theme colors using `sketchy-colorful-outline`.
+
+<CustomTable 
+  headers={['Metric', 'Value', 'Trend']}
+  rows={[
+    ['Users', '1,200', '+15%'],
+    ['Sessions', '3,400', '+8%'],
+    ['Bounce', '45%', '-2%']
+  ]}
+  style="sketchy-colorful-outline"
+  color="green"
+  font="sans"
+/>
+
+## 3. Bold & Colorful
+
+For when you need high contrast and impact. The `bold-colorful` style combines thick borders, uppercase headers, and vibrant theme colors.
+
+<CustomTable 
+  headers={['Rank', 'Team', 'Points']}
+  rows={[
+    ['1', 'Red Dragons', '98'],
+    ['2', 'Blue Knights', '95'],
+    ['3', 'Green Giants', '88']
+  ]}
+  style="bold-colorful"
+  color="red"
+  font="sans"
+/>
+
+## 4. Font Control
+
+You're not stuck with the hand-drawn font. Use the `font` prop to switch between `hand-drawn`, `sans`, `serif`, and `mono`.
+
+### Sans-Serif (Clean)
+
+<CustomTable 
+  headers={['Name', 'Email']}
+  rows={[
+    ['John Doe', 'john@example.com'],
+    ['Jane Smith', 'jane@example.com']
+  ]}
+  style="minimal"
+  font="sans"
+  color="blue"
+/>
+
+### Monospace (Code)
+
+<CustomTable 
+  headers={['Variable', 'Type', 'Default']}
+  rows={[
+    ['isLoading', 'boolean', 'false'],
+    ['data', 'object', 'null'],
+    ['error', 'string', 'undefined']
+  ]}
+  style="bold"
+  font="mono"
+  color="purple"
+/>
+
+## 5. Scroll-Triggered Animations
+
+By default, animations play on load. Set `trigger="visible"` to play them when the table scrolls into view.
+
+Scroll down to see these animate in!
+
+<div style="height: 50vh; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 8px; margin: 2rem 0;">
+  <p>Scroll down...</p>
+</div>
+
+### Slide Up on Scroll
+
+<CustomTable 
+  headers={['Event', 'Date']}
+  rows={[
+    ['Launch', 'Jan 1st'],
+    ['Update', 'Feb 15th']
+  ]}
+  style="sketchy-colorful-outline"
+  color="orange"
+  animation="slide-up"
+  trigger="visible"
+/>
+
+<div style="height: 20vh;"></div>
+
+### Zoom In on Scroll
+
+<CustomTable 
+  headers={['Feature', 'Status']}
+  rows={[
+    ['Dark Mode', 'Done'],
+    ['API', 'Pending']
+  ]}
+  style="sketchy-outline"
+  animation="zoom-in"
+  trigger="visible"
+/>
+
+## The Ultimate Combo
+
+Sketchy colorful outline, monospace font, purple theme, and a slide-left animation triggered on scroll.
+
+<CustomTable 
+  headers={['ID', 'Operation', 'Result']}
+  rows={[
+    ['0x1A', 'ALLOC', 'SUCCESS'],
+    ['0x1B', 'WRITE', 'SUCCESS'],
+    ['0x1C', 'FREE', 'PENDING']
+  ]}
+  style="sketchy-colorful-outline"
+  color="purple"
+  font="mono"
+  animation="slide-left"
+  trigger="visible"
+/>

@@ -1,0 +1,74 @@
+---
+title: "Visualizing Ideas with Mermaid Diagrams"
+description: "Learn how to embed flowcharts, sequence diagrams, and more directly into your Markdown using Mermaid.js."
+pubDate: 2023-12-09
+author: "Aryan"
+image: "/favicon.png"
+tags: ["mermaid", "diagrams", "visualization", "astro"]
+---
+
+A picture is worth a thousand words, especially when explaining complex systems. While our "Active Whiteboard" style is great for informal sketches, sometimes you need structured, standard diagrams.
+
+Enter **Mermaid**.
+
+Mermaid lets you create diagrams and visualizations using text and code. And now, you can embed them directly in your blog posts!
+
+## 1. Flowcharts
+
+Flowcharts are perfect for describing processes.
+
+<Mermaid code={`
+graph TD
+    A[Start] --> B{Is it working?}
+    B -- Yes --> C[Great!]
+    B -- No --> D[Debug]
+    D --> B
+`} />
+
+```astro
+<Mermaid code={\`
+graph TD
+    A[Start] --> B{Is it working?}
+    B -- Yes --> C[Great!]
+    B -- No --> D[Debug]
+    D --> B
+\`} />
+```
+
+## 2. Sequence Diagrams
+
+Great for showing interactions between systems over time.
+
+<Mermaid code={`
+sequenceDiagram
+    participant User
+    participant System
+    participant Database
+
+    User->>System: Request Data
+    System->>Database: Query
+    Database-->>System: Results
+    System-->>User: Response
+`} />
+
+## 3. Gantt Charts
+
+Visualize project timelines effectively.
+
+<Mermaid code={`
+gantt
+    title Project Timeline
+    dateFormat  YYYY-MM-DD
+    section Design
+    Research           :a1, 2023-12-01, 3d
+    Prototyping        :after a1, 5d
+    section Development
+    Implementation     :2023-12-10, 10d
+    Testing            :2023-12-20, 5d
+`} />
+
+## How It Works
+
+We use a custom `<Mermaid>` component that renders the diagram on the client side. It automatically detects your site's theme (light/dark) and adjusts the diagram colors accordingly.
+
+Just pass your Mermaid code to the `code` prop of the `<Mermaid>` component!

@@ -1,0 +1,76 @@
+---
+import ThemeToggle from "./ThemeToggle.astro";
+---
+
+<header>
+  <div class="container header-content">
+    <a href="/" class="logo">
+      <span class="civic">CIVIC</span>
+      <span class="thesis">Thesis</span>
+    </a>
+
+    <nav>
+      <a href="/">Blog</a>
+      <ThemeToggle />
+    </nav>
+  </div>
+</header>
+
+<style>
+  header {
+    padding: var(--spacing-md) 0;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--spacing-xl);
+    background-color: var(--color-bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.4rem;
+    line-height: 1;
+    text-decoration: none;
+  }
+
+  .civic {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: var(--color-logo-text);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .thesis {
+    font-family: "Playfair Display", serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 1.8rem;
+    color: var(--color-secondary);
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+
+  nav a {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  nav a:hover {
+    color: var(--color-primary);
+  }
+</style>

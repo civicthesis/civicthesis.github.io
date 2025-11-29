@@ -1,0 +1,72 @@
+---
+title: "Beautiful Math: Hand-Drawn & Animated Equations"
+description: "See how we transform standard LaTeX equations into colorful, hand-drawn, and animated mathematical art using KaTeX and CSS."
+pubDate: 2023-12-12
+author: "Aryan"
+image: "/favicon.png"
+tags: ["math", "katex", "design", "animation"]
+---
+
+Mathematics doesn't have to be cold and rigid. By combining **KaTeX** with our "Active Whiteboard" design system, we can make equations feel like they were just scribbled on a napkin during a eureka moment.
+
+## 1. The "Hand-Drawn" Look
+
+All equations on this site automatically use the **Kalam** font and have a slight organic feel.
+
+$$
+e^{i\pi} + 1 = 0
+$$
+
+$$
+\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+$$
+
+## 2. Colorful Equations
+
+We can style specific parts of the equation using CSS classes. Here, variables are red, operators are yellow, and relations are blue!
+
+<div class="math-colorful">
+$$
+f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}
+$$
+</div>
+
+```html
+<div class="math-colorful">
+  $$ f(x) = ... $$
+</div>
+```
+
+## 3. Animated Math
+
+Why stop at static text? Let's make the math float!
+
+<div class="math-animate-float">
+$$
+\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}
+$$
+</div>
+
+Or give it a heartbeat:
+
+<div class="math-animate-pulse">
+$$
+\heartsuit = \lim_{x \to \infty} \frac{Love}{Time}
+$$
+</div>
+
+## 4. Inline Math
+
+It works perfectly for inline equations too, like $E = mc^2$ or $a^2 + b^2 = c^2$, flowing right along with your text.
+
+## How it Works
+
+We use `rehype-katex` to render the LaTeX, and then apply a custom CSS font stack:
+
+```css
+.katex {
+  font-family: 'Kalam', cursive;
+}
+```
+
+This simple change completely transforms the reading experience, making complex topics feel more approachable and friendly.

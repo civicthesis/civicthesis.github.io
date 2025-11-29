@@ -1,0 +1,86 @@
+---
+title: "Typing Math: Animated Equations & Styles"
+description: "Learn how to create typing animations for your math equations and apply new styles like Chalkboard."
+pubDate: 2023-12-14
+author: "Aryan"
+image: "/logo.png"
+tags: ["astro", "math", "animation", "katex"]
+---
+
+We've explored typing text, but what about typing math? It's a bit more complex because math equations are often 2D structures, but we can simulate the effect of an equation being written out.
+
+In this post, we'll introduce the `typewriter` animation and the `chalkboard` style for our `<StyledMath />` component.
+
+## 1. The Typewriter Effect
+
+This animation reveals the equation from left to right, simulating a typewriter or a mechanical printer.
+
+<StyledMath animation="typewriter" trigger="visible">
+$$
+f(x) = \int_{-\infty}^{\infty} \hat f(\xi)\,e^{2\pi i \xi x} \,d\xi
+$$
+</StyledMath>
+
+It works by animating the width of the container.
+
+## 2. Chalkboard Style
+
+Nothing says "math" like a chalkboard. We've added a new style that mimics the look of chalk on a slate board.
+
+<StyledMath style="chalkboard">
+$$
+\frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \mathbf{u}) = 0
+$$
+</StyledMath>
+
+### Combined: Writing on a Chalkboard
+
+Let's combine the `chalkboard` style with the `reveal` animation (which is smoother than typewriter) to simulate writing on a board.
+
+<StyledMath style="chalkboard" animation="reveal" trigger="visible">
+$$
+R_{\mu\nu} - \frac{1}{2}R g_{\mu\nu} + \Lambda g_{\mu\nu} = \frac{8\pi G}{c^4} T_{\mu\nu}
+$$
+</StyledMath>
+
+## 3. Step-by-Step Guide
+
+Here is how you can use these new features in your markdown.
+
+### Typewriter Animation
+
+Use `animation="typewriter"` and `trigger="visible"` to start the animation when the user scrolls to it.
+
+```astro
+<StyledMath animation="typewriter" trigger="visible">
+  $$ E = mc^2 $$
+</StyledMath>
+```
+
+### Chalkboard Style
+
+Use `style="chalkboard"`.
+
+```astro
+<StyledMath style="chalkboard">
+  $$ a^2 + b^2 = c^2 $$
+</StyledMath>
+```
+
+### Mixing and Matching
+
+You can mix any style with any animation!
+
+```astro
+<StyledMath style="neon" animation="typewriter" trigger="visible">
+  $$ i\hbar \dot{\Psi} = \hat{H}\Psi $$
+</StyledMath>
+```
+
+<StyledMath style="neon" animation="typewriter" trigger="visible">
+$$
+i\hbar \dot{\Psi} = \hat{H}\Psi
+$$
+</StyledMath>
+
+Go ahead and experiment with these combinations to make your math content engaging and fun!

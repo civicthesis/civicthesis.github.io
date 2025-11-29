@@ -1,0 +1,89 @@
+---
+title: "Express Yourself: Styled Emojis in Markdown"
+description: "Learn how to use and style emojis in your Astro blog posts, including custom sizes and animations."
+pubDate: 2023-12-11
+author: "Aryan"
+image: "/favicon.png"
+tags: ["emoji", "design", "animation", "astro"]
+---
+
+Emojis are a great way to add personality to your writing. In standard Markdown, you can just paste them in:
+
+👋 Hello world! 🚀 Blast off!
+
+But what if you want them bigger? Or bouncing? Or spinning?
+
+We've added a custom `<Emoji>` component to give you superpowers.
+
+## 1. Sizing
+
+Make a statement with giant emojis.
+
+<ScribbleBox>
+  <div style="display: flex; gap: 1rem; align-items: center; justify-content: center;">
+    <Emoji size="sm">🐜</Emoji>
+    <Emoji size="md">🐈</Emoji>
+    <Emoji size="lg">🐕</Emoji>
+    <Emoji size="xl">🐘</Emoji>
+    <Emoji size="2xl">🦕</Emoji>
+  </div>
+</ScribbleBox>
+
+```astro
+<Emoji size="sm">🐜</Emoji>
+<Emoji size="md">🐈</Emoji>
+<Emoji size="lg">🐕</Emoji>
+<Emoji size="xl">🐘</Emoji>
+<Emoji size="2xl">🦕</Emoji>
+```
+
+## 2. Animations
+
+Bring your content to life with built-in animations.
+
+### Bounce
+Great for excitement!
+<Emoji size="3xl" animation="bounce">🏀</Emoji>
+
+```astro
+<Emoji size="3xl" animation="bounce">🏀</Emoji>
+```
+
+### Spin
+Perfect for loading states or just for fun.
+<Emoji size="3xl" animation="spin">🌍</Emoji>
+
+```astro
+<Emoji size="3xl" animation="spin">🌍</Emoji>
+```
+
+### Shake
+"No way!" or "Alert!"
+<Emoji size="3xl" animation="shake">🔔</Emoji>
+
+```astro
+<Emoji size="3xl" animation="shake">🔔</Emoji>
+```
+
+### Pulse
+A subtle heartbeat effect.
+<Emoji size="3xl" animation="pulse">❤️</Emoji>
+
+```astro
+<Emoji size="3xl" animation="pulse">❤️</Emoji>
+```
+
+## 3. Combining with Diagrams
+
+You can even use emojis inside your Mermaid diagrams!
+
+<Mermaid code={`
+graph TD
+    A[🚀 Launch] --> B{✨ Ready?}
+    B -- Yes --> C[🎉 Party!]
+    B -- No --> D[🔧 Fix it]
+    style A fill:#eef,stroke:#333
+    style C fill:#efe,stroke:#333
+`} />
+
+Go ahead, sprinkle some fun into your posts! ✨

@@ -1,0 +1,123 @@
+---
+title: "Mastering Image Optimizations in Astro (Part 1)"
+description: "Learn the basics of using optimized images with custom hand-drawn styles and animations in your Markdown content."
+pubDate: 2023-12-11
+author: "Aryan"
+image: "/logo.png"
+tags: ["astro", "images", "design", "css"]
+---
+
+Images are a crucial part of any blog, but they can also be the biggest bottleneck for performance. Astro's built-in `<Image />` component handles optimization out of the box, but what if we want to add some flair?
+
+In this post, we'll explore how to use our custom `OptimizedImage` component to add hand-drawn styles, shapes, and animations to your images directly in Markdown.
+
+## 1. The Basics
+
+First, let's look at a standard optimized image. It's responsive and lazy-loaded by default.
+
+<OptimizedImage
+  src="/aryan.jpg"
+  alt="A standard photo"
+  width={600}
+  height={400}
+  caption="A standard optimized image"
+/>
+
+## 2. Hand-Drawn Style
+
+To fit our "Active Whiteboard" aesthetic, we can add a `style="hand-drawn"` prop. This adds a sketchy border and a subtle shadow.
+
+<OptimizedImage
+  src="/logo.png"
+  alt="Hand-drawn style logo"
+  width={300}
+  height={300}
+  style="hand-drawn"
+  caption="Our logo with a hand-drawn border"
+/>
+
+## 3. Shapes
+
+We can also change the shape of the image. This is great for avatars or profile pictures.
+
+### Circle
+
+<OptimizedImage
+  src="/aryan.jpg"
+  alt="Circular avatar"
+  width={200}
+  height={200}
+  shape="circle"
+  style="hand-drawn"
+  caption="Perfect for avatars!"
+/>
+
+### Square
+
+<OptimizedImage
+  src="/logo.png"
+  alt="Square image"
+  width={200}
+  height={200}
+  shape="square"
+  style="hand-drawn"
+  caption="A perfect square"
+/>
+
+## 4. Animations
+
+Bring your content to life with entrance animations.
+
+### Fade In
+
+<OptimizedImage
+  src="/aryan.jpg"
+  alt="Fade in animation"
+  width={400}
+  height={300}
+  animation="fade-in"
+  style="hand-drawn"
+  caption="Fading in..."
+/>
+
+### Slide Up
+
+<OptimizedImage
+  src="/logo.png"
+  alt="Slide up animation"
+  width={300}
+  height={300}
+  animation="slide-up"
+  caption="Sliding up from below"
+/>
+
+### Zoom In
+
+<OptimizedImage
+  src="/aryan.jpg"
+  alt="Zoom in animation"
+  width={400}
+  height={300}
+  animation="zoom-in"
+  style="hand-drawn"
+  caption="Zooming in for impact"
+/>
+
+## Usage
+
+To use this in your own posts, simply use the component like this (no import needed!):
+
+```astro
+<OptimizedImage
+  src="/path/to/image.jpg"
+  alt="Description"
+  width={500}
+  height={300}
+  style="hand-drawn"
+  shape="rectangle"
+  animation="fade-in"
+  caption="Your caption here"
+/>
+```
+
+Stay tuned for Part 2 where we explore advanced styles and 3D effects!

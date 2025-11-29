@@ -1,0 +1,81 @@
+---
+title: "Magic Imports: Using Components Without Importing Them"
+description: "Streamline your Markdown workflow by making Astro components globally available in your MDX files."
+pubDate: 2023-12-08
+author: "Aryan"
+image: "/favicon.png"
+tags: ["astro", "mdx", "productivity", "tips"]
+---
+
+In our [previous post](/blog/astro-components), we saw how Astro components can clean up our Markdown. But there was one catch: we still had to import them at the top of every file.
+
+```astro
+---
+import ScribbleBox from '../../components/scribble/ScribbleBox.astro';
+// ... more imports
+---
+```
+
+This gets repetitive. Wouldn't it be nice if these components were just *available*, like standard HTML tags?
+
+## The Solution: Global Injection
+
+We've updated our blog layout to automatically pass our "Active Whiteboard" components to every MDX post. This means you can now use `<ScribbleBox>`, `<Chart>`, and others without writing a single import statement!
+
+### Example: No Imports Required!
+
+I'm using the `<ScribbleBox>` component right here, and if you check the source of this file, you'll see **zero imports**.
+
+<ScribbleBox>
+  <strong>Look Ma, No Imports!</strong> This component was injected globally by the layout.
+</ScribbleBox>
+
+### How It Works
+
+In our `[...slug].astro` layout, we pass a `components` object to the `<Content />` component:
+
+```astro
+// src/pages/blog/[...slug].astro
+import ScribbleBox from '../../components/scribble/ScribbleBox.astro';
+// ... other imports
+
+const components = {
+  ScribbleBox,
+  // ... other components
+};
+
+// ...
+
+<Content components={components} />
+```
+
+This simple change saves time and keeps your Markdown files focused purely on content.
+
+<div class="diagram-container">
+  <div class="diagram-node">
+    <ScribbleBox>
+      <h3>Layout</h3>
+      <p>Imports <ScribbleHighlight>Once</ScribbleHighlight></p>
+    </ScribbleBox>
+  </div>
+
+  <DiagramArrow direction="right" />
+
+  <div class="diagram-node">
+    <ScribbleBox>
+      <h3>MDX Files</h3>
+      <p>Use <ScribbleCircle>Everywhere</ScribbleCircle></p>
+    </ScribbleBox>
+  </div>
+</div>
+
+## Available Components
+
+Currently, the following components are available globally:
+- `<ScribbleBox>`
+- `<ScribbleHighlight>`
+- `<ScribbleCircle>`
+- `<DiagramArrow>`
+- `<Chart>`
+
+Happy writing!

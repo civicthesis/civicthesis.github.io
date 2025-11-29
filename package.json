@@ -1,0 +1,20 @@
+{
+  "name": "civicthesis",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.12",
+    "astro": "^5.16.2",
+    "chart.js": "^4.5.1",
+    "fuse.js": "^7.1.0",
+    "mermaid": "^11.12.1",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0"
+  }
+}

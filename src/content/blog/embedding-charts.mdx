@@ -1,0 +1,103 @@
+---
+title: "Visualizing Data with Embedded Charts"
+description: "Learn how to embed interactive, responsive charts directly into your Markdown content using Astro and Chart.js."
+pubDate: 2023-12-07
+author: "Aryan"
+image: "/favicon.png"
+tags: ["data-visualization", "charts", "astro", "mdx"]
+---
+
+import Chart from '../../components/Chart.astro';
+
+Data visualization is a powerful tool for storytelling. Instead of static images, why not embed interactive charts directly into your blog posts?
+
+With Astro and MDX, we can easily integrate **Chart.js** to render beautiful, responsive charts.
+
+## 1. Bar Chart
+
+Bar charts are great for comparing categorical data. Here's an example showing the popularity of different programming languages.
+
+<Chart 
+  type="bar"
+  data={{
+    labels: ['JavaScript', 'Python', 'Rust', 'Go', 'TypeScript'],
+    datasets: [{
+      label: 'Popularity Index',
+      data: [85, 90, 75, 70, 80],
+      backgroundColor: [
+        'rgba(255, 99, 132, 0.6)',
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(75, 192, 192, 0.6)',
+        'rgba(153, 102, 255, 0.6)'
+      ],
+      borderColor: [
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)'
+      ],
+      borderWidth: 1
+    }]
+  }}
+/>
+
+```astro
+<Chart 
+  type="bar"
+  data={{
+    labels: ['JavaScript', 'Python', ...],
+    datasets: [{
+      label: 'Popularity Index',
+      data: [85, 90, ...],
+      backgroundColor: [...]
+    }]
+  }}
+/>
+```
+
+## 2. Line Chart
+
+Line charts are perfect for showing trends over time.
+
+<Chart 
+  type="line"
+  data={{
+    labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+    datasets: [{
+      label: 'Monthly Visitors',
+      data: [1200, 1900, 3000, 5000, 4500, 6000],
+      fill: true,
+      borderColor: 'rgb(75, 192, 192)',
+      tension: 0.1
+    }]
+  }}
+/>
+
+## 3. Doughnut Chart
+
+Doughnut charts are useful for showing proportional data.
+
+<Chart 
+  type="doughnut"
+  data={{
+    labels: ['Red', 'Blue', 'Yellow'],
+    datasets: [{
+      label: 'My First Dataset',
+      data: [300, 50, 100],
+      backgroundColor: [
+        'rgb(255, 99, 132)',
+        'rgb(54, 162, 235)',
+        'rgb(255, 205, 86)'
+      ],
+      hoverOffset: 4
+    }]
+  }}
+/>
+
+## How It Works
+
+We use a custom `<Chart />` component that wraps **Chart.js**. This component handles the initialization and canvas rendering, allowing you to pass chart configuration directly as props.
+
+This approach keeps your content interactive and your codebase clean!

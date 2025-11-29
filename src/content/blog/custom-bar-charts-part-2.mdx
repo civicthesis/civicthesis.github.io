@@ -1,0 +1,105 @@
+---
+title: "Advanced Hand-Drawn Charts: Sketchy Styles & Scroll Animations"
+description: "Take your data visualization to the next level with sketchy outlines and scroll-triggered animations."
+pubDate: 2023-12-17
+author: "Aryan"
+image: "/logo.png"
+tags: ["astro", "dataviz", "charts", "animation"]
+---
+
+In Part 1, we introduced our custom `<BarChart />` component. Now, let's push the boundaries with even more "sketchy" styles and interactive animations.
+
+## 1. Sketchy Outlines
+
+The `sketchy-outline` style combines the minimalist outline look with the hand-drawn distortion filter. It looks like a quick napkin sketch.
+
+<BarChart 
+  data={[
+    { label: 'Napkin', value: 100 },
+    { label: 'Paper', value: 60 },
+    { label: 'Digital', value: 20 }
+  ]}
+  style="sketchy-outline"
+  color="black"
+/>
+
+## 2. Sketchy Fill
+
+The `sketchy` style fills the bars but keeps the distorted edges and adds a border. It feels like a marker drawing.
+
+<BarChart 
+  data={[
+    { label: 'Marker', value: 85 },
+    { label: 'Pen', value: 65 },
+    { label: 'Pencil', value: 45 }
+  ]}
+  style="sketchy"
+  color="colorful"
+/>
+
+## 3. Scroll-Triggered Animations
+
+By default, charts animate when the page loads. But what if the chart is further down the page? You want it to animate when the user sees it.
+
+Use `trigger="visible"` to enable scroll-triggered animations.
+
+<div style="height: 200px; display: flex; align-items: center; justify-content: center; background: var(--color-code-bg); margin: 2rem 0;">
+  <p>Scroll down to see the chart animate!</p>
+</div>
+
+<BarChart 
+  data={[
+    { label: 'Seen', value: 100 },
+    { label: 'Unseen', value: 0 }
+  ]}
+  style="sketchy"
+  animation="grow"
+  trigger="visible"
+  color="blue"
+/>
+
+## 4. Mixing Colors & Styles
+
+You can combine these new styles with our existing color palettes.
+
+### Green Sketchy Outline
+
+<BarChart 
+  data={[
+    { label: 'Eco', value: 90 },
+    { label: 'Bio', value: 75 }
+  ]}
+  style="sketchy-outline"
+  color="green"
+  trigger="visible"
+/>
+
+### Red Sketchy Fill
+
+<BarChart 
+  data={[
+    { label: 'Hot', value: 80 },
+    { label: 'Warm', value: 40 }
+  ]}
+  style="sketchy"
+  color="red"
+  trigger="visible"
+/>
+
+## Usage Code
+
+Here's how to implement the scroll-triggered sketchy chart:
+
+```astro
+<BarChart 
+  data={[
+    { label: 'A', value: 10 },
+    { label: 'B', value: 20 }
+  ]}
+  style="sketchy"
+  color="blue"
+  trigger="visible"
+/>
+```
+
+Enjoy your sketchy data!

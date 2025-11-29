@@ -1,0 +1,122 @@
+---
+title: "Bringing Text and Math to Life"
+description: "Learn how to add typing animations to your text and style your KaTeX equations with animations and colors."
+pubDate: 2023-12-13
+author: "Aryan"
+image: "/logo.png"
+tags: ["astro", "animation", "math", "katex"]
+---
+
+Static content is boring. Let's add some motion to our words and equations!
+
+In this post, we'll explore two new components: `<TypingText />` and `<StyledMath />`.
+
+## 1. Typing Animations
+
+Want to simulate a typewriter effect? Or maybe a terminal command being typed out?
+
+### Basic Usage
+
+<TypingText text="Hello, world! I am being typed out." />
+
+### Custom Speed & Delay
+
+You can control the speed and add a start delay.
+
+<TypingText text="I am typing... very... slowly..." speed={150} />
+
+### Scroll Trigger
+
+By default, the animation starts when the element scrolls into view.
+
+<div style="height: 200px; background: var(--color-code-bg); display: flex; align-items: center; justify-content: center; margin: 2rem 0;">
+  <TypingText text="You scrolled down to find me!" trigger="visible" />
+</div>
+
+## 2. Styled Math Equations
+
+We already love KaTeX for rendering math, but let's make it fit our design system better.
+
+### Hand-Drawn Style
+
+Perfect for that "back of the napkin" look.
+
+<StyledMath style="hand-drawn">
+$$
+\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+$$
+</StyledMath>
+
+### Colorful
+
+Highlight the beauty of math with colors.
+
+<StyledMath style="colorful">
+$$
+e^{i\pi} + 1 = 0
+$$
+</StyledMath>
+
+### Neon / Cyberpunk
+
+For a modern, techy feel.
+
+<StyledMath style="neon">
+$$
+i\hbar\frac{\partial}{\partial t}\Psi(\mathbf{r},t) = \hat H \Psi(\mathbf{r},t)
+$$
+</StyledMath>
+
+## 3. Animated Equations
+
+Let's add some movement to the equations themselves.
+
+### Float
+
+<StyledMath animation="float" style="hand-drawn">
+$$
+E = mc^2
+$$
+</StyledMath>
+
+### Pulse
+
+<StyledMath animation="pulse" style="colorful">
+$$
+\heartsuit = \sin(x)^2 + \cos(x)^2
+$$
+</StyledMath>
+
+### Slide Up (On Scroll)
+
+This equation will slide up when you scroll to it.
+
+<StyledMath animation="slide-up" trigger="visible">
+$$
+\sum_{n=1}^{\infty} \frac{1}{n^s} = \prod_{p} \frac{1}{1-p^{-s}}
+$$
+</StyledMath>
+
+### Reveal
+
+A smooth reveal effect.
+
+<StyledMath animation="reveal" trigger="visible" style="hand-drawn">
+$$
+\zeta(s) = \sum_{n=1}^{\infty} \frac{1}{n^s}
+$$
+</StyledMath>
+
+## Usage
+
+Just like our images, these components are auto-imported!
+
+```astro
+<TypingText text="Type me!" />
+
+<StyledMath style="neon" animation="pulse">
+  $$ E = mc^2 $$
+</StyledMath>
+```
+
+Go ahead and make your content dynamic!

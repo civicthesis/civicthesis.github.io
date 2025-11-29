@@ -1,0 +1,560 @@
+/* Global Styles */
+:root {
+    /* Color Palette - Light Mode */
+    --color-bg: #ffffff;
+    --color-text: #1a1a1a;
+    --color-primary: #1B2A41;
+    /* Navy Blue */
+    --color-secondary: #C5A059;
+    /* Gold */
+    --color-accent: #E0C080;
+    --color-border: #e0e0e0;
+    --color-code-bg: #f5f5f5;
+    --color-logo-text: #1B2A41;
+    /* Navy for light mode */
+
+    /* Typography */
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-serif: 'Merriweather', serif;
+    --font-mono: 'Fira Code', monospace;
+
+    /* Spacing */
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 4rem;
+}
+
+[data-theme="dark"] {
+    /* Color Palette - Dark Mode */
+    --color-bg: #1F2023;
+    /* Dark Charcoal from Image */
+    --color-text: #e2e8f0;
+    --color-primary: #ffffff;
+    /* White for primary elements in dark mode */
+    --color-secondary: #C5A059;
+    /* Gold remains same */
+    --color-accent: #93C5FD;
+    --color-border: #333333;
+    --color-code-bg: #2a2b2e;
+    --color-logo-text: #ffffff;
+    /* White for "CIVIC" in dark mode */
+}
+
+/* Reset & Base */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-family: var(--font-sans);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    scroll-behavior: smooth;
+}
+
+body {
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--color-primary);
+}
+
+img,
+video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Typography Utilities */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: var(--spacing-md);
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.75rem;
+}
+
+p {
+    margin-bottom: var(--spacing-md);
+}
+
+/* Layout Utilities */
+.container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+/* Markdown Content Styles */
+.prose {
+    max-width: 65ch;
+    margin: 0 auto;
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+    margin-top: var(--spacing-lg);
+}
+
+.prose a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+}
+
+.prose a:hover {
+    background-color: var(--color-secondary);
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+.prose blockquote {
+    border-left: 4px solid var(--color-secondary);
+    padding-left: var(--spacing-md);
+    font-style: italic;
+    margin: var(--spacing-lg) 0;
+}
+
+.prose code {
+    font-family: var(--font-mono);
+    background-color: var(--color-code-bg);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.prose pre {
+    background-color: var(--color-code-bg);
+    padding: var(--spacing-md);
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: var(--spacing-lg) 0;
+}
+
+.prose pre code {
+    background-color: transparent;
+    padding: 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Brand Typography */
+.civic {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: var(--color-logo-text);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.thesis {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 600;
+    color: var(--color-secondary);
+}
+
+/* Hand-drawn / Scribble Styles */
+.scribble-box {
+    border: 2px solid var(--color-text);
+    border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
+    padding: var(--spacing-md);
+    position: relative;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.scribble-box:hover {
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    transform: scale(1.01);
+}
+
+.scribble-circle {
+    position: relative;
+    display: inline-block;
+}
+
+.scribble-circle::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 120%;
+    border: 3px solid #ef4444;
+    /* Red marker */
+    border-radius: 68% 32% 75% 25% / 55% 28% 72% 45%;
+    transform: rotate(-5deg);
+    pointer-events: none;
+    animation: drawCircle 0.8s ease-out forwards;
+}
+
+.scribble-highlight {
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+.scribble-highlight::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: -5px;
+    right: -5px;
+    bottom: 10%;
+    background-color: rgba(253, 224, 71, 0.6);
+    /* Yellow highlighter */
+    z-index: -1;
+    transform: rotate(-1deg);
+    border-radius: 20% 80% 20% 80% / 80% 20% 80% 20%;
+    animation: highlight 0.5s ease-out forwards;
+    transform-origin: left center;
+}
+
+/* Diagram Layout */
+.diagram-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    justify-content: center;
+    align-items: center;
+    margin: var(--spacing-xl) 0;
+    font-family: 'Kalam', cursive, var(--font-sans);
+    /* Fallback to sans if Kalam not loaded */
+}
+
+.diagram-node {
+    max-width: 250px;
+    text-align: center;
+}
+
+.diagram-arrow {
+    font-size: 2rem;
+    color: var(--color-text);
+    animation: wiggle 2s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes drawCircle {
+    0% {
+        clip-path: polygon(0 0, 0 0, 0 0);
+    }
+
+    100% {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+}
+
+@keyframes highlight {
+    0% {
+        transform: scaleX(0) rotate(-1deg);
+    }
+
+    100% {
+        transform: scaleX(1) rotate(-1deg);
+    }
+}
+
+@keyframes wiggle {
+
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(5deg);
+    }
+
+    75% {
+        transform: rotate(-5deg);
+    }
+}
+
+/* Dark mode adjustments for scribbles */
+[data-theme="dark"] .scribble-box {
+    border-color: var(--color-text);
+}
+
+.prose a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+}
+
+.prose a:hover {
+    background-color: var(--color-secondary);
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+.prose blockquote {
+    border-left: 4px solid var(--color-secondary);
+    padding-left: var(--spacing-md);
+    font-style: italic;
+    margin: var(--spacing-lg) 0;
+}
+
+.prose code {
+    font-family: var(--font-mono);
+    background-color: var(--color-code-bg);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.prose pre {
+    background-color: var(--color-code-bg);
+    padding: var(--spacing-md);
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: var(--spacing-lg) 0;
+}
+
+.prose pre code {
+    background-color: transparent;
+    padding: 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Brand Typography */
+.civic {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: var(--color-logo-text);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.thesis {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 600;
+    color: var(--color-secondary);
+}
+
+/* Hand-drawn / Scribble Styles */
+.scribble-box {
+    border: 2px solid var(--color-text);
+    border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
+    padding: var(--spacing-md);
+    position: relative;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.scribble-box:hover {
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    transform: scale(1.01);
+}
+
+.scribble-circle {
+    position: relative;
+    display: inline-block;
+}
+
+.scribble-circle::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 120%;
+    border: 3px solid #ef4444;
+    /* Red marker */
+    border-radius: 68% 32% 75% 25% / 55% 28% 72% 45%;
+    transform: rotate(-5deg);
+    pointer-events: none;
+    animation: drawCircle 0.8s ease-out forwards;
+}
+
+.scribble-highlight {
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+.scribble-highlight::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: -5px;
+    right: -5px;
+    bottom: 10%;
+    background-color: rgba(253, 224, 71, 0.6);
+    /* Yellow highlighter */
+    z-index: -1;
+    transform: rotate(-1deg);
+    border-radius: 20% 80% 20% 80% / 80% 20% 80% 20%;
+    animation: highlight 0.5s ease-out forwards;
+    transform-origin: left center;
+}
+
+/* Diagram Layout */
+.diagram-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    justify-content: center;
+    align-items: center;
+    margin: var(--spacing-xl) 0;
+    font-family: 'Kalam', cursive, var(--font-sans);
+    /* Fallback to sans if Kalam not loaded */
+}
+
+.diagram-node {
+    max-width: 250px;
+    text-align: center;
+}
+
+.diagram-arrow {
+    font-size: 2rem;
+    color: var(--color-text);
+    animation: wiggle 2s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes drawCircle {
+    0% {
+        clip-path: polygon(0 0, 0 0, 0 0);
+    }
+
+    100% {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+}
+
+@keyframes highlight {
+    0% {
+        transform: scaleX(0) rotate(-1deg);
+    }
+
+    100% {
+        transform: scaleX(1) rotate(-1deg);
+    }
+}
+
+@keyframes wiggle {
+
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(5deg);
+    }
+
+    75% {
+        transform: rotate(-5deg);
+    }
+}
+
+/* Colorful Math */
+.math-colorful .katex {
+    color: var(--color-primary);
+}
+
+.math-colorful .mord.mathnormal {
+    color: #ef4444;
+    /* Red variables */
+}
+
+.math-colorful .mbin {
+    color: #eab308;
+    /* Yellow operators */
+}
+
+.math-colorful .mrel {
+    color: #3b82f6;
+    /* Blue relations */
+}
+
+/* Animations */
+.math-animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.math-animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}

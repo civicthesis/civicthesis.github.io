@@ -1,0 +1,228 @@
+---
+---
+
+<div class="search-container">
+  <button id="search-btn" aria-label="Search">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+  </button>
+
+  <div id="search-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="search-header">
+        <input type="text" id="search-input" placeholder="Search posts..." autofocus>
+        <button id="close-search" aria-label="Close search">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <ul id="search-results"></ul>
+    </div>
+  </div>
+</div>
+
+<style>
+  #search-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text);
+    padding: 0.5rem;
+    transition: color 0.2s;
+  }
+
+  #search-btn:hover {
+    color: var(--color-primary);
+  }
+
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 10vh;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .modal.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal-content {
+    background: var(--color-bg);
+    width: 90%;
+    max-width: 600px;
+    border-radius: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    transform: translateY(-20px);
+    transition: transform 0.2s ease;
+  }
+
+  .modal.open .modal-content {
+    transform: translateY(0);
+  }
+
+  .search-header {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  #search-input {
+    flex: 1;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--color-text);
+    outline: none;
+    font-family: var(--font-sans);
+  }
+
+  #close-search {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    padding: 0.25rem;
+  }
+
+  #search-results {
+    list-style: none;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: var(--spacing-sm);
+  }
+
+  :global(.search-result-item) {
+    display: block;
+    padding: var(--spacing-md);
+    border-radius: 8px;
+    transition: background-color 0.2s;
+  }
+
+  :global(.search-result-item:hover) {
+    background-color: var(--color-code-bg);
+    text-decoration: none;
+  }
+
+  :global(.search-result-title) {
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--color-primary);
+  }
+
+  :global(.search-result-excerpt) {
+    font-size: 0.9rem;
+    color: var(--color-text);
+    opacity: 0.8;
+  }
+</style>
+
+<script>
+  import Fuse from 'fuse.js';
+
+  let fuse;
+  const searchBtn = document.getElementById('search-btn');
+  const modal = document.getElementById('search-modal');
+  const closeBtn = document.getElementById('close-search');
+  const input = document.getElementById('search-input') as HTMLInputElement;
+  const resultsList = document.getElementById('search-results');
+
+  // Fetch posts data
+  const fetchPosts = async () => {
+    if (fuse) return;
+    
+    // In a real app, you might generate a JSON index at build time.
+    // For this demo, we'll fetch from a local API endpoint or just assume we have data if we were using a JSON file.
+    // Since we can't easily generate a JSON file on the fly without an integration, 
+    // we will use a script in the layout to pass data or fetch a generated endpoint.
+    // Let's create a simple API endpoint in pages/api/posts.json.ts
+    
+    try {
+      const res = await fetch('/api/posts.json');
+      const posts = await res.json();
+      
+      fuse = new Fuse(posts, {
+        keys: ['title', 'description', 'body'],
+        threshold: 0.3,
+      });
+    } catch (e) {
+      console.error("Failed to fetch posts for search", e);
+    }
+  };
+
+  const openSearch = async () => {
+    modal?.classList.remove('hidden');
+    // Force reflow
+    void modal?.offsetWidth;
+    modal?.classList.add('open');
+    input?.focus();
+    await fetchPosts();
+  };
+
+  const closeSearch = () => {
+    modal?.classList.remove('open');
+    setTimeout(() => {
+      modal?.classList.add('hidden');
+      if (input) input.value = '';
+      if (resultsList) resultsList.innerHTML = '';
+    }, 200);
+  };
+
+  const handleSearch = (e) => {
+    if (!fuse) return;
+    const query = e.target.value;
+    const results = fuse.search(query);
+    
+    if (resultsList) {
+      if (query.length === 0) {
+        resultsList.innerHTML = '';
+        return;
+      }
+
+      resultsList.innerHTML = results.map(result => `
+        <li>
+          <a href="/blog/${result.item.slug}" class="search-result-item">
+            <span class="search-result-title">${result.item.title}</span>
+            <span class="search-result-excerpt">${result.item.description}</span>
+          </a>
+        </li>
+      `).join('');
+    }
+  };
+
+  searchBtn?.addEventListener('click', openSearch);
+  closeBtn?.addEventListener('click', closeSearch);
+  input?.addEventListener('input', handleSearch);
+  
+  // Close on click outside
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeSearch();
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('open')) {
+      closeSearch();
+    }
+  });
+</script>

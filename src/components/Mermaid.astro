@@ -1,0 +1,152 @@
+---
+interface Props {
+    code?: string;
+}
+
+const { code } = Astro.props;
+const content = code || (await Astro.slots.render("default"));
+---
+
+<mermaid-diagram data-code={content} class="mermaid-container">
+    <div class="loading">Loading diagram...</div>
+    <div class="diagram-content"></div>
+</mermaid-diagram>
+
+<style>
+    @import url("https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap");
+
+    .mermaid-container {
+        display: block;
+        margin: var(--spacing-lg) 0;
+        background: var(--color-bg); /* Match page bg for transparency feel */
+        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+        padding: var(--spacing-lg);
+        border: 2px solid var(--color-text);
+        overflow-x: auto;
+        text-align: center;
+        box-shadow: 2px 3px 0px var(--color-text);
+        transition: all 0.3s ease;
+    }
+
+    .mermaid-container:hover {
+        box-shadow: 4px 5px 0px var(--color-primary);
+        transform: translateY(-2px);
+    }
+
+    .loading {
+        color: var(--color-text);
+        font-family: "Kalam", cursive;
+        font-size: 1.2rem;
+        opacity: 0.7;
+    }
+</style>
+
+<script>
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+
+    class MermaidDiagram extends HTMLElement {
+        async connectedCallback() {
+            let code = this.dataset.code;
+            if (!code) return;
+
+            // Decode HTML entities and strip tags
+            const temp = document.createElement("div");
+            temp.innerHTML = code;
+            code = temp.textContent || temp.innerText;
+
+            const container = this.querySelector(".diagram-content");
+            const loading = this.querySelector(".loading");
+
+            if (!container) return;
+
+            const isDark =
+                document.documentElement.getAttribute("data-theme") === "dark";
+            const primaryColor = getComputedStyle(document.documentElement)
+                .getPropertyValue("--color-primary")
+                .trim();
+            const secondaryColor = getComputedStyle(document.documentElement)
+                .getPropertyValue("--color-secondary")
+                .trim();
+            const textColor = getComputedStyle(document.documentElement)
+                .getPropertyValue("--color-text")
+                .trim();
+            const borderColor = getComputedStyle(document.documentElement)
+                .getPropertyValue("--color-border")
+                .trim();
+            const bgColor = getComputedStyle(document.documentElement)
+                .getPropertyValue("--color-bg")
+                .trim();
+
+            try {
+                mermaid.initialize({
+                    startOnLoad: false,
+                    theme: "base",
+                    securityLevel: "loose",
+                    fontFamily: '"Kalam", cursive',
+                    themeVariables: {
+                        primaryColor: isDark ? "#333" : "#fff",
+                        primaryTextColor: textColor,
+                        primaryBorderColor: textColor,
+                        lineColor: textColor,
+                        secondaryColor: secondaryColor,
+                        tertiaryColor: bgColor,
+                        fontFamily: '"Kalam", cursive',
+                        fontSize: "18px",
+
+                        // Flowchart specific
+                        nodeBorder: textColor,
+                        clusterBkg: "none",
+                        clusterBorder: textColor,
+                        defaultLinkColor: textColor,
+                        titleColor: textColor,
+                        edgeLabelBackground: bgColor,
+
+                        // Sequence Diagram specific
+                        actorBorder: textColor,
+                        actorBkg: primaryColor,
+                        signalColor: textColor,
+                        signalTextColor: textColor,
+                        labelBoxBkgColor: bgColor,
+                        labelBoxBorderColor: textColor,
+                        loopTextColor: textColor,
+
+                        // Gantt specific
+                        sectionBkgColor: isDark ? "#222" : "#f9f9f9",
+                        altSectionBkgColor: bgColor,
+                        sectionBkgColor2: bgColor,
+                        taskBorderColor: textColor,
+                        taskTextColor: textColor,
+                        taskTextLightColor: textColor,
+                        taskTextDarkColor: textColor,
+                        taskBkgColor: primaryColor,
+                        activeTaskBkgColor: secondaryColor,
+                        gridColor: borderColor,
+                        todayLineColor: secondaryColor,
+                    },
+                });
+
+                const id = "mermaid-" + Math.random().toString(36).substr(2, 9);
+                const { svg } = await mermaid.render(id, code);
+
+                container.innerHTML = svg;
+
+                // Post-process SVG for extra hand-drawn feel (optional)
+                const svgElement = container.querySelector("svg");
+                if (svgElement) {
+                    svgElement.style.maxWidth = "100%";
+                    svgElement.style.height = "auto";
+                }
+
+                if (loading) loading.remove();
+            } catch (error) {
+                console.error("Mermaid rendering error:", error);
+                if (container)
+                    container.innerHTML = `<pre class="error" style="color: red; font-family: monospace;">Error rendering diagram: ${error instanceof Error ? error.message : String(error)}</pre>`;
+            }
+        }
+    }
+
+    if (!customElements.get("mermaid-diagram")) {
+        customElements.define("mermaid-diagram", MermaidDiagram);
+    }
+</script>

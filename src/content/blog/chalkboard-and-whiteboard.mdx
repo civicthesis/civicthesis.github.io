@@ -1,0 +1,93 @@
+---
+title: "The Classroom Aesthetic: Chalkboards & Whiteboards"
+description: "Learn how to style your content like a classroom board with hand-drawn chalk and marker annotations."
+pubDate: 2023-12-15
+author: "Aryan"
+image: "/logo.png"
+tags: ["astro", "design", "chalkboard", "whiteboard"]
+---
+
+Sometimes the best way to explain a concept is to write it on a board. We've added two new board styles to our blog: **Whiteboard** and **Chalkboard**.
+
+## 1. The Whiteboard
+
+The whiteboard style is clean, modern, and uses marker-like colors. It's perfect for diagrams and brainstorming.
+
+<Board type="whiteboard">
+  ### Brainstorming Session
+
+  - <ScribbleCheck color="green" /> **Idea 1**: Use AI for good.
+  - <ScribbleCheck color="blue" /> **Idea 2**: Make learning fun.
+  - <ScribbleCheck color="red" /> **Idea 3**: <ScribbleLine type="strike" color="red">Take over the world.</ScribbleLine> (Maybe later)
+
+  We can highlight important text with a <ScribbleHighlight color="yellow">yellow marker</ScribbleHighlight> or circle key concepts like <ScribbleCircle color="blue">Innovation</ScribbleCircle>.
+</Board>
+
+## 2. The Chalkboard
+
+The chalkboard style brings a classic, academic feel. It uses a dark textured background and chalk-like fonts.
+
+<Board type="chalkboard">
+  ### Physics 101
+
+  Today we are learning about **Gravity**.
+
+  <StyledMath style="hand-drawn" animation="typewriter" trigger="visible">
+  $$
+  F = G \frac{m_1 m_2}{r^2}
+  $$
+  </StyledMath>
+
+  Note that <ScribbleCircle color="white">G</ScribbleCircle> is the gravitational constant.
+
+  <DiagramArrow direction="down" color="white" /> **Gravity pulls things down!**
+</Board>
+
+## 3. Annotations
+
+We have a full set of hand-drawn annotations that work on both boards (and anywhere else!).
+
+### Checks & Lines
+
+- <ScribbleCheck color="green" /> Green Check
+- <ScribbleCheck color="blue" /> Blue Check
+- <ScribbleLine type="underline" color="red">Underlined Text</ScribbleLine>
+- <ScribbleLine type="strike" color="black">Strikethrough</ScribbleLine>
+
+### Highlights & Circles
+
+- <ScribbleHighlight color="pink">Pink Highlight</ScribbleHighlight>
+- <ScribbleHighlight color="blue">Blue Highlight</ScribbleHighlight>
+- <ScribbleCircle color="red">Red Circle</ScribbleCircle>
+- <ScribbleCircle color="yellow">Yellow Circle</ScribbleCircle>
+
+## 4. Math on the Board
+
+Combining our `StyledMath` component with the `Board` component creates a truly immersive experience.
+
+<Board type="chalkboard">
+  Let's solve for $x$:
+
+  <StyledMath style="hand-drawn">
+  $$
+  x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+  $$
+  </StyledMath>
+
+  <ScribbleBox color="yellow">
+    Don't forget the quadratic formula!
+  </ScribbleBox>
+</Board>
+
+## Usage
+
+Wrap your content in a `<Board>` component and use the annotation components freely.
+
+```astro
+<Board type="chalkboard">
+  # Hello Class!
+  <ScribbleLine color="white">Welcome</ScribbleLine> to the lesson.
+</Board>
+```
+
+Class dismissed!

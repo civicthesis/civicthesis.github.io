@@ -1,0 +1,130 @@
+---
+title: "Image Optimizations Part 2: Advanced Styles & Magic Imports"
+description: "Take your images further with Polaroid, 3D, and Brutalist styles, plus organic shapes and auto-imports."
+pubDate: 2023-12-12
+author: "Aryan"
+image: "/logo.png"
+tags: ["astro", "images", "design", "css", "advanced"]
+---
+
+Welcome back! In [Part 1](/blog/image-optimizations), we covered the basics of our `OptimizedImage` component. Now, let's dive into the advanced features that will really make your blog stand out.
+
+## 1. Auto-Import Magic
+
+You might have noticed in Part 1 that we didn't need to import the `OptimizedImage` component. 
+
+We've configured our blog layout to automatically provide this component to all MDX files. This keeps your content clean and focused on writing.
+
+## 2. New Styles
+
+We've added some exciting new styles to make your images pop.
+
+### Polaroid
+
+Give your images a nostalgic feel with the `polaroid` style.
+
+<OptimizedImage
+  src="/aryan.jpg"
+  alt="Polaroid style photo"
+  width={300}
+  height={300}
+  style="polaroid"
+  caption="Captured moments"
+/>
+
+### 3D Depth
+
+Add some depth with the `3d` style.
+
+<OptimizedImage
+  src="/logo.png"
+  alt="3D style logo"
+  width={300}
+  height={300}
+  style="3d"
+  caption="Popping off the screen"
+/>
+
+### Brutalism
+
+Go bold with the `brutal` style.
+
+<OptimizedImage
+  src="/aryan.jpg"
+  alt="Brutalist style"
+  width={300}
+  height={300}
+  style="brutal"
+  caption="Bold and stark"
+/>
+
+## 3. Organic Shapes
+
+Move beyond the rectangle with new shapes.
+
+### Blob
+
+<OptimizedImage
+  src="/aryan.jpg"
+  alt="Blob shape"
+  width={300}
+  height={300}
+  shape="blob"
+  caption="Organic and fluid"
+/>
+
+### Rounded
+
+<OptimizedImage
+  src="/logo.png"
+  alt="Rounded corners"
+  width={300}
+  height={300}
+  shape="rounded"
+  caption="Soft and friendly"
+/>
+
+## 4. Animations
+
+Bring your content to life with entrance animations.
+
+### Rotate In
+
+<OptimizedImage
+  src="/logo.png"
+  alt="Rotate in animation"
+  width={300}
+  height={300}
+  animation="rotate-in"
+  caption="Spinning into view"
+/>
+
+### Bounce
+
+<OptimizedImage
+  src="/aryan.jpg"
+  alt="Bounce animation"
+  width={300}
+  height={300}
+  animation="bounce"
+  shape="circle"
+  caption="Bouncing with energy"
+/>
+
+## Usage
+
+Just like before, simply use the component directly:
+
+```astro
+<OptimizedImage
+  src="/path/to/image.jpg"
+  alt="Description"
+  width={500}
+  height={300}
+  style="polaroid"
+  animation="rotate-in"
+  caption="Your caption here"
+/>
+```
+
+Now go forth and make your images beautiful!

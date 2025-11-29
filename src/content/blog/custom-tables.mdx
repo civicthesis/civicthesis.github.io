@@ -1,0 +1,97 @@
+---
+title: "Tables with a Twist: Hand-Drawn & Animated"
+description: "Ditch the boring grids. Learn how to style your tables with personality."
+pubDate: 2023-12-19
+author: "Aryan"
+image: "/logo.png"
+tags: ["astro", "design", "tables", "components"]
+---
+
+Tables are essential for data, but they don't have to be boring. We've created a `<CustomTable />` component that brings life to your grids.
+
+## 1. Hand-Drawn Style
+
+Perfect for that "notebook" feel. It uses the Kalam font and sketchy borders.
+
+<CustomTable 
+  headers={['Task', 'Status', 'Priority']}
+  rows={[
+    ['Design Mockups', 'Done', 'High'],
+    ['Implement API', 'In Progress', 'High'],
+    ['Write Tests', 'Pending', 'Medium']
+  ]}
+  style="hand-drawn"
+/>
+
+## 2. Bold Style
+
+For when you need to make a statement. High contrast, thick borders.
+
+<CustomTable 
+  headers={['Feature', 'Plan A', 'Plan B']}
+  rows={[
+    ['Storage', '10GB', '100GB'],
+    ['Users', '5', 'Unlimited'],
+    ['Support', 'Email', '24/7 Priority']
+  ]}
+  style="bold"
+/>
+
+## 3. Colorful Style
+
+Add a splash of color to differentiate your data.
+
+<CustomTable 
+  headers={['Metric', 'Q1', 'Q2', 'Q3']}
+  rows={[
+    ['Revenue', '$10k', '$15k', '$22k'],
+    ['Growth', '5%', '12%', '18%'],
+    ['Churn', '2%', '1.5%', '1%']
+  ]}
+  style="colorful"
+/>
+
+## 4. Animations
+
+You can animate the table entry with `fade` or `slide-up`.
+
+<CustomTable 
+  headers={['Step', 'Action']}
+  rows={[
+    ['1', 'Initialize'],
+    ['2', 'Load Data'],
+    ['3', 'Render']
+  ]}
+  style="normal"
+  animation="slide-up"
+/>
+
+## 5. Mix & Match
+
+Combine styles and animations for a unique look. Here's a **Hand-Drawn** table with **Slide-Up** animation.
+
+<CustomTable 
+  headers={['Idea', 'Feasibility', 'Fun Factor']}
+  rows={[
+    ['Moon Base', 'Low', 'High'],
+    ['Mars Colony', 'Medium', 'High'],
+    ['Backyard Tent', 'High', 'Medium']
+  ]}
+  style="hand-drawn"
+  animation="slide-up"
+/>
+
+## Usage
+
+Pass `headers` (array of strings) and `rows` (array of arrays of strings).
+
+```astro
+<CustomTable 
+  headers={['A', 'B']}
+  rows={[
+    ['1', '2'],
+    ['3', '4']
+  ]}
+  style="hand-drawn"
+/>
+```

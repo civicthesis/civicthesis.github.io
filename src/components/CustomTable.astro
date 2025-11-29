@@ -1,0 +1,425 @@
+---
+interface Props {
+    headers: string[];
+    rows: string[][];
+    style?:
+        | "normal"
+        | "hand-drawn"
+        | "bold"
+        | "colorful"
+        | "sketchy"
+        | "minimal"
+        | "sketchy-outline"
+        | "sketchy-colorful-outline"
+        | "bold-colorful";
+    color?:
+        | "default"
+        | "red"
+        | "blue"
+        | "green"
+        | "yellow"
+        | "purple"
+        | "orange";
+    animation?:
+        | "none"
+        | "fade"
+        | "slide-up"
+        | "slide-left"
+        | "slide-right"
+        | "zoom-in";
+    font?: "hand-drawn" | "sans" | "serif" | "mono";
+    trigger?: "load" | "visible";
+    class?: string;
+}
+
+const {
+    headers,
+    rows,
+    style = "normal",
+    color = "default",
+    animation = "none",
+    font = "hand-drawn",
+    trigger = "load",
+    class: className,
+} = Astro.props;
+
+const colors = {
+    default: {
+        border: "var(--color-border)",
+        bg: "var(--color-surface)",
+        text: "var(--color-heading)",
+    },
+    red: { border: "#ef4444", bg: "#fee2e2", text: "#991b1b" },
+    blue: { border: "#3b82f6", bg: "#dbeafe", text: "#1e40af" },
+    green: { border: "#22c55e", bg: "#dcfce7", text: "#166534" },
+    yellow: { border: "#eab308", bg: "#fef9c3", text: "#854d0e" },
+    purple: { border: "#a855f7", bg: "#f3e8ff", text: "#6b21a8" },
+    orange: { border: "#f97316", bg: "#ffedd5", text: "#9a3412" },
+};
+
+const theme = colors[color];
+---
+
+<div
+    class={`custom-table-container style-${style} font-${font} animate-${animation} ${className || ""}`}
+    data-trigger={trigger}
+    style={`
+    --theme-border: ${theme.border};
+    --theme-bg: ${theme.bg};
+    --theme-text: ${theme.text};
+  `}
+>
+    <table>
+        <thead>
+            <tr>
+                {headers.map((header) => <th>{header}</th>)}
+            </tr>
+        </thead>
+        <tbody>
+            {
+                rows.map((row) => (
+                    <tr>
+                        {row.map((cell) => (
+                            <td>{cell}</td>
+                        ))}
+                    </tr>
+                ))
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    console.log("CustomTable script loaded");
+
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    console.log("Table intersecting:", entry.target);
+                    entry.target.classList.add("in-view");
+                    observer.unobserve(entry.target);
+                }
+            });
+        },
+        { threshold: 0.1 },
+    );
+
+    const initAnimations = () => {
+        const visibleTables = document.querySelectorAll(
+            '.custom-table-container[data-trigger="visible"]',
+        );
+        console.log("Found visible trigger tables:", visibleTables.length);
+        visibleTables.forEach((el) => {
+            observer.observe(el);
+        });
+
+        // Trigger load animations immediately
+        const loadTables = document.querySelectorAll(
+            '.custom-table-container[data-trigger="load"]',
+        );
+        console.log("Found load trigger tables:", loadTables.length);
+        loadTables.forEach((el) => {
+            requestAnimationFrame(() => {
+                el.classList.add("in-view");
+            });
+        });
+    };
+
+    // Run on load
+    initAnimations();
+
+    // Run on Astro page navigation
+    document.addEventListener("astro:page-load", () => {
+        console.log("astro:page-load triggered");
+        initAnimations();
+    });
+</script>
+
+<style>
+    .custom-table-container {
+        width: 100%;
+        overflow-x: auto;
+        margin: 2rem 0;
+        --table-border-color: var(--theme-border);
+        --table-bg: var(--color-code-bg);
+        --table-text: var(--color-text);
+        --header-bg: var(--theme-bg);
+        --header-text: var(--theme-text);
+    }
+
+    /* Default overrides if color is default */
+    .custom-table-container[style*="--theme-bg: var(--color-surface)"] {
+        --header-bg: var(--color-surface);
+        --header-text: var(--color-heading);
+    }
+
+    /* Fonts */
+    .font-hand-drawn {
+        font-family: "Kalam", cursive, sans-serif;
+    }
+    .font-sans {
+        font-family: var(--font-sans, system-ui, sans-serif);
+    }
+    .font-serif {
+        font-family: var(--font-serif, Georgia, serif);
+    }
+    .font-mono {
+        font-family: var(--font-mono, monospace);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+        color: var(--table-text);
+    }
+
+    th,
+    td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--table-border-color);
+    }
+
+    th {
+        font-weight: 600;
+        background-color: var(--header-bg);
+        color: var(--header-text);
+    }
+
+    /* Style: Normal */
+    .style-normal table {
+        border: 1px solid var(--table-border-color);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    /* Style: Hand-Drawn */
+    .style-hand-drawn table {
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 2px solid var(--table-text);
+        border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px;
+        box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .style-hand-drawn th,
+    .style-hand-drawn td {
+        border-bottom: 2px solid var(--table-text);
+        border-right: 2px solid var(--table-text);
+    }
+
+    .style-hand-drawn th:last-child,
+    .style-hand-drawn td:last-child {
+        border-right: none;
+    }
+
+    .style-hand-drawn tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Style: Bold */
+    .style-bold th {
+        background-color: var(--theme-text);
+        color: var(--color-bg);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 3px solid var(--theme-border);
+    }
+
+    .style-bold table {
+        border: 3px solid var(--theme-text);
+    }
+
+    .style-bold td {
+        border-bottom: 1px solid var(--theme-text);
+        font-weight: 500;
+    }
+
+    /* Style: Colorful */
+    .style-colorful th {
+        background-color: var(--theme-border);
+        color: white;
+    }
+
+    .style-colorful tr:nth-child(even) {
+        background-color: var(--theme-bg);
+    }
+
+    .style-colorful table {
+        border: 2px solid var(--theme-border);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    /* Style: Sketchy */
+    .style-sketchy table {
+        border: 3px solid var(--theme-border);
+        border-radius: 4px;
+        background: var(--color-code-bg);
+        box-shadow: 4px 4px 0 var(--theme-border);
+    }
+
+    .style-sketchy th {
+        background: transparent;
+        border-bottom: 2px dashed var(--theme-border);
+        color: var(--theme-text);
+    }
+
+    .style-sketchy td {
+        border-bottom: 1px dashed var(--theme-border);
+    }
+
+    /* Style: Sketchy Outline */
+    .style-sketchy-outline table {
+        border: 3px solid var(--table-text);
+        border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px;
+        background: transparent;
+    }
+
+    .style-sketchy-outline th {
+        background: transparent;
+        border-bottom: 3px solid var(--table-text);
+        color: var(--table-text);
+    }
+
+    .style-sketchy-outline td {
+        border-bottom: 1px solid var(--table-text);
+    }
+
+    /* Style: Sketchy Colorful Outline */
+    .style-sketchy-colorful-outline table {
+        border: 3px solid var(--theme-border);
+        border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px;
+        background: var(--theme-bg);
+    }
+
+    .style-sketchy-colorful-outline th {
+        background: var(--theme-border);
+        color: white;
+        border-bottom: 3px solid var(--theme-border);
+    }
+
+    .style-sketchy-colorful-outline td {
+        border-bottom: 1px solid var(--theme-border);
+        background: var(--color-code-bg);
+    }
+
+    /* Style: Minimal */
+    .style-minimal table {
+        border: none;
+    }
+
+    .style-minimal th {
+        background: transparent;
+        border-bottom: 2px solid var(--theme-border);
+        color: var(--theme-text);
+        padding-left: 0;
+    }
+
+    .style-minimal td {
+        border-bottom: 1px solid var(--color-border);
+        padding-left: 0;
+    }
+
+    /* Style: Bold Colorful */
+    .style-bold-colorful table {
+        border: 3px solid var(--theme-border);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .style-bold-colorful th {
+        background-color: var(--theme-border);
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 3px solid var(--theme-border);
+    }
+
+    .style-bold-colorful tr:nth-child(even) {
+        background-color: var(--theme-bg);
+    }
+
+    .style-bold-colorful td {
+        border-bottom: 1px solid var(--theme-border);
+        font-weight: 500;
+    }
+
+    /* Animations */
+    /* Only animate when .in-view is present */
+    .custom-table-container.in-view.animate-fade {
+        animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    .custom-table-container.in-view.animate-slide-up {
+        animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .custom-table-container.in-view.animate-slide-left {
+        animation: slideLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .custom-table-container.in-view.animate-slide-right {
+        animation: slideRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .custom-table-container.in-view.animate-zoom-in {
+        animation: zoomIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Initial states for animations - EXCLUDE animate-none */
+    .custom-table-container:not(.in-view):not(
+            .animate-none
+        )[class*="animate-"] {
+        opacity: 0;
+    }
+
+    .custom-table-container:not(.in-view).animate-slide-up {
+        transform: translateY(20px);
+    }
+    .custom-table-container:not(.in-view).animate-slide-left {
+        transform: translateX(20px);
+    }
+    .custom-table-container:not(.in-view).animate-slide-right {
+        transform: translateX(-20px);
+    }
+    .custom-table-container:not(.in-view).animate-zoom-in {
+        transform: scale(0.9);
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideLeft {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideRight {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes zoomIn {
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+</style>

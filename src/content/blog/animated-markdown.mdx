@@ -1,0 +1,118 @@
+---
+title: "The Art of Animated Markdown"
+description: "Transforming static text into living, breathing content with CSS and creative markdown."
+pubDate: 2023-12-05
+author: "Aryan"
+image: "/favicon.png"
+tags: ["css", "markdown", "design", "animation"]
+---
+
+import Chart from '../../components/Chart.astro';
+
+Markdown is fantastic for writing content, but sometimes you want your words to *pop* off the screen. What if your technical diagrams looked like they were drawn on a whiteboard? What if you could highlight key concepts with a marker pen animation?
+
+In this post, we'll explore how to combine standard Markdown with CSS utility classes to create an "Active Whiteboard" aesthetic.
+
+## The "Hand-Drawn" Effect
+
+The secret to this look is **irregularity**. Perfect lines feel digital; slightly wobbly lines feel human. We can achieve this using `border-radius` with multiple values and slight CSS rotations.
+
+### 1. The Scribble Box
+
+Instead of a standard box, we use a "scribble box" to group related ideas.
+
+<div class="scribble-box">
+  <strong>Key Concept:</strong> This box uses irregular border-radius values to mimic a hand-drawn rectangle.
+</div>
+
+```html
+<div class="scribble-box">
+  <strong>Key Concept:</strong> This box uses irregular border-radius...
+</div>
+```
+
+### 2. The Marker Highlight
+
+Want to emphasize a specific word? Don't just bold it—<span class="scribble-highlight">highlight it!</span>
+
+This effect uses a pseudo-element with a yellow background, slightly rotated and animated to look like a highlighter stroke.
+
+```html
+Don't just bold it—<span class="scribble-highlight">highlight it!</span>
+```
+
+### 3. The Circle Emphasis
+
+Sometimes you want to <span class="scribble-circle">circle</span> a critical point.
+
+```html
+Sometimes you want to <span class="scribble-circle">circle</span> a critical point.
+```
+
+## Live Demo: The Learning Path
+
+Let's put it all together into a flow chart, similar to what you might sketch during a brainstorming session.
+
+<div class="diagram-container">
+  <div class="diagram-node">
+    <div class="scribble-box">
+      <h3>Chapter 1</h3>
+      <p>Why <span class="scribble-highlight">AI & Ethics</span> Matter?</p>
+      <ul>
+        <li>Bias in Data</li>
+        <li>Transparency</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="diagram-arrow">→</div>
+
+  <div class="diagram-node">
+    <div class="scribble-box">
+      <h3>Chapter 2</h3>
+      <p>Building <span class="scribble-circle">Trust</span></p>
+      <ul>
+        <li>Explainability</li>
+        <li>Accountability</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="diagram-arrow">↘</div>
+
+  <div class="diagram-node">
+    <div class="scribble-box">
+      <h3>Chapter 3</h3>
+      <p>Future <span class="scribble-highlight">Impact</span></p>
+      <ul>
+        <li>Regulation</li>
+        <li>Society</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+## How It Works
+
+The magic lies in the CSS. Here's a snippet of the `scribble-box` class:
+
+```css
+.scribble-box {
+  border: 2px solid var(--color-text);
+  border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
+  transition: all 0.3s ease;
+}
+
+.scribble-box:hover {
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  transform: scale(1.01);
+}
+```
+
+By changing the `border-radius` on hover, the box feels "alive" and responsive to the user's interaction.
+
+## Conclusion
+
+You don't need complex JavaScript libraries to make your content engaging. With a few creative CSS classes, you can turn a standard blog post into an interactive storytelling experience.
+
+*Go ahead, hover over the boxes above!*

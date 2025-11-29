@@ -1,0 +1,43 @@
+---
+const today = new Date();
+---
+
+<footer>
+  <div class="container">
+    <p>
+      &copy; {today.getFullYear()}
+      <span class="civic" style="font-size: 1rem; color: #666;">CIVIC</span>
+      <span class="thesis" style="font-size: 1rem; color: #666;">Thesis</span>.
+      All rights reserved.
+    </p>
+    <div class="social-links">
+      <a href="/about">About</a>
+      <a href="#" target="_blank" rel="noopener noreferrer">Twitter</a>
+      <a href="#" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  footer {
+    margin-top: 2rem;
+    padding: var(--spacing-xl) 0;
+    border-top: 1px solid var(--color-border);
+    color: #666;
+  }
+
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .social-links {
+    display: flex;
+    gap: var(--spacing-md);
+  }
+
+  a:hover {
+    color: var(--color-primary);
+  }
+</style>

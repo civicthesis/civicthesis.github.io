@@ -1,0 +1,263 @@
+---
+import { Image } from "astro:assets";
+
+interface Props {
+    src: ImageMetadata | string;
+    alt: string;
+    width?: number;
+    height?: number;
+    shape?: "circle" | "square" | "rectangle" | "rounded" | "blob";
+    style?: "hand-drawn" | "clean" | "polaroid" | "3d" | "brutal";
+    animation?:
+        | "fade-in"
+        | "slide-up"
+        | "zoom-in"
+        | "rotate-in"
+        | "bounce"
+        | "none";
+    caption?: string;
+    class?: string;
+}
+
+const {
+    src,
+    alt,
+    width,
+    height,
+    shape = "rectangle",
+    style = "clean",
+    animation = "none",
+    caption,
+    class: className,
+} = Astro.props;
+
+const shapeClass = `shape-${shape}`;
+const styleClass = `style-${style}`;
+const animationClass = animation !== "none" ? `animate-${animation}` : "";
+
+const imageClass = `optimized-image ${shapeClass} ${styleClass} ${animationClass} ${className || ""}`;
+---
+
+<figure
+    class={`image-container ${animationClass} ${style === "polaroid" ? "polaroid-container" : ""}`}
+>
+    {
+        typeof src === "string" ? (
+            <img
+                src={src}
+                alt={alt}
+                width={width}
+                height={height}
+                class={imageClass}
+                loading="lazy"
+            />
+        ) : (
+            <Image
+                src={src}
+                alt={alt}
+                width={width || src.width}
+                height={height || src.height}
+                class={imageClass}
+            />
+        )
+    }
+    {caption && <figcaption class="image-caption">{caption}</figcaption>}
+</figure>
+
+<style>
+    .image-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 2rem 0;
+        perspective: 1000px;
+    }
+
+    .optimized-image {
+        max-width: 100%;
+        height: auto;
+        transition: all 0.3s ease;
+    }
+
+    /* Shapes */
+    .shape-circle {
+        border-radius: 50%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+    }
+
+    .shape-square {
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+    }
+
+    .shape-rectangle {
+        /* Default */
+    }
+
+    .shape-rounded {
+        border-radius: 1rem;
+    }
+
+    .shape-blob {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        animation: blobMorph 8s ease-in-out infinite;
+    }
+
+    /* Styles */
+    .style-hand-drawn {
+        border: 3px solid var(--color-text);
+        border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
+        box-shadow: 2px 3px 0px rgba(0, 0, 0, 0.1);
+    }
+
+    .style-hand-drawn:hover {
+        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+        transform: scale(1.02);
+    }
+
+    .style-polaroid {
+        border: 12px solid white;
+        border-bottom: 50px solid white;
+        box-shadow:
+            0 4px 6px rgba(0, 0, 0, 0.1),
+            0 1px 3px rgba(0, 0, 0, 0.08);
+        transform: rotate(-2deg);
+    }
+
+    .style-polaroid:hover {
+        transform: rotate(0deg) scale(1.02);
+        box-shadow:
+            0 10px 15px rgba(0, 0, 0, 0.1),
+            0 4px 6px rgba(0, 0, 0, 0.05);
+        z-index: 10;
+    }
+
+    .style-3d {
+        transform: rotateX(10deg) rotateY(-10deg);
+        box-shadow: -10px 10px 20px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+    }
+
+    .style-3d:hover {
+        transform: rotateX(0) rotateY(0);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .style-brutal {
+        border: 4px solid #000;
+        box-shadow: 8px 8px 0px #000;
+        filter: contrast(1.1);
+    }
+
+    .style-brutal:hover {
+        transform: translate(4px, 4px);
+        box-shadow: 4px 4px 0px #000;
+    }
+
+    /* Captions */
+    .image-caption {
+        margin-top: 0.75rem;
+        font-family: "Kalam", cursive, var(--font-sans);
+        color: var(--color-text);
+        opacity: 0.8;
+        font-size: 0.95rem;
+        text-align: center;
+    }
+
+    .polaroid-container .image-caption {
+        margin-top: -40px;
+        margin-bottom: 10px;
+        color: #333; /* Always dark on polaroid white */
+        z-index: 2;
+        position: relative;
+        font-family: "Kalam", cursive;
+    }
+
+    /* Animations */
+    .animate-fade-in {
+        animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    .animate-slide-up {
+        animation: slideUp 0.8s ease-out forwards;
+    }
+
+    .animate-zoom-in {
+        animation: zoomIn 0.6s ease-out forwards;
+    }
+
+    .animate-rotate-in {
+        animation: rotateIn 0.8s ease-out forwards;
+    }
+
+    .animate-bounce {
+        animation: bounce 2s infinite;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes zoomIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes rotateIn {
+        from {
+            opacity: 0;
+            transform: rotate(-10deg) scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: rotate(0) scale(1);
+        }
+    }
+
+    @keyframes bounce {
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    @keyframes blobMorph {
+        0% {
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        }
+        50% {
+            border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+        }
+        100% {
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        }
+    }
+</style>

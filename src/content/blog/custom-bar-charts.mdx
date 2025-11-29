@@ -1,0 +1,87 @@
+---
+title: "Data Viz with Personality: Hand-Drawn Bar Charts"
+description: "Learn how to create unique, hand-drawn bar charts using our custom Astro component."
+pubDate: 2023-12-16
+author: "Aryan"
+image: "/logo.png"
+tags: ["astro", "dataviz", "charts", "design"]
+---
+
+Standard charts are great for dashboards, but sometimes you want your data to tell a story with a bit more personality.
+
+We've built a custom `<BarChart />` component that supports hand-drawn, scribble, and outline styles.
+
+## 1. The Hand-Drawn Style
+
+This style applies a displacement filter to the bars, giving them a shaky, sketched look.
+
+<BarChart 
+  data={[
+    { label: 'Creativity', value: 90 },
+    { label: 'Logic', value: 70 },
+    { label: 'Coffee', value: 100 }
+  ]}
+  style="hand-drawn"
+  color="colorful"
+/>
+
+## 2. The Scribble Style
+
+Instead of a solid fill, this style uses a diagonal hatch pattern to simulate scribbling.
+
+<BarChart 
+  data={[
+    { label: 'Q1', value: 45 },
+    { label: 'Q2', value: 60 },
+    { label: 'Q3', value: 75 },
+    { label: 'Q4', value: 90 }
+  ]}
+  style="scribble"
+  color="blue"
+/>
+
+## 3. Outline Style
+
+Minimalist and clean, just the outlines.
+
+<BarChart 
+  data={[
+    { label: 'HTML', value: 80 },
+    { label: 'CSS', value: 95 },
+    { label: 'JS', value: 85 }
+  ]}
+  style="outline"
+  color="black"
+/>
+
+## 4. Animations
+
+The charts come with built-in animations. The default is `grow`, but you can also use `fade`.
+
+<BarChart 
+  data={[
+    { label: 'Fade In', value: 50 },
+    { label: 'Is', value: 70 },
+    { label: 'Smooth', value: 90 }
+  ]}
+  style="clean"
+  animation="fade"
+  color="green"
+/>
+
+## Usage
+
+Using the component is simple. Just pass your data as an array of objects.
+
+```astro
+<BarChart 
+  data={[
+    { label: 'A', value: 10 },
+    { label: 'B', value: 20 }
+  ]}
+  style="hand-drawn"
+  color="red"
+/>
+```
+
+Go ahead and make your data pop!

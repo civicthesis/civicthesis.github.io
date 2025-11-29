@@ -1,0 +1,82 @@
+---
+title: "Powering Up Markdown with Astro Components"
+description: "How to use reusable Astro components to create interactive content without writing raw HTML."
+pubDate: 2023-12-06
+author: "Aryan"
+image: "/favicon.png"
+tags: ["astro", "components", "mdx", "developer-experience"]
+---
+
+import ScribbleBox from '../../components/scribble/ScribbleBox.astro';
+import ScribbleHighlight from '../../components/scribble/ScribbleHighlight.astro';
+import ScribbleCircle from '../../components/scribble/ScribbleCircle.astro';
+import DiagramArrow from '../../components/scribble/DiagramArrow.astro';
+
+In our [previous post](/blog/animated-markdown), we explored how to create an "Active Whiteboard" look using CSS classes. While effective, writing raw HTML like `<div class="scribble-box">` inside Markdown can get messy.
+
+Enter **Astro Components**.
+
+By wrapping our CSS styles in reusable components, we can write clean, semantic MDX that looks great and is easy to maintain.
+
+## The Component Approach
+
+Instead of remembering complex class names, we can just import and use components directly in our Markdown.
+
+### 1. The Scribble Box
+
+<ScribbleBox>
+  <strong>Clean Syntax:</strong> This box is rendered using the <code>&lt;ScribbleBox&gt;</code> component.
+</ScribbleBox>
+
+```astro
+<ScribbleBox>
+  <strong>Clean Syntax:</strong> This box is rendered using...
+</ScribbleBox>
+```
+
+### 2. Highlights and Circles
+
+We can mix components inline with text. For example, we can <ScribbleHighlight>highlight important terms</ScribbleHighlight> or <ScribbleCircle>circle</ScribbleCircle> key numbers.
+
+```astro
+We can <ScribbleHighlight>highlight important terms</ScribbleHighlight>...
+```
+
+## Building a Flow Chart
+
+Look how readable the code becomes when building complex diagrams:
+
+<div class="diagram-container">
+  <div class="diagram-node">
+    <ScribbleBox>
+      <h3>Step 1</h3>
+      <p>Write <ScribbleHighlight>MDX</ScribbleHighlight></p>
+    </ScribbleBox>
+  </div>
+
+  <DiagramArrow direction="right" />
+
+  <div class="diagram-node">
+    <ScribbleBox>
+      <h3>Step 2</h3>
+      <p>Import <ScribbleCircle>Components</ScribbleCircle></p>
+    </ScribbleBox>
+  </div>
+
+  <DiagramArrow direction="right" />
+
+  <div class="diagram-node">
+    <ScribbleBox>
+      <h3>Step 3</h3>
+      <p>Enjoy <ScribbleHighlight>Result</ScribbleHighlight></p>
+    </ScribbleBox>
+  </div>
+</div>
+
+## Why This Matters
+
+1.  **Maintainability**: Change the style in one component, and it updates everywhere.
+2.  **Readability**: MDX files remain focused on content, not markup.
+3.  **Power**: You can add complex logic (like interactivity or data fetching) inside these components.
+
+This is the power of Astro: bringing the best of component-driven development to your content-heavy sites.

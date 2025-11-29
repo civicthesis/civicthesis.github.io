@@ -1,0 +1,127 @@
+---
+title: "Advanced Tables: Colors, Sketches & Motion"
+description: "Take your tables further with vibrant colors, sketchy styles, and dynamic entrance animations."
+pubDate: 2023-12-20
+author: "Aryan"
+image: "/logo.png"
+tags: ["astro", "design", "tables", "animation"]
+---
+
+In Part 1, we covered the basics. Now, let's unlock the full potential of our `<CustomTable />` component with new styles, colors, and animations.
+
+## 1. Sketchy Style
+
+The `sketchy` style is rougher than `hand-drawn`. It features dashed lines, a box shadow, and a transparent header. Perfect for prototyping or casual notes.
+
+<CustomTable 
+  headers={['Draft', 'Notes', 'Ideas']}
+  rows={[
+    ['V1', 'Too clean', 'Add noise'],
+    ['V2', 'Better', 'More color'],
+    ['V3', 'Perfect', 'Ship it']
+  ]}
+  style="sketchy"
+  color="purple"
+/>
+
+## 2. Minimal Style
+
+Sometimes less is more. The `minimal` style removes vertical borders and keeps things clean, using the `color` prop for the header underline.
+
+<CustomTable 
+  headers={['Name', 'Role', 'Department']}
+  rows={[
+    ['Alice', 'Engineer', 'Product'],
+    ['Bob', 'Designer', 'Marketing'],
+    ['Charlie', 'Manager', 'Sales']
+  ]}
+  style="minimal"
+  color="blue"
+/>
+
+## 3. Color Themes
+
+We've added a `color` prop that works across all styles. Choose from `red`, `blue`, `green`, `yellow`, `purple`, and `orange`.
+
+### Red Bold Table
+
+<CustomTable 
+  headers={['Error', 'Code', 'Severity']}
+  rows={[
+    ['Not Found', '404', 'Low'],
+    ['Server Error', '500', 'High'],
+    ['Unauthorized', '401', 'Medium']
+  ]}
+  style="bold"
+  color="red"
+/>
+
+### Green Colorful Table
+
+<CustomTable 
+  headers={['Item', 'Stock', 'Status']}
+  rows={[
+    ['Apples', '50', 'In Stock'],
+    ['Bananas', '20', 'Low Stock'],
+    ['Oranges', '0', 'Out of Stock']
+  ]}
+  style="colorful"
+  color="green"
+/>
+
+## 4. New Animations
+
+Bring your tables to life with `slide-left`, `slide-right`, and `zoom-in`.
+
+### Zoom In
+
+<CustomTable 
+  headers={['Winner', 'Score']}
+  rows={[
+    ['Team A', '98'],
+    ['Team B', '95']
+  ]}
+  style="minimal"
+  color="yellow"
+  animation="zoom-in"
+/>
+
+### Slide Right
+
+<CustomTable 
+  headers={['Step 1', 'Step 2', 'Step 3']}
+  rows={[
+    ['Plan', 'Execute', 'Review']
+  ]}
+  style="sketchy"
+  color="orange"
+  animation="slide-right"
+/>
+
+## 5. The Kitchen Sink
+
+Combine everything for a truly unique table.
+
+<CustomTable 
+  headers={['Style', 'Color', 'Animation']}
+  rows={[
+    ['Sketchy', 'Purple', 'Zoom In'],
+    ['Minimal', 'Blue', 'Slide Left'],
+    ['Bold', 'Red', 'Fade']
+  ]}
+  style="sketchy"
+  color="purple"
+  animation="zoom-in"
+/>
+
+## Usage
+
+```astro
+<CustomTable 
+  headers={['A', 'B']}
+  rows={[['1', '2']]}
+  style="sketchy"
+  color="purple"
+  animation="zoom-in"
+/>
+```
