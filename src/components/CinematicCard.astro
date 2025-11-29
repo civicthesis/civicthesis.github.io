@@ -76,6 +76,13 @@ const { title, theme = "paper", className = "" } = Astro.props;
             inset 0 0 30px rgba(59, 130, 246, 0.2);
     }
 
+    .cinematic-card.neon :global(code) {
+        background-color: rgba(15, 23, 42, 0.5);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        color: #60a5fa;
+        text-shadow: none;
+    }
+
     /* Theme: Noir (Black & White cinematic) */
     .cinematic-card.noir {
         background: #000;

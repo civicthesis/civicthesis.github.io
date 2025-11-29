@@ -1,0 +1,106 @@
+---
+title: "Typing Animations Part 2: Syntax Highlighting"
+description: "How to animate code blocks while preserving beautiful syntax highlighting."
+pubDate: 2024-03-28
+author: "Aryan"
+image: ""
+tags: ["Astro", "UI/UX", "Animation", "Shiki"]
+---
+
+import TypewriterSyntax from "../../components/TypewriterSyntax.astro";
+import CinematicText from "../../components/CinematicText.astro";
+
+<CinematicText 
+  text="Syntax in Motion" 
+  font="cinematic" 
+  animation="glitch" 
+  className="text-5xl text-center mb-12"
+/>
+
+In [Part 1](/blog/typing-animations), we learned how to animate plain text code blocks. But what if we want the full beauty of syntax highlighting?
+
+Animating highlighted code is trickier because the HTML structure is complex. We can't just append text; we need to preserve the `<span>` tags that give us our colors.
+
+## The Solution
+
+We've built a new component, `TypewriterSyntax`, that:
+1.  Uses **Astro's built-in Shiki integration** to generate the highlighted HTML server-side.
+2.  Uses a client-side script to **traverse the DOM** and split every text node into individual characters.
+3.  Reveals these characters one by one, preserving their parent styles (colors).
+
+## Examples
+
+### 1. JavaScript with Comments
+
+Notice how the comments are grey, strings are green, and keywords are purple/red, even while typing.
+
+<TypewriterSyntax 
+    lang="javascript"
+    code={`// This is a comment
+const hero = {
+    name: "Neo",
+    inMatrix: false,
+    powers: ["flight", "kung-fu"]
+};
+
+function wakeUp() {
+    console.log("Follow the white rabbit.");
+}`} 
+/>
+
+### 2. CSS Styling
+
+CSS selectors and properties retain their distinct colors.
+
+<TypewriterSyntax 
+    lang="css"
+    speed={40}
+    code={`.matrix-rain {
+    position: absolute;
+    top: 0;
+    color: #0f0;
+    font-family: 'Matrix Code', monospace;
+    text-shadow: 0 0 5px #0f0;
+}`} 
+/>
+
+### 3. React Component
+
+Even complex JSX structures work perfectly.
+
+<TypewriterSyntax 
+    lang="jsx"
+    speed={20}
+    code={`import React, { useState } from 'react';
+
+export default function RedPill() {
+    const [choice, setChoice] = useState(null);
+
+    return (
+        <button onClick={() => setChoice('truth')}>
+            Take the Red Pill
+        </button>
+    );
+}`} 
+/>
+
+## How It Works
+
+The magic happens in the DOM manipulation. We take the pre-rendered HTML from Shiki:
+
+```html
+<span style="color: #ff7b72">const</span> <span style="color: #79c0ff">x</span> = 1;
+```
+
+And our script transforms it into:
+
+```html
+<span style="color: #ff7b72">
+  <span class="char">c</span><span class="char">o</span><span class="char">n</span>...
+</span> 
+...
+```
+
+Then we simply toggle the opacity of each `.char` class sequentially. This keeps the DOM structure intact while giving us granular control over the animation.
+
+Now you have the best of both worlds: dynamic animation and professional-grade syntax highlighting!

@@ -1,0 +1,237 @@
+---
+interface Props {
+    code: string;
+    lang?: string;
+    trigger?: "visible" | "load";
+    speed?: number;
+    cursor?: boolean;
+    className?: string;
+}
+
+const {
+    code,
+    lang = "text",
+    trigger = "visible",
+    speed = 50,
+    cursor = true,
+    className = "",
+} = Astro.props;
+
+// Escape code for initial hidden state to prevent layout shift if possible,
+// but we'll largely rely on JS to fill it.
+// We keep the code in a data attribute for the script to pick up.
+---
+
+<div
+    class={`typewriter-code-wrapper ${className}`}
+    data-code={code}
+    data-trigger={trigger}
+    data-speed={speed}
+>
+    <div class="code-header">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <span class="lang-badge">{lang}</span>
+    </div>
+    <pre><code class={`language-${lang}`}><span class="typewriter-content" />{cursor && <span class="cursor">|</span>}</code></pre>
+</div>
+
+<style>
+    .typewriter-code-wrapper {
+        background: #1e1e1e;
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 2rem 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        font-family: "Fira Code", monospace;
+        border: 1px solid #333;
+    }
+
+    .code-header {
+        background: #2d2d2d;
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-bottom: 1px solid #333;
+    }
+
+    .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+    .dot.red {
+        background: #ff5f56;
+    }
+    .dot.yellow {
+        background: #ffbd2e;
+    }
+    .dot.green {
+        background: #27c93f;
+    }
+
+    .lang-badge {
+        margin-left: auto;
+        font-size: 0.75rem;
+        color: #888;
+        text-transform: uppercase;
+    }
+
+    pre {
+        margin: 0;
+        padding: 1.5rem;
+        overflow-x: auto;
+        color: #d4d4d4;
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    .cursor {
+        color: #fff;
+        animation: blink 1s step-end infinite;
+        font-weight: bold;
+    }
+
+    @keyframes blink {
+        0%,
+        100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0;
+        }
+    }
+</style>
+
+<script>
+    class TypewriterCode extends HTMLElement {
+        constructor() {
+            super();
+            this.observer = null;
+            this.hasStarted = false;
+        }
+
+        connectedCallback() {
+            const trigger = this.dataset.trigger;
+
+            if (trigger === "visible") {
+                this.observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting && !this.hasStarted) {
+                                this.startTyping();
+                                this.observer.unobserve(entry.target);
+                            }
+                        });
+                    },
+                    { threshold: 0.2 },
+                );
+                this.observer.observe(this);
+            } else {
+                this.startTyping();
+            }
+        }
+
+        startTyping() {
+            this.hasStarted = true;
+            const code = this.dataset.code || "";
+            const speed = parseInt(this.dataset.speed || "50");
+            const contentEl = this.querySelector(".typewriter-content");
+
+            if (!contentEl) return;
+
+            let i = 0;
+            const typeChar = () => {
+                if (i < code.length) {
+                    contentEl.textContent += code.charAt(i);
+                    i++;
+                    setTimeout(typeChar, speed);
+
+                    // Auto-scroll to bottom if needed
+                    const pre = this.querySelector("pre");
+                    if (pre) {
+                        pre.scrollTop = pre.scrollHeight;
+                    }
+                } else {
+                    // Finished
+                    const cursor = this.querySelector(".cursor");
+                    if (cursor) {
+                        // Optional: stop blinking or hide cursor after done
+                        // cursor.style.display = 'none';
+                    }
+                }
+            };
+
+            typeChar();
+        }
+
+        disconnectedCallback() {
+            if (this.observer) {
+                this.observer.disconnect();
+            }
+        }
+    }
+
+    // Define the custom element if it doesn't exist
+    // We use a wrapper class selector to find elements and upgrade them
+    // or just define the custom element and wrap the component in it.
+    // Here, let's use the standard custom element approach but since we used a div wrapper in HTML,
+    // we'll just run a script to "hydrate" them or change the wrapper to a custom element.
+    // Changing wrapper to custom element is cleaner.
+</script>
+
+<script>
+    // Separate script to handle the logic without defining a custom element tag in HTML if we prefer,
+    // OR we can just use the class logic. Let's stick to the class logic but apply it to the div.
+
+    // Actually, defining a custom element is best for isolation.
+    // Let's wrap the content in <typewriter-code> in the HTML above?
+    // No, Astro components are often just divs. Let's use the IntersectionObserver pattern directly.
+
+    const initTypewriter = (el) => {
+        const trigger = el.dataset.trigger;
+        const code = el.dataset.code || "";
+        const speed = parseInt(el.dataset.speed || "50");
+        const contentEl = el.querySelector(".typewriter-content");
+        let hasStarted = false;
+
+        const startTyping = () => {
+            if (hasStarted) return;
+            hasStarted = true;
+
+            let i = 0;
+            const typeChar = () => {
+                if (i < code.length) {
+                    contentEl.textContent += code.charAt(i);
+                    i++;
+                    setTimeout(typeChar, speed);
+                }
+            };
+            typeChar();
+        };
+
+        if (trigger === "visible") {
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            startTyping();
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                },
+                { threshold: 0.2 },
+            );
+            observer.observe(el);
+        } else {
+            startTyping();
+        }
+    };
+
+    document
+        .querySelectorAll(".typewriter-code-wrapper")
+        .forEach(initTypewriter);
+</script>

@@ -1,0 +1,92 @@
+---
+title: "Bringing Code to Life: Typing Animations"
+description: "Learn how to add engaging typewriter effects to your code blocks."
+pubDate: 2024-03-25
+author: "Aryan"
+image: ""
+tags: ["Astro", "UI/UX", "Animation"]
+---
+
+import TypewriterCode from "../../components/TypewriterCode.astro";
+import CinematicText from "../../components/CinematicText.astro";
+
+<CinematicText 
+  text="Code in Motion" 
+  font="cinematic" 
+  animation="tracking-in" 
+  className="text-5xl text-center mb-12"
+/>
+
+Static code blocks are fine for documentation, but sometimes you want to tell a story. You want the user to feel like they're watching the code being written in real-time.
+
+Enter the **Typewriter Effect**.
+
+## Why Use It?
+
+-   **Engagement**: It grabs attention immediately.
+-   **Pacing**: It forces the reader to follow the code flow line by line.
+-   **Cool Factor**: It just looks "hacker-ish" and cool.
+
+## The Component
+
+We've built a `TypewriterCode` component that handles this for us. It takes the raw code string and animates it character by character.
+
+### Example 1: Hello World
+
+Here is a simple example that starts typing as soon as you scroll it into view.
+
+<TypewriterCode 
+    lang="javascript"
+    code={`console.log("Hello, World!");
+console.log("This is being typed live...");
+// Pretty cool, right?`} 
+/>
+
+### Example 2: Fast Typing
+
+We can adjust the speed. Let's type this Python script a bit faster (20ms per char).
+
+<TypewriterCode 
+    lang="python"
+    speed={20}
+    code={`def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+
+# Calculating first 10 numbers
+for i in range(10):
+    print(fibonacci(i))`} 
+/>
+
+### Example 3: The Matrix Style
+
+Combined with our dark mode, this creates a great immersive feel.
+
+<TypewriterCode 
+    lang="bash"
+    speed={40}
+    code={`$ wake_up_neo...
+$ the_matrix_has_you...
+$ follow_the_white_rabbit...
+$ knock_knock_neo.`} 
+/>
+
+## How It Works
+
+The component uses an `IntersectionObserver` to detect when the code block enters the viewport. Once visible, it triggers a JavaScript function that appends characters to a `<code>` element one by one using `setTimeout`.
+
+This approach is lightweight and doesn't require any heavy animation libraries.
+
+```javascript
+// Simplified logic
+const typeChar = () => {
+    if (i < code.length) {
+        element.textContent += code.charAt(i);
+        i++;
+        setTimeout(typeChar, speed);
+    }
+};
+```
+
+Try adding this to your own Astro projects to give your technical tutorials a bit of extra flair!

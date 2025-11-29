@@ -1,0 +1,152 @@
+---
+title: "Deploying Astro to GitHub Pages"
+description: "A complete guide to publishing your Astro site using GitHub Actions."
+pubDate: 2025-11-29
+author: "Aryan"
+image: ""
+tags: ["Astro", "DevOps", "GitHub"]
+---
+
+import CinematicText from "../../components/CinematicText.astro";
+import HandDrawnBox from "../../components/HandDrawnBox.astro";
+import CinematicCard from "../../components/CinematicCard.astro";
+import Mermaid from "../../components/Mermaid.astro";
+
+<CinematicText 
+  text="Deploying to the Stars" 
+  font="cinematic" 
+  animation="scale-up" 
+  className="text-5xl text-center mb-12"
+/>
+
+So you've built a beautiful Astro site (maybe even using some of the components from this blog!). Now it's time to share it with the world. GitHub Pages is a fantastic, free hosting solution, and with GitHub Actions, we can automate the entire deployment process.
+
+## The Mission Plan
+
+Here is the workflow we are going to implement:
+
+<Mermaid code={`
+graph LR
+    A[Code Changes] -->|Push| B[GitHub Repo]
+    B -->|Trigger| C[GitHub Action]
+    C -->|Build| D[Astro Build]
+    D -->|Deploy| E[GitHub Pages]
+    E -->|Live| F[Your Website]
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style F fill:#9f9,stroke:#333,stroke-width:2px
+`} />
+
+## Step 1: Configuration
+
+First, we need to tell Astro where your site will live. Open your `astro.config.mjs` file.
+
+You need to configure two key properties:
+1.  `site`: Your full domain (e.g., `https://username.github.io`).
+2.  `base`: The subpath if you are deploying to a project repo (e.g., `/my-repo`).
+
+```javascript
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+
+export default defineConfig({
+  site: 'https://your-username.github.io',
+  base: '/your-repo-name', // Remove this if deploying to username.github.io directly
+});
+```
+
+<HandDrawnBox title="Custom Domains" variant="tip">
+  If you are using a custom domain (like `www.example.com`), you don't need the `base` property, and your `site` should be your custom domain.
+</HandDrawnBox>
+
+## Step 2: The Launch Sequence (GitHub Actions)
+
+We need to create a workflow file that tells GitHub how to build and deploy our site.
+
+Create a new file at `.github/workflows/deploy.yml` and paste the following:
+
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  # Trigger the workflow every time you push to the `main` branch
+  push:
+    branches: [ main ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets the GITHUB_TOKEN permissions to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repository using git
+        uses: actions/checkout@v4
+      
+      - name: Install, build, and upload your site
+        uses: withastro/action@v2
+        # with:
+          # path: . # The root location of your Astro project inside the repository. (optional)
+          # node-version: 20 # The specific version of Node that should be used to build your site. Defaults to 20. (optional)
+          # package-manager: pnpm@latest # The Node package manager that should be used to install dependencies and build your site. Automatically detected based on your lockfile. (optional)
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
+    <CinematicCard theme="neon" title="Checkout">
+        The `actions/checkout` step pulls your code from the repository so the runner can access it.
+    </CinematicCard>
+    <CinematicCard theme="noir" title="Astro Action">
+        The `withastro/action` is a magic helper that detects your package manager, installs dependencies, and builds your site automatically!
+    </CinematicCard>
+</div>
+
+## Step 3: Mission Control Settings
+
+Before we launch, we need to enable GitHub Pages in your repository settings.
+
+1.  Go to your repository on GitHub.
+2.  Click on **Settings** > **Pages**.
+3.  Under **Build and deployment**, select **GitHub Actions** as the source.
+
+<HandDrawnBox title="Critical Warning" variant="warning">
+  Do not select "Deploy from a branch" (Classic Pages). We are using a custom GitHub Actions workflow, so you **must** select "GitHub Actions" as the source.
+</HandDrawnBox>
+
+## Step 4: Blast Off! 🚀
+
+Now, simply commit your changes and push to GitHub.
+
+```bash
+git add .
+git commit -m "Setup GitHub Pages deployment"
+git push origin main
+```
+
+Head over to the **Actions** tab in your repository. You should see your "Deploy to GitHub Pages" workflow running. Once it turns green, your site is live!
+
+<CinematicText 
+  text="Welcome to the Future" 
+  font="cinematic" 
+  animation="glitch" 
+  className="text-3xl text-center mt-12"
+/>
