@@ -1,0 +1,188 @@
+---
+import { formatDate } from "../utils";
+
+interface Props {
+    title: string;
+    description: string;
+    date: Date;
+    image?: string;
+    href: string;
+    tags?: string[];
+}
+
+const { title, description, date, image, href, tags = [] } = Astro.props;
+---
+
+<a href={href} class="story-card group">
+    <div class="image-container">
+        {image && <img src={image} alt={title} loading="lazy" />}
+        <div class="overlay"></div>
+        {tags.length > 0 && <span class="floating-tag">{tags[0]}</span>}
+    </div>
+    <div class="content">
+        <div class="meta">
+            <time datetime={date.toISOString()}>{formatDate(date)}</time>
+        </div>
+        <h3 class="title">{title}</h3>
+        <p class="description">{description}</p>
+        <div class="read-more">
+            Read Story
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="arrow"
+                ><line x1="5" y1="12" x2="19" y2="12"></line><polyline
+                    points="12 5 19 12 12 19"></polyline></svg
+            >
+        </div>
+    </div>
+</a>
+
+<style>
+    .story-card {
+        display: flex;
+        flex-direction: column;
+        background: var(--color-surface);
+        border-radius: 16px;
+        overflow: hidden;
+        text-decoration: none;
+        color: inherit;
+        transition:
+            transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+            box-shadow 0.4s ease,
+            border-color 0.3s ease;
+        border: 1px solid var(--color-border);
+        height: 100%;
+        position: relative;
+        /* Override accent color for better contrast */
+        --card-accent: #d97706; /* Darker amber/orange */
+    }
+
+    .story-card:hover {
+        transform: translateY(-12px) scale(1.02);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        border-color: var(--card-accent);
+        z-index: 10;
+    }
+
+    .image-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16/9;
+        overflow: hidden;
+    }
+
+    .image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .story-card:hover .image-container img {
+        transform: scale(1.15);
+    }
+
+    .overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(0, 0, 0, 0.3) 100%
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .story-card:hover .overlay {
+        opacity: 1;
+    }
+
+    .floating-tag {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--card-accent);
+        padding: 0.35rem 0.85rem;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(4px);
+        z-index: 2;
+    }
+
+    .content {
+        padding: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        gap: 1rem;
+    }
+
+    .meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+        color: var(--color-text-muted);
+        font-weight: 500;
+    }
+
+    .title {
+        font-family: "Playfair Display", serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1.25;
+        margin: 0;
+        color: var(--color-heading);
+        transition: color 0.2s ease;
+    }
+
+    .story-card:hover .title {
+        color: var(--card-accent);
+    }
+
+    .description {
+        font-size: 1rem;
+        color: var(--color-text);
+        line-height: 1.6;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex-grow: 1;
+        opacity: 0.9;
+    }
+
+    .read-more {
+        margin-top: auto;
+        padding-top: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+        color: var(--card-accent);
+        font-size: 0.95rem;
+        opacity: 0.8;
+        transform: translateX(0);
+        transition: all 0.3s ease;
+    }
+
+    .story-card:hover .read-more {
+        opacity: 1;
+        transform: translateX(4px);
+    }
+</style>

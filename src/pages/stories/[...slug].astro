@@ -1,0 +1,180 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import { formatDate } from "../../utils";
+import OptimizedImage from "../../components/OptimizedImage.astro";
+
+export async function getStaticPaths() {
+    const stories = await getCollection("stories");
+    return stories.map((story) => ({
+        params: { slug: story.slug },
+        props: story,
+    }));
+}
+
+const story = Astro.props;
+const { Content } = await story.render();
+---
+
+<Layout title={story.data.title}>
+    <main>
+        <article class="story-article">
+            <header class="story-header">
+                <div class="container">
+                    <div class="meta">
+                        <time datetime={story.data.pubDate.toISOString()}
+                            >{formatDate(story.data.pubDate)}</time
+                        >
+                        {
+                            story.data.tags && story.data.tags.length > 0 && (
+                                <span class="tag">{story.data.tags[0]}</span>
+                            )
+                        }
+                    </div>
+                    <h1>{story.data.title}</h1>
+                    <p class="description">{story.data.description}</p>
+                </div>
+                {
+                    story.data.image && (
+                        <div class="hero-image-wrapper">
+                            <OptimizedImage
+                                src={story.data.image}
+                                alt={story.data.title}
+                                style="clean"
+                                animation="zoom-in"
+                                class="story-hero-image"
+                            />
+                        </div>
+                    )
+                }
+            </header>
+
+            <div class="container content-container">
+                <div class="prose">
+                    <Content />
+                </div>
+            </div>
+        </article>
+    </main>
+</Layout>
+
+<style>
+    .story-article {
+        padding-bottom: 6rem;
+    }
+
+    .story-header {
+        padding: 6rem 0 4rem;
+        text-align: center;
+        background: linear-gradient(
+            to bottom,
+            var(--color-bg) 0%,
+            var(--color-surface) 100%
+        );
+        border-bottom: 1px solid var(--color-border);
+        margin-bottom: 4rem;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    .content-container {
+        max-width: 720px;
+    }
+
+    .meta {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        color: var(--color-text-muted);
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+
+    .tag {
+        background: var(--color-accent-muted);
+        color: var(--color-accent);
+        padding: 0.25rem 0.85rem;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 3.5rem;
+        font-weight: 700;
+        font-style: italic;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+        color: var(--color-heading);
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .description {
+        font-size: 1.35rem;
+        color: var(--color-text);
+        max-width: 750px;
+        margin: 0 auto;
+        line-height: 1.6;
+        opacity: 0.9;
+    }
+
+    .hero-image-wrapper {
+        margin-top: 4rem;
+        max-width: 1100px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0 1.5rem;
+    }
+
+    /* Target the OptimizedImage component styles */
+    :global(.story-hero-image) {
+        width: 100%;
+        max-height: 600px;
+        object-fit: cover;
+        border-radius: 16px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .prose {
+        font-size: 1.15rem;
+        line-height: 1.8;
+        color: var(--color-text);
+    }
+
+    .prose :global(h2) {
+        font-family: "Playfair Display", serif;
+        font-size: 2.25rem;
+        margin-top: 3.5rem;
+        margin-bottom: 1.5rem;
+        color: var(--color-heading);
+    }
+
+    .prose :global(p) {
+        margin-bottom: 1.75rem;
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        .story-header {
+            padding: 4rem 0 3rem;
+        }
+
+        .hero-image-wrapper {
+            margin-top: 2.5rem;
+        }
+    }
+</style>

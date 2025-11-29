@@ -1,0 +1,108 @@
+---
+import Layout from "../layouts/Layout.astro";
+import StoryCard from "../components/StoryCard.astro";
+import { getCollection } from "astro:content";
+
+const stories = (await getCollection("stories")).sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<Layout title="Stories | News & Updates">
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Stories</h1>
+                <p class="subtitle">
+                    News, updates, and current affairs from around the world.
+                </p>
+            </div>
+        </section>
+
+        <section class="stories-grid">
+            <div class="container">
+                <div class="grid">
+                    {
+                        stories.map((story) => (
+                            <StoryCard
+                                title={story.data.title}
+                                description={story.data.description}
+                                date={story.data.pubDate}
+                                image={story.data.image}
+                                href={`/stories/${story.slug}`}
+                                tags={story.data.tags}
+                            />
+                        ))
+                    }
+                </div>
+            </div>
+        </section>
+    </main>
+</Layout>
+
+<style>
+    main {
+        width: 100%;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    .hero {
+        padding: 6rem 0 4rem;
+        text-align: center;
+        background: linear-gradient(
+            to bottom,
+            var(--color-bg) 0%,
+            var(--color-surface) 100%
+        );
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 4.5rem;
+        font-weight: 700;
+        font-style: italic;
+        margin-bottom: 1rem;
+        color: var(--color-heading);
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+    }
+
+    .subtitle {
+        font-size: 1.25rem;
+        color: var(--color-text-muted);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .stories-grid {
+        padding: 4rem 0 6rem;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2.5rem;
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        .hero {
+            padding: 4rem 0 3rem;
+        }
+
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
