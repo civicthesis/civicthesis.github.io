@@ -2,16 +2,16 @@
 title: "Data Science"
 description: "A comprehensive 4-year BS Degree program in Data Science and Applications."
 pubDate: 2024-01-01
-image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+image: ""
 institution: "IIT Madras"
 courseType: "Degree"
 tags: ["Data Science", "IIT Madras"]
 type: "course"
 ---
 
-import BarChart from "../../../components/BarChart.astro";
+import SubjectCard from "../../../components/SubjectCard.astro";
 
-# Welcome to the Data Science Program
+## Welcome to the Data Science Program
 
 This program is designed to create a strong foundation in Data Science and Applications.
 
@@ -22,12 +22,55 @@ The curriculum is divided into three levels:
 2.  **Diploma Level** (6 courses + 2 projects)
 3.  **Degree Level** (Advanced electives)
 
-## Subjects in Foundation Level
+## Foundation Level Subjects
 
-*   Mathematics 1 & 2
-*   Statistics 1 & 2
-*   Computational Thinking
-*   Introduction to Python
-*   English 1 & 2
-
-Select a subject from the sidebar to start learning!
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 2rem; margin: 2rem 0;">
+    <SubjectCard 
+        title="Mathematics 1" 
+        href="/education/data-science/mathematics-1" 
+        color="#ef4444" 
+        icon="∑"
+    />
+    <SubjectCard 
+        title="Statistics 1" 
+        href="/education/data-science/statistics-1" 
+        color="#f59e0b" 
+        icon="📊"
+    />
+    <SubjectCard 
+        title="Computational Thinking" 
+        href="/education/data-science/computational-thinking" 
+        color="#10b981" 
+        icon="🧠"
+    />
+    <SubjectCard 
+        title="English 1" 
+        href="/education/data-science/english-1" 
+        color="#3b82f6" 
+        icon="Aa"
+    />
+     <SubjectCard 
+        title="Mathematics 2" 
+        href="/education/data-science/mathematics-2" 
+        color="#ef4444" 
+        icon="∫"
+    />
+    <SubjectCard 
+        title="Statistics 2" 
+        href="/education/data-science/statistics-2" 
+        color="#f59e0b" 
+        icon="📈"
+    />
+    <SubjectCard 
+        title="Intro to Python" 
+        href="/education/data-science/python" 
+        color="#10b981" 
+        icon="🐍"
+    />
+    <SubjectCard 
+        title="English 2" 
+        href="/education/data-science/english-2" 
+        color="#3b82f6" 
+        icon="¶"
+    />
+</div>

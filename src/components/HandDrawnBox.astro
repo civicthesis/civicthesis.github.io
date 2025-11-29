@@ -1,0 +1,104 @@
+---
+interface Props {
+    title?: string;
+    variant?: "default" | "note" | "tip" | "warning";
+    color?: string;
+}
+
+const { title, variant = "default", color } = Astro.props;
+
+const variants = {
+    default: {
+        bg: "#f3f4f6",
+        border: "#4b5563",
+        icon: "📝",
+    },
+    note: {
+        bg: "#eff6ff", // blue-50
+        border: "#3b82f6", // blue-500
+        icon: "💡",
+    },
+    tip: {
+        bg: "#f0fdf4", // green-50
+        border: "#22c55e", // green-500
+        icon: "✨",
+    },
+    warning: {
+        bg: "#fefce8", // yellow-50
+        border: "#eab308", // yellow-500
+        icon: "⚠️",
+    },
+};
+
+const style = variants[variant];
+const customStyle = color ? { ...style, border: color } : style;
+---
+
+<div
+    class="hand-drawn-box"
+    style={`--box-bg: ${customStyle.bg}; --box-border: ${customStyle.border};`}
+>
+    {
+        title && (
+            <div class="box-header">
+                <span class="icon">{customStyle.icon}</span>
+                <span class="title">{title}</span>
+            </div>
+        )
+    }
+    <div class="box-content">
+        <slot />
+    </div>
+</div>
+
+<style>
+    .hand-drawn-box {
+        background: var(--box-bg);
+        border: 2px solid var(--box-border);
+        /* Irregular border radius for hand-drawn look */
+        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        position: relative;
+        box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .hand-drawn-box:hover {
+        transform: translateY(-2px) rotate(-0.5deg);
+        box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .box-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px dashed var(--box-border);
+        opacity: 0.9;
+    }
+
+    .icon {
+        font-size: 1.5rem;
+    }
+
+    .title {
+        font-family: "Playfair Display", serif;
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: var(--color-heading);
+    }
+
+    .box-content {
+        font-family: var(--font-sans);
+        line-height: 1.7;
+    }
+
+    /* Ensure content inside doesn't overflow */
+    .box-content :global(p:last-child) {
+        margin-bottom: 0;
+    }
+</style>

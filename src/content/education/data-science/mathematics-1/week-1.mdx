@@ -3,14 +3,14 @@ title: "Week 1: Sets and Relations"
 description: "Introduction to Sets, subsets, operations on sets, and relations."
 pubDate: 2024-01-03
 tags: ["Data Science", "Mathematics"]
+
 type: "unit"
 order: 1
 subject: "mathematics-1"
 parent: "data-science/mathematics-1"
 ---
 
-import ScribbleBox from "../../../../components/scribble/ScribbleBox.astro";
-import ScribbleLine from "../../../../components/scribble/ScribbleLine.astro";
+import HandDrawnBox from "../../../../components/HandDrawnBox.astro";
 
 # Sets and Relations
 
@@ -18,13 +18,18 @@ import ScribbleLine from "../../../../components/scribble/ScribbleLine.astro";
 
 A set is a well-defined collection of distinct objects.
 
-<ScribbleBox color="blue">
-  **Definition:** A set is a collection of well-defined objects.
-</ScribbleBox>
+<HandDrawnBox title="Definition" variant="note">
+  **A set is a collection of well-defined objects.**
+  
+  Think of it like a bag of unique items where order doesn't matter.
+</HandDrawnBox>
 
 ### Examples
-*   The set of all vowels in English alphabet: $V = \{a, e, i, o, u\}$
-*   The set of natural numbers: $\mathbb{N} = \{1, 2, 3, ...\}$
+
+<HandDrawnBox title="Common Sets" variant="tip">
+  *   The set of all vowels in English alphabet: $V = \{a, e, i, o, u\}$
+  *   The set of natural numbers: $\mathbb{N} = \{1, 2, 3, ...\}$
+</HandDrawnBox>
 
 ## Operations on Sets
 
@@ -32,14 +37,21 @@ A set is a well-defined collection of distinct objects.
 2.  **Intersection ($A \cap B$):** Elements in both A and B.
 3.  **Difference ($A - B$):** Elements in A but not in B.
 
-<div style="margin: 2rem 0;">
-  <h3>Visualizing Intersection</h3>
-  <ScribbleLine color="red" />
-  <p>Think of the common area between two overlapping circles.</p>
+<div style="margin: 3rem 0; text-align: center; padding: 2rem; background: #fff1f2; border-radius: 20px; border: 2px dashed #fb7185;">
+  <h3 style="color: #e11d48; margin-top: 0;">Visualizing Intersection</h3>
+  <div style="font-size: 3rem; margin: 1rem 0;">🔴 ∩ 🔵 = 🟣</div>
+  <p style="color: #be123c;">The intersection is the common ground where two sets overlap.</p>
 </div>
 
 ## Practice Problem
 
-If $A = \{1, 2, 3\}$ and $B = \{3, 4, 5\}$, find $A \cap B$.
-
-**Answer:** $\{3\}$
+<HandDrawnBox title="Try it yourself!" variant="warning">
+  If $A = \{1, 2, 3\}$ and $B = \{3, 4, 5\}$, find $A \cap B$.
+  
+  <details style="margin-top: 1rem; cursor: pointer;">
+    <summary style="font-weight: bold; color: #d97706;">Click to reveal answer</summary>
+    <p style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(255,255,255,0.5); border-radius: 8px;">
+      **Answer:** $\{3\}$
+    </p>
+  </details>
+</HandDrawnBox>

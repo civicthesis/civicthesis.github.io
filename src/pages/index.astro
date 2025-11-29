@@ -141,4 +141,10 @@ const posts = (await getCollection("blog")).sort(
 		color: var(--color-text);
 		font-family: var(--font-mono);
 	}
+
+	@media (max-width: 768px) {
+		.hero h1 {
+			font-size: 2.5rem;
+		}
+	}
 </style>
