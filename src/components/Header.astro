@@ -158,21 +158,6 @@ import Search from "./Search.astro";
     color: var(--color-primary);
   }
 
-  .desktop-nav a::after {
-    content: "";
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: -4px;
-    left: 0;
-    background-color: var(--color-secondary);
-    transition: width 0.3s ease;
-  }
-
-  .desktop-nav a:hover::after {
-    width: 100%;
-  }
-
   /* Mobile Menu Button */
   .mobile-menu-btn {
     display: none;
@@ -283,6 +268,10 @@ import Search from "./Search.astro";
 
   /* Responsive Styles */
   @media (max-width: 768px) {
+    header {
+      margin-bottom: 0;
+    }
+
     .desktop-nav {
       display: none;
     }

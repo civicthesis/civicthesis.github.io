@@ -1,0 +1,135 @@
+---
+title: "Bring Your Text to Life: Hand-Drawn Scribble Effects in Astro"
+description: "Learn how to add personality to your site with animated, hand-drawn text components that wiggle, pop, and draw themselves on scroll."
+pubDate: 2024-05-20
+author: "Aryan"
+image: ""
+tags: ["Astro", "Design", "CSS", "Animation"]
+---
+
+import ScribbleText from "../../components/scribble/ScribbleText.astro";
+import CinematicText from "../../components/CinematicText.astro";
+import HandDrawnBox from "../../components/HandDrawnBox.astro";
+import TypewriterCode from "../../components/TypewriterCode.astro";
+
+<CinematicText 
+  text="The Art of Imperfection" 
+  font="cinematic" 
+  animation="blur-reveal" 
+  className="text-5xl text-center mb-12"
+/>
+
+In a world of pixel-perfect grids and sans-serif fonts, sometimes you just want to **scribble**. 
+
+Adding hand-drawn elements can make your website feel more human, approachable, and fun. Today, we're going to build a `ScribbleText` component in Astro that brings that notebook aesthetic to life.
+
+## Meet the Component
+
+Here is what we are building. Hover over them!
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 my-12 text-center">
+  <div class="p-8 border-2 border-dashed border-gray-300 rounded-lg">
+    <ScribbleText 
+      text="Wiggle Wiggle" 
+      as="h3" 
+      animation="wiggle" 
+      trigger="hover" 
+      color="#FF6B6B" 
+      class="text-3xl"
+    />
+    <p class="mt-4 text-sm text-gray-500">Hover me!</p>
+  </div>
+  <div class="p-8 border-2 border-dashed border-gray-300 rounded-lg">
+    <ScribbleText 
+      text="Pop!" 
+      as="h3" 
+      animation="pop" 
+      trigger="hover" 
+      color="#4ECDC4" 
+      class="text-3xl"
+    />
+    <p class="mt-4 text-sm text-gray-500">Hover me!</p>
+  </div>
+  <div class="p-8 border-2 border-dashed border-gray-300 rounded-lg">
+    <ScribbleText 
+      text="Draw Me" 
+      as="h3" 
+      animation="draw" 
+      trigger="load" 
+      color="#FFE66D" 
+      class="text-3xl"
+    />
+    <p class="mt-4 text-sm text-gray-500">I drew on load</p>
+  </div>
+</div>
+
+## How to Use It
+
+Using the component is super simple. Just import it and pass your text.
+
+<TypewriterCode 
+    lang="astro"
+    code={`---
+import ScribbleText from '../components/scribble/ScribbleText.astro';
+---
+
+<ScribbleText 
+  text="Hello World" 
+  color="#FF6B6B" 
+  animation="wiggle" 
+/>`}
+/>
+
+### Props Breakdown
+
+| Prop | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `text` | `string` | required | The text to display |
+| `as` | `tag` | `span` | The HTML tag to render (h1, p, div, etc.) |
+| `color` | `string` | `var(--color-text)` | The text color |
+| `animation` | `enum` | `none` | `wiggle`, `pop`, `draw` |
+| `trigger` | `enum` | `load` | `load`, `hover`, `scroll` |
+
+## Scroll Triggered Magic
+
+The best part? You can trigger these animations when the user scrolls them into view. This is perfect for highlighting key points as the reader moves down the page.
+
+<div class="my-20 p-12 bg-gray-50 dark:bg-gray-800 rounded-xl text-center">
+  <p class="mb-8 text-xl">Scroll down...</p>
+  <div class="h-32"></div>
+  <ScribbleText 
+    text="I appear when you see me!" 
+    as="h2" 
+    animation="pop" 
+    trigger="scroll" 
+    color="#A78BFA" 
+    class="text-4xl font-bold"
+  />
+</div>
+
+## The "Kalam" Font
+
+The secret sauce is the **Kalam** font from Google Fonts. It has that perfect marker-on-paper feel.
+
+<HandDrawnBox title="Design Tip" variant="note">
+  Don't overdo it! Scribble text works best for headings, emphasis, or small playful elements. If you use it for long paragraphs, it becomes hard to read.
+</HandDrawnBox>
+
+## Under the Hood
+
+The component uses a combination of CSS Keyframes for the animations and the `IntersectionObserver` API for the scroll triggering.
+
+The `draw` animation is a clever trick using `clip-path`. We start with the text fully clipped (hidden) and animate the clip-path to reveal it, making it look like it's being written in real-time.
+
+```css
+@keyframes draw {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+```
+
+Now go forth and make your websites a little less serious and a little more **you**.
