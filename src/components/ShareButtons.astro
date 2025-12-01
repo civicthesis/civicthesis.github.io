@@ -2,15 +2,16 @@
 interface Props {
     title: string;
     url: string | URL;
+    label?: string;
 }
 
-const { title, url } = Astro.props;
+const { title, url, label = "Share this post" } = Astro.props;
 const encodedUrl = encodeURIComponent(url.toString());
 const encodedTitle = encodeURIComponent(title);
 ---
 
 <div class="share-container">
-    <span class="share-label">Share this post</span>
+    <span class="share-label">{label}</span>
     <div class="share-buttons">
         <a
             href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
