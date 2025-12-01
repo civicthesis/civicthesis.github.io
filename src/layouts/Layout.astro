@@ -14,7 +14,7 @@ interface Props {
 const {
 	title,
 	description = "A minimal, modern blog.",
-	image = "/favicon.png",
+	image = "/logo.png",
 	type = "website",
 	fullWidth = false,
 } = Astro.props;
@@ -46,6 +46,7 @@ const socialImageURL = new URL(image, Astro.url);
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:image" content={socialImageURL} />
+		<meta property="og:site_name" content="CivicThesis" />
 
 		<!-- Twitter -->
 		<meta property="twitter:card" content="summary_large_image" />
