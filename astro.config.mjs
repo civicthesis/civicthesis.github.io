@@ -9,6 +9,7 @@ import rehypeKatex from 'rehype-katex';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://civicthesis.github.io/',
+  base: '/',
   integrations: [mdx({
     remarkPlugins: [remarkMath],
     rehypePlugins: [rehypeKatex]
