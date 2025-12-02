@@ -40,4 +40,12 @@ const today = new Date();
   a:hover {
     color: var(--color-primary);
   }
+
+  @media (max-width: 640px) {
+    .container {
+      flex-direction: column;
+      gap: var(--spacing-md);
+      text-align: center;
+    }
+  }
 </style>
