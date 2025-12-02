@@ -17,5 +17,8 @@
     "mermaid": "^11.12.1",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0"
+  },
+  "devDependencies": {
+    "vite-plugin-pwa": "^1.2.0"
   }
 }

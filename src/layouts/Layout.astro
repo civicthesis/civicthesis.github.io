@@ -37,6 +37,7 @@ const socialImageURL = new URL(image, Astro.url);
 		<meta name="description" content={description} />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/logo-white-crop.svg" />
+		<link rel="manifest" href="/manifest.webmanifest" />
 		<meta name="generator" content={Astro.generator} />
 		<link rel="canonical" href={canonicalURL} />
 		<meta
@@ -110,6 +111,13 @@ const socialImageURL = new URL(image, Astro.url);
 				document.documentElement.setAttribute("data-theme", "light");
 			}
 			window.localStorage.setItem("theme", theme);
+		</script>
+		<script>
+			if ("serviceWorker" in navigator) {
+				window.addEventListener("load", () => {
+					navigator.serviceWorker.register("/sw.js");
+				});
+			}
 		</script>
 	</head>
 	<body>
