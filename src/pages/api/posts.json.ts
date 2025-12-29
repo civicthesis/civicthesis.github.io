@@ -12,6 +12,7 @@ export async function GET({ }) {
             slug: `blog/${post.slug}`,
             tags: post.data.tags,
             pubDate: post.data.pubDate,
+            image: post.data.heroImage,
             type: "Blog",
         })),
         ...stories.map((story) => ({
@@ -20,6 +21,7 @@ export async function GET({ }) {
             slug: `stories/${story.slug}`,
             tags: story.data.tags || [], // Stories might not have tags
             pubDate: story.data.pubDate,
+            image: story.data.image,
             type: "Story",
         })),
     ];

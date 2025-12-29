@@ -2,34 +2,36 @@
 
 ---
 
-<div class="search-container">
-  <button id="search-btn" aria-label="Search" class="search-trigger">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <circle cx="11" cy="11" r="8"></circle>
-      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-    </svg>
-    <span class="search-shortcut">⌘K</span>
-  </button>
-
-  <div id="search-modal" class="modal hidden">
-    <div class="modal-backdrop"></div>
-    <div class="modal-content">
-      <div class="search-header">
+<div class="search-wrapper" id="search-component">
+  <div class="search-bar">
+    <button id="search-trigger" aria-label="Toggle Search" class="icon-btn">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </button>
+    <div class="input-container">
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Search topics, stories..."
+        autocomplete="off"
+      />
+      <button id="close-search" aria-label="Clear search" class="clear-btn">
         <svg
-          class="search-icon"
           xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
+          width="16"
+          height="16"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -37,411 +39,284 @@
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
-        <input
-          type="text"
-          id="search-input"
-          placeholder="Search articles, stories, and more..."
-          autocomplete="off"
-        />
-        <button
-          id="close-search"
-          aria-label="Close search"
-          class="close-trigger"
-        >
-          <span class="esc-hint">ESC</span>
-          <svg
-            class="close-icon"
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-      <div class="search-body">
-        <div id="search-status" class="search-status hidden"></div>
-        <ul id="search-results" class="results-list"></ul>
-        <div id="empty-state" class="empty-state">
-          <div class="empty-icon">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="48"
-              height="48"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              ><circle cx="11" cy="11" r="8"></circle><line
-                x1="21"
-                y1="21"
-                x2="16.65"
-                y2="16.65"></line></svg
-            >
-          </div>
-          <p>Type to start searching...</p>
-        </div>
-      </div>
-      <div class="search-footer">
-        <div class="footer-item">
-          <kbd>↵</kbd>
-          <span>to select</span>
-        </div>
-        <div class="footer-item">
-          <kbd>↑↓</kbd>
-          <span>to navigate</span>
-        </div>
-        <div class="footer-item">
-          <kbd>esc</kbd>
-          <span>to close</span>
-        </div>
-      </div>
+      </button>
+    </div>
+  </div>
+
+  <div id="search-dropdown" class="dropdown">
+    <div id="search-results" class="results-list"></div>
+    <div id="empty-state" class="empty-state hidden">
+      <span>No results found</span>
     </div>
   </div>
 </div>
 
 <style>
-  /* Trigger Button */
-  .search-trigger {
+  .search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    z-index: 50; /* Ensure high z-index context */
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
     background: transparent;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     border: 1px solid transparent;
+    position: relative;
+    z-index: 20;
+  }
+
+  /* Expanded State */
+  .search-wrapper.expanded .search-bar {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    padding-right: 0.5rem;
+  }
+
+  .icon-btn {
+    background: transparent;
+    border: none;
     cursor: pointer;
     color: var(--color-text);
-    padding: 0.5rem 0.75rem;
-    border-radius: 8px;
+    padding: 0.6rem;
+    border-radius: 50%;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
     transition: all 0.2s ease;
-    z-index: 50; /* Ensure it's clickable */
-    position: relative;
   }
 
-  .search-trigger:hover {
-    background-color: var(--color-code-bg);
+  .icon-btn:hover {
+    background: var(--color-bg-offset);
     color: var(--color-primary);
   }
 
-  .search-shortcut {
-    font-size: 0.75rem;
-    font-family: var(--font-mono);
-    opacity: 0.6;
-    background: var(--color-border);
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-    font-weight: 500;
+  .input-container {
+    display: flex;
+    align-items: center;
+    width: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* Modal Overlay */
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 15vh;
+  .search-wrapper.expanded .input-container {
+    width: 500px; /* Much wider search bar on desktop */
+    opacity: 1;
+    margin-left: 0.25rem;
+  }
+
+  /* Global styles to hide other header elements when search is expanded */
+  :global(body.search-active) header .logo,
+  :global(body.search-active) header .desktop-nav,
+  :global(body.search-active) header .mobile-menu-btn {
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease;
-  }
-
-  .modal.open {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .modal-backdrop {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-
-  /* Modal Content (Command Palette) */
-  .modal-content {
-    position: relative;
-    background: var(--color-bg);
-    width: 90%;
-    max-width: 640px;
-    border-radius: 16px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    border: 1px solid var(--color-border);
-    overflow: hidden;
-    transform: scale(0.95) translateY(10px);
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    display: flex;
-    flex-direction: column;
-    max-height: 70vh;
-  }
-
-  .modal.open .modal-content {
-    transform: scale(1) translateY(0);
-  }
-
-  /* Search Header */
-  .search-header {
-    display: flex;
-    align-items: center;
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--color-border);
-    gap: 1rem;
-  }
-
-  .search-icon {
-    color: var(--color-primary);
-    opacity: 0.8;
-    flex-shrink: 0;
+    transition: opacity 0.2s;
   }
 
   #search-input {
-    flex: 1;
-    background: none;
+    background: transparent;
     border: none;
-    font-size: 1.25rem;
+    font-size: 0.95rem;
     color: var(--color-text);
     outline: none;
     font-family: var(--font-sans);
     font-weight: 500;
-    min-width: 0; /* Prevent overflow */
+    width: 100%;
+    padding: 0.5rem 0;
   }
 
   #search-input::placeholder {
+    color: var(--color-text-muted);
+    opacity: 0.7;
+  }
+
+  .clear-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .search-wrapper.expanded .clear-btn {
+    opacity: 0.5;
+  }
+
+  .search-wrapper.expanded .clear-btn:hover {
+    opacity: 1;
+  }
+
+  /* Dropdown Results */
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 100%; /* Match width of search bar */
+    min-width: 400px; /* Minimum width for good readability */
+    max-width: 90vw;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow:
+      0 10px 25px -5px rgba(0, 0, 0, 0.1),
+      0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow: hidden;
+    z-index: 1001; /* Higher than mobile overlay */
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    visibility: hidden; /* Start hidden */
+    transition: all 0.2s ease;
+  }
+
+  .search-wrapper.has-results .dropdown {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    visibility: visible;
+  }
+
+  /* Remove hidden class usage for dropdown container itself to avoid confusion */
+  .empty-state.hidden {
+    display: none;
+  }
+
+  .results-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 0.5rem;
+  }
+
+  .empty-state {
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+
+  /* Result Items Styles */
+  :global(.search-result-item) {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
     color: var(--color-text);
-    opacity: 0.4;
-    font-weight: 400;
+    transition: background 0.15s ease;
+  }
+
+  :global(.search-result-item:hover) {
+    background: var(--color-bg-offset);
+  }
+
+  :global(.search-thumb) {
+    width: 60px;
+    height: 45px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: var(--color-border);
+    flex-shrink: 0;
+  }
+
+  :global(.search-thumb-placeholder) {
+    width: 60px;
+    height: 45px;
+    border-radius: 6px;
+    background: var(--color-code-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+  }
+
+  :global(.search-result-content) {
+    flex: 1;
+    min-width: 0;
+  }
+
+  :global(.search-result-title) {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.15rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .esc-hint {
-    font-size: 0.75rem;
-    font-family: var(--font-mono);
-    color: var(--color-text);
-    opacity: 0.5;
-    border: 1px solid var(--color-border);
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-    display: block;
-  }
-
-  .close-icon {
-    display: none;
-    color: var(--color-text);
-    opacity: 0.6;
-  }
-
-  .close-trigger:hover .esc-hint {
-    opacity: 1;
-    border-color: var(--color-text);
-  }
-
-  .close-trigger:hover .close-icon {
-    opacity: 1;
-  }
-
-  .close-trigger {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* Search Body */
-  .search-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0.5rem;
-    min-height: 150px;
-  }
-
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 200px;
-    color: var(--color-text);
-    opacity: 0.5;
-    font-size: 1rem;
-    gap: 1rem;
-  }
-
-  .empty-icon {
-    opacity: 0.5;
-  }
-
-  .results-list {
-    opacity: 0.7;
-  }
-
-  /* Search Footer */
-  .search-footer {
-    display: flex;
-    gap: 1.5rem;
-    padding: 0.75rem 1.5rem;
-    border-top: 1px solid var(--color-border);
-    background: var(--color-code-bg);
-    font-size: 0.75rem;
-    color: var(--color-text);
-    opacity: 0.7;
-  }
-
-  .footer-item {
+  :global(.search-result-meta) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
   }
 
-  kbd {
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    padding: 0.1rem 0.4rem;
-    font-family: var(--font-mono);
-    min-width: 1.5em;
-    text-align: center;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  :global(.search-badge) {
     font-weight: 600;
-  }
-
-  /* Global Styles for Results (injected by JS) */
-  :global(.search-result-item) {
-    display: flex;
-    flex-direction: column;
-    padding: 1rem 1.25rem;
-    border-radius: 8px;
-    text-decoration: none;
-    border-left: 3px solid transparent;
-    transition: all 0.15s ease;
-    margin-bottom: 0.25rem;
-    cursor: pointer;
-  }
-
-  :global(.search-result-item:hover),
-  :global(.search-result-item.selected) {
-    background-color: var(--color-code-bg);
-    border-left-color: var(--color-secondary); /* Gold accent */
-  }
-
-  :global(.search-result-item.selected) {
-    background-color: rgba(197, 160, 89, 0.1); /* Subtle gold tint */
-  }
-
-  :global(.search-result-header) {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.35rem;
-  }
-
-  :global(.search-result-title) {
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: var(--color-text);
-  }
-
-  :global(.search-result-type) {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 700;
-    color: var(--color-primary);
-    background: rgba(var(--color-primary-rgb), 0.08);
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    border: 1px solid rgba(var(--color-primary-rgb), 0.2);
-  }
-
-  /* Specific badge colors */
-  :global(.search-result-type.story) {
-    color: #10b981; /* Green */
-    border-color: rgba(16, 185, 129, 0.2);
-    background: rgba(16, 185, 129, 0.1);
-  }
-
-  :global(.search-result-type.education) {
-    color: #3b82f6; /* Blue */
-    border-color: rgba(59, 130, 246, 0.2);
-    background: rgba(59, 130, 246, 0.1);
-  }
-
-  :global(.search-result-excerpt) {
-    font-size: 0.9rem;
-    color: var(--color-text);
-    opacity: 0.7;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    line-height: 1.5;
-  }
-
-  /* Dark Mode Specifics */
-  :global([data-theme="dark"]) .modal-content {
-    background: #1a1b1e;
-    border: 1px solid var(--color-secondary);
-    box-shadow: 0 0 40px rgba(197, 160, 89, 0.15); /* Gold glow */
+    letter-spacing: 0.05em;
   }
 
   @media (max-width: 768px) {
-    .search-shortcut {
-      display: none;
+    .search-wrapper.expanded {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 70px;
+      background: var(--color-bg);
+      justify-content: center;
+      z-index: 2000; /* Extremely high z-index to cover everything */
     }
 
-    .search-trigger {
-      padding: 0.75rem; /* Larger touch target */
+    .search-wrapper.expanded .search-bar {
+      width: 100%;
+      max-width: 90vw;
     }
 
-    .search-header {
-      padding: 1rem;
-      gap: 0.75rem;
+    .search-wrapper.expanded .input-container {
+      width: 100%;
     }
 
-    #search-input {
-      font-size: 1.1rem;
-    }
-
-    .esc-hint {
-      display: none;
-    }
-
-    .close-icon {
-      display: block;
+    .search-wrapper.expanded .dropdown {
+      width: 100vw;
+      min-width: 0; /* Reset desktop min-width */
+      left: 0;
+      right: 0;
+      top: 100%;
+      position: absolute; /* Position relative to the fixed wrapper */
+      z-index: 1999;
+      border-radius: 0 0 12px 12px;
+      max-height: calc(100vh - 70px); /* Ensure it fits on screen */
+      border-top: none;
     }
   }
 </style>
 
 <script>
-  // Dynamic import for Fuse.js to avoid build issues and reduce initial bundle size
   let Fuse: any;
 
-  // Define types for better type safety
   interface Post {
     title: string;
     description: string;
@@ -449,30 +324,27 @@
     tags: string[];
     pubDate: string;
     type: string;
+    image?: string;
   }
 
   let fuse: any;
   let posts: Post[] = [];
-  let selectedIndex = -1;
 
-  const searchBtn = document.getElementById("search-btn");
-  const modal = document.getElementById("search-modal");
-  const closeBtn = document.getElementById("close-search");
+  const wrapper = document.getElementById("search-component");
+  const toggleBtn = document.getElementById("search-trigger");
   const input = document.getElementById("search-input") as HTMLInputElement;
+  const closeBtn = document.getElementById("close-search");
+  const dropdown = document.getElementById("search-dropdown");
   const resultsList = document.getElementById("search-results");
   const emptyState = document.getElementById("empty-state");
 
-  // Fetch posts data
   const fetchPosts = async () => {
     if (posts.length > 0) return;
-
     try {
-      // Load Fuse.js dynamically
       if (!Fuse) {
         const fuseModule = await import("fuse.js");
         Fuse = fuseModule.default;
       }
-
       const res = await fetch("/api/posts.json");
       if (!res.ok) throw new Error("Failed to fetch posts");
       posts = await res.json();
@@ -486,150 +358,101 @@
         threshold: 0.4,
         includeScore: true,
       });
+
+      // Retry search if input has value (fixes race condition)
+      if (input.value.length > 0) {
+        handleInput();
+      }
     } catch (e) {
-      console.error("Failed to fetch posts or load Fuse.js", e);
+      console.error("Search init failed:", e);
     }
   };
 
-  const openSearch = async (e?: Event) => {
-    console.log("Opening search modal...");
-    if (e) e.preventDefault();
-    if (!modal) {
-      console.error("Search modal not found!");
-      return;
+  const toggleSearch = async () => {
+    const isExpanded = wrapper?.classList.contains("expanded");
+    if (!isExpanded) {
+      wrapper?.classList.add("expanded");
+      document.body.classList.add("search-active"); // Hide other elements
+      input?.focus();
+      await fetchPosts();
+    } else {
+      closeSearch();
     }
-
-    modal.classList.remove("hidden");
-    // Force reflow
-    void modal.offsetWidth;
-    modal.classList.add("open");
-    input?.focus();
-    await fetchPosts();
   };
 
   const closeSearch = () => {
-    if (!modal) return;
-    modal.classList.remove("open");
-    setTimeout(() => {
-      modal.classList.add("hidden");
-      if (input) input.value = "";
-      if (resultsList) resultsList.innerHTML = "";
-      if (emptyState) emptyState.style.display = "flex";
-      selectedIndex = -1;
-    }, 200);
+    wrapper?.classList.remove("expanded");
+    wrapper?.classList.remove("has-results");
+    document.body.classList.remove("search-active"); // Show other elements
+    if (input) input.value = "";
   };
 
-  const updateSelection = () => {
-    const items = resultsList?.querySelectorAll(".search-result-item");
-    if (!items) return;
-
-    items.forEach((item, index) => {
-      if (index === selectedIndex) {
-        item.classList.add("selected");
-        item.scrollIntoView({ block: "nearest" });
-      } else {
-        item.classList.remove("selected");
-      }
-    });
-  };
-
-  const handleSearch = (e: Event) => {
-    if (!fuse) return;
-    const target = e.target as HTMLInputElement;
-    const query = target.value;
-
+  const handleInput = () => {
+    const query = input.value;
     if (query.length === 0) {
-      if (resultsList) resultsList.innerHTML = "";
-      if (emptyState) emptyState.style.display = "flex";
-      selectedIndex = -1;
+      wrapper?.classList.remove("has-results");
       return;
     }
 
-    if (emptyState) emptyState.style.display = "none";
+    if (!fuse) return;
     const results = fuse.search(query);
 
-    if (resultsList) {
-      resultsList.innerHTML = results
-        .slice(0, 10)
-        .map((result: any, index: number) => {
-          const typeClass = result.item.type
-            ? result.item.type.toLowerCase()
-            : "post";
-          return `
-        <li>
-          <a href="/${result.item.slug}" class="search-result-item" data-index="${index}">
-            <div class="search-result-header">
-              <span class="search-result-title">${result.item.title}</span>
-              <span class="search-result-type ${typeClass}">${result.item.type || "Post"}</span>
-            </div>
-            <span class="search-result-excerpt">${result.item.description || ""}</span>
-          </a>
-        </li>
-      `;
-        })
-        .join("");
+    if (results.length > 0) {
+      wrapper?.classList.add("has-results");
+      if (emptyState) emptyState.classList.add("hidden");
+      if (resultsList) {
+        resultsList.innerHTML = results
+          .slice(0, 5)
+          .map((r: any) => {
+            const img = r.item.image
+              ? `<img src="${r.item.image}" alt="" class="search-thumb" loading="lazy" />`
+              : `<div class="search-thumb-placeholder"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>`;
 
-      // Select first item by default
-      selectedIndex = 0;
-      updateSelection();
-    }
-  };
-
-  const handleKeydown = (e: KeyboardEvent) => {
-    if (!modal?.classList.contains("open")) {
-      // Open shortcut
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        openSearch();
+            return `
+                <a href="/${r.item.slug}" class="search-result-item">
+                    ${img}
+                    <div class="search-result-content">
+                        <span class="search-result-title">${r.item.title}</span>
+                        <div class="search-result-meta">
+                            <span class="search-badge">${r.item.type || "Story"}</span>
+                         </div>
+                    </div>
+                </a>
+             `;
+          })
+          .join("");
       }
-      return;
-    }
-
-    const items = resultsList?.querySelectorAll(".search-result-item");
-    const maxIndex = items ? items.length - 1 : -1;
-
-    switch (e.key) {
-      case "Escape":
-        e.preventDefault();
-        closeSearch();
-        break;
-      case "ArrowDown":
-        e.preventDefault();
-        if (selectedIndex < maxIndex) selectedIndex++;
-        updateSelection();
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        if (selectedIndex > 0) selectedIndex--;
-        updateSelection();
-        break;
-      case "Enter":
-        e.preventDefault();
-        if (selectedIndex >= 0 && items) {
-          (items[selectedIndex] as HTMLElement).click();
-        }
-        break;
+    } else {
+      wrapper?.classList.add("has-results");
+      if (resultsList) resultsList.innerHTML = "";
+      if (emptyState) emptyState.classList.remove("hidden");
     }
   };
 
-  // Initialize
-  if (searchBtn) {
-    searchBtn.addEventListener("click", openSearch);
-    console.log("Search button listener attached");
-  } else {
-    console.error("Search button not found during initialization");
-  }
+  toggleBtn?.addEventListener("click", toggleSearch);
+  closeBtn?.addEventListener("click", () => {
+    input.value = "";
+    input.focus();
+    wrapper?.classList.remove("has-results");
+  });
 
-  closeBtn?.addEventListener("click", closeSearch);
-  input?.addEventListener("input", handleSearch);
-  document.addEventListener("keydown", handleKeydown);
+  input?.addEventListener("input", handleInput);
 
-  // Close on click outside
-  modal?.addEventListener("click", (e) => {
-    if (
-      e.target === modal ||
-      (e.target as HTMLElement).classList.contains("modal-backdrop")
-    )
+  document.addEventListener("click", (e) => {
+    if (!wrapper?.contains(e.target as Node)) {
       closeSearch();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeSearch();
+    if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      e.preventDefault();
+      if (!wrapper?.classList.contains("expanded")) {
+        toggleSearch();
+      } else {
+        input.focus();
+      }
+    }
   });
 </script>
