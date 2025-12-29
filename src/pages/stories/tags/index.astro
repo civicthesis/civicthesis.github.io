@@ -1,0 +1,157 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const allStories = await getCollection("stories");
+const tags = [...new Set(allStories.map((story) => story.data.tags).flat())];
+---
+
+<Layout title="Story Tags | CivicThesis">
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/stories">Stories</a>
+                    <span class="separator">/</span>
+                    <span class="current">Tags</span>
+                </div>
+                <h1>Explore Topics</h1>
+                <p class="subtitle">Browse stories by category and topic.</p>
+            </div>
+        </section>
+
+        <section class="tags-section">
+            <div class="container">
+                <div class="tags-grid">
+                    {
+                        tags.map((tag) => (
+                            <a href={`/stories/tags/${tag}`} class="tag-card">
+                                <span class="tag-name">{tag}</span>
+                                <span class="story-count">
+                                    {
+                                        allStories.filter((s) =>
+                                            s.data.tags.includes(tag),
+                                        ).length
+                                    }
+                                </span>
+                            </a>
+                        ))
+                    }
+                </div>
+            </div>
+        </section>
+    </main>
+</Layout>
+
+<style>
+    main {
+        width: 100%;
+        min-height: 80vh;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    .hero {
+        padding: 6rem 0 4rem;
+        text-align: center;
+        background: linear-gradient(
+            to bottom,
+            var(--color-bg) 0%,
+            var(--color-surface) 100%
+        );
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 500;
+    }
+
+    .breadcrumb a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .breadcrumb a:hover {
+        color: var(--color-primary);
+    }
+
+    h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 3.5rem;
+        font-weight: 700;
+        font-style: italic;
+        margin-bottom: 1rem;
+        color: var(--color-heading);
+    }
+
+    .subtitle {
+        font-size: 1.25rem;
+        color: var(--color-text-muted);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .tags-section {
+        padding: 4rem 0;
+    }
+
+    .tags-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .tag-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--color-text);
+        transition: all 0.3s ease;
+    }
+
+    .tag-card:hover {
+        border-color: var(--color-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .tag-name {
+        font-family: "Playfair Display", serif;
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    .story-count {
+        background: var(--color-bg);
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        color: var(--color-text-muted);
+        font-weight: 500;
+    }
+
+    .tag-card:hover .story-count {
+        background: var(--color-primary);
+        color: white;
+    }
+</style>
