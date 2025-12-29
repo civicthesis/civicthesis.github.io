@@ -114,13 +114,23 @@
     margin-left: 0.25rem;
   }
 
+  /* Disable transition for mobile */
+  @media (max-width: 768px) {
+    .input-container {
+      transition: none;
+    }
+    .search-bar {
+      transition: none;
+    }
+  }
+
   /* Global styles to hide other header elements when search is expanded */
-    :global(body.search-active) header .logo,
-    :global(body.search-active) header .desktop-nav,
-    :global(body.search-active) header .mobile-menu-btn {
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s;
+  :global(body.search-active) header .logo,
+  :global(body.search-active) header .desktop-nav,
+  :global(body.search-active) header .mobile-menu-btn {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
   }
 
   #search-input {
@@ -279,38 +289,25 @@
   }
 
   @media (max-width: 768px) {
-    /* Preserve layout space on mobile to prevent jump */
-    .search-wrapper {
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    /* Static toggle: Use fixed positioning to cover header reliably, but disable animation/transition */
 
     .search-wrapper.expanded .search-bar {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
-      height: 70px;
+      height: 70px; /* Match header height approx or fixed height */
       background: var(--color-bg);
-      justify-content: center;
+      justify-content: center; /* Center input */
       z-index: 2000;
       padding: 0 1rem;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
 
-    @keyframes slideDown {
-      from {
-        transform: translateY(-100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
+      /* Force static behavior */
+      animation: none;
+      transition: none;
+      transform: none;
+      opacity: 1;
     }
 
     .search-wrapper.expanded .input-container {
@@ -322,8 +319,9 @@
       min-width: 0;
       left: 0;
       right: 0;
+      top: 0;
+      margin-top: 70px; /* Offset by fixed bar height */
       position: fixed;
-      top: 70px; /* Offset by header/bar height */
       z-index: 1999;
       border-radius: 0 0 12px 12px;
       max-height: calc(100vh - 70px);
