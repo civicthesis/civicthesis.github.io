@@ -13,11 +13,22 @@ interface Props {
 const { title, description, date, image, href, tags = [] } = Astro.props;
 ---
 
-<a href={href} class="story-card group">
+<div class="story-card group">
+    {/* Main Link Overlay */}
+    <a href={href} class="story-cover-link" aria-label={`Read ${title}`}>
+        <span class="sr-only">Read Story</span>
+    </a>
+
     <div class="image-container">
         {image && <img src={image} alt={title} loading="lazy" />}
         <div class="overlay"></div>
-        {tags.length > 0 && <span class="floating-tag">{tags[0]}</span>}
+        {
+            tags.length > 0 && (
+                <a href={`/stories/tags/${tags[0]}`} class="floating-tag">
+                    {tags[0]}
+                </a>
+            )
+        }
     </div>
     <div class="content">
         <div class="meta">
@@ -38,12 +49,13 @@ const { title, description, date, image, href, tags = [] } = Astro.props;
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 class="arrow"
-                ><line x1="5" y1="12" x2="19" y2="12"></line><polyline
-                    points="12 5 19 12 12 19"></polyline></svg
             >
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
         </div>
     </div>
-</a>
+</div>
 
 <style>
     .story-card {
@@ -52,15 +64,13 @@ const { title, description, date, image, href, tags = [] } = Astro.props;
         background: var(--color-surface);
         border-radius: 16px;
         overflow: hidden;
-        text-decoration: none;
-        color: inherit;
+        position: relative;
         transition:
             transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
             box-shadow 0.4s ease,
             border-color 0.3s ease;
         border: 1px solid var(--color-border);
         height: 100%;
-        position: relative;
         /* Override accent color for better contrast */
         --card-accent: #d97706; /* Darker amber/orange */
     }
@@ -72,11 +82,19 @@ const { title, description, date, image, href, tags = [] } = Astro.props;
         z-index: 10;
     }
 
+    .story-cover-link {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+    }
+
     .image-container {
         position: relative;
         width: 100%;
         aspect-ratio: 16/9;
         overflow: hidden;
+        z-index: 2;
+        pointer-events: none; /* Let clicks pass through to cover link */
     }
 
     .image-container img {
@@ -120,7 +138,9 @@ const { title, description, date, image, href, tags = [] } = Astro.props;
         letter-spacing: 0.05em;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         backdrop-filter: blur(4px);
-        z-index: 2;
+        text-decoration: none;
+        z-index: 10;
+        pointer-events: auto; /* Re-enable clicks for this element */
     }
 
     .content {
@@ -129,6 +149,9 @@ const { title, description, date, image, href, tags = [] } = Astro.props;
         flex-direction: column;
         flex-grow: 1;
         gap: 1rem;
+        position: relative;
+        z-index: 2;
+        pointer-events: none; /* Let clicks pass through to cover link */
     }
 
     .meta {

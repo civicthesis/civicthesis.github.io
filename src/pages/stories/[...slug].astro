@@ -35,7 +35,12 @@ const { Content } = await story.render();
                         >
                         {
                             story.data.tags && story.data.tags.length > 0 && (
-                                <span class="tag">{story.data.tags[0]}</span>
+                                <a
+                                    href={`/stories/tags/${story.data.tags[0]}`}        
+                                    class="tag"
+                                >
+                                    {story.data.tags[0]}
+                                </a>
                             )
                         }
                     </div>
