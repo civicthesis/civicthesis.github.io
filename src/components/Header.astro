@@ -1,6 +1,37 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro";
 import Search from "./Search.astro";
+import { getCollection } from "astro:content";
+
+// Fetch collections to generate dynamic category links
+const blogEntries = await getCollection("blog");
+const storyEntries = await getCollection("stories");
+
+const allTags = [
+  ...blogEntries.map((e) => e.data.tags).flat(),
+  ...storyEntries.map((e) => e.data.tags || []).flat(),
+];
+
+// Count tag frequency
+const tagCounts = allTags.reduce(
+  (acc, tag) => {
+    const normalizedTag = tag.trim().toLowerCase();
+    acc[normalizedTag] = (acc[normalizedTag] || 0) + 1;
+    return acc;
+  },
+  {} as Record<string, number>,
+);
+
+// Sort by frequency and take top 10
+const topTags = Object.keys(tagCounts)
+  .sort((a, b) => tagCounts[b] - tagCounts[a])
+  .slice(0, 10);
+
+// Capitalize helper
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+const pathname = Astro.url.pathname;
+const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
 ---
 
 <header>
@@ -45,6 +76,30 @@ import Search from "./Search.astro";
         </svg>
       </button>
     </div>
+  </div>
+
+  <!-- Category/Tags Navigation -->
+  <div class="container mobile-categories">
+    <nav class="category-scroll">
+      <a
+        href="/stories"
+        class={`category-link ${isStoriesActive ? "active" : ""}`}>All</a
+      >
+      {
+        topTags.map((tag) => {
+          const tagPath = `/stories/tags/${tag}`;
+          const isActive = pathname.includes(tagPath);
+          return (
+            <a
+              href={tagPath}
+              class={`category-link ${isActive ? "active" : ""}`}
+            >
+              {capitalize(tag)}
+            </a>
+          );
+        })
+      }
+    </nav>
   </div>
 
   <!-- Mobile Menu Overlay -->
@@ -297,6 +352,59 @@ import Search from "./Search.astro";
     .logo {
       gap: 0.25rem;
     }
+  }
+
+  /* Category Scroll Styles */
+  .mobile-categories {
+    max-width: 950px;
+    margin-top: 0.5rem;
+    padding-bottom: 0px; /* Slight adjust */
+  }
+
+  .category-scroll {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    /* padding-bottom: 0.5rem; */
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
+    mask-image: linear-gradient(to right, black 95%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 95%, transparent 100%);
+  }
+
+  .category-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-link {
+    white-space: nowrap;
+    color: var(--color-text-muted); /* fallback if variable exists */
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    text-transform: capitalize;
+    position: relative;
+  }
+
+  /* Add theme variable support manually if needed, or rely on global */
+  :global([data-theme="dark"]) .category-link {
+    color: #a1a1aa;
+  }
+
+  .category-link:hover,
+  .category-link.active {
+    color: var(--color-text);
+  }
+
+  .category-link.active {
+    border-bottom: 2px solid var(--color-text);
+    padding-bottom: 4px; /* Ensure border doesn't clip text */
+  }
+
+  :global([data-theme="dark"]) .category-link:hover {
+    color: #fff;
   }
 </style>
 
