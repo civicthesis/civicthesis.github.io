@@ -66,7 +66,7 @@
     display: flex;
     align-items: center;
     background: transparent;
-    border-radius: 12px;
+    border-radius: 8px;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     border: 1px solid transparent;
     position: relative;
@@ -279,7 +279,16 @@
   }
 
   @media (max-width: 768px) {
-    .search-wrapper.expanded {
+    /* Preserve layout space on mobile to prevent jump */
+    .search-wrapper {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-wrapper.expanded .search-bar {
       position: fixed;
       top: 0;
       left: 0;
@@ -287,12 +296,21 @@
       height: 70px;
       background: var(--color-bg);
       justify-content: center;
-      z-index: 2000; /* Extremely high z-index to cover everything */
+      z-index: 2000;
+      padding: 0 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .search-wrapper.expanded .search-bar {
-      width: 100%;
-      max-width: 90vw;
+    @keyframes slideDown {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
 
     .search-wrapper.expanded .input-container {
@@ -301,15 +319,16 @@
 
     .search-wrapper.expanded .dropdown {
       width: 100vw;
-      min-width: 0; /* Reset desktop min-width */
+      min-width: 0;
       left: 0;
       right: 0;
-      top: 100%;
-      position: absolute; /* Position relative to the fixed wrapper */
+      position: fixed;
+      top: 70px; /* Offset by header/bar height */
       z-index: 1999;
       border-radius: 0 0 12px 12px;
-      max-height: calc(100vh - 70px); /* Ensure it fits on screen */
+      max-height: calc(100vh - 70px);
       border-top: none;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
   }
 </style>
