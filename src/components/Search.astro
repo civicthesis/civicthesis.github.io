@@ -331,6 +331,19 @@
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
   }
+
+  .search-section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding: 0.5rem 1rem;
+    letter-spacing: 0.05em;
+  }
+
+  .recent-search-item {
+    cursor: pointer;
+  }
 </style>
 
 <script>
@@ -449,6 +462,10 @@
             selectedIndex = index;
             updateSelection();
           });
+          // Save search on click
+          item.addEventListener("click", () => {
+            saveRecentSearch(input.value);
+          });
         });
       }
     } else {
@@ -473,15 +490,100 @@
     });
   };
 
-  toggleBtn?.addEventListener("click", toggleSearch);
+  // Recent Searches Logic
+  const getRecentSearches = (): string[] => {
+    try {
+      return JSON.parse(localStorage.getItem("recent_searches") || "[]");
+    } catch {
+      return [];
+    }
+  };
+
+  const saveRecentSearch = (query: string) => {
+    if (!query || query.trim().length === 0) return;
+    const history = getRecentSearches();
+    const newHistory = [query, ...history.filter((h) => h !== query)].slice(
+      0,
+      5,
+    );
+    localStorage.setItem("recent_searches", JSON.stringify(newHistory));
+  };
+
+  const renderRecentSearches = () => {
+    const history = getRecentSearches();
+    if (history.length === 0) {
+      wrapper?.classList.remove("has-results");
+      if (resultsList) resultsList.innerHTML = "";
+      return;
+    }
+
+    wrapper?.classList.add("has-results");
+    if (resultsList) {
+      resultsList.innerHTML = `
+            <div class="search-section-title">Recent Searches</div>
+            ${history
+              .map(
+                (query) => `
+                <div class="search-result-item recent-search-item" role="button" tabindex="0">
+                     <div class="search-thumb-placeholder" style="width: 32px; height: 32px; border-radius: 50%;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                     </div>
+                     <div class="search-result-content">
+                        <span class="search-result-title" style="font-weight: 500;">${query}</span>
+                     </div>
+                </div>
+            `,
+              )
+              .join("")}
+        `;
+
+      // Attach click handlers
+      const items = resultsList.querySelectorAll(".recent-search-item");
+      items.forEach((item) => {
+        item.addEventListener("click", () => {
+          const query =
+            item.querySelector(".search-result-title")?.textContent || "";
+          input.value = query;
+          input.focus();
+          handleInput();
+        });
+        // Keyboard support for recent items if needed?
+        // Currently main keydown handles ArrowUp/Down which should work if they have class .search-result-item
+      });
+
+      // Attach mouseenter for hover-sync
+      items.forEach((item, index) => {
+        item.addEventListener("mouseenter", () => {
+          selectedIndex = index;
+          updateSelection();
+        });
+      });
+    }
+  };
+
+  toggleBtn?.addEventListener("click", () => {
+    // Logic from original toggle
+    const isExpanded = wrapper?.classList.contains("expanded");
+    if (!isExpanded) {
+      wrapper?.classList.add("expanded");
+      document.body.classList.add("search-active");
+      input?.focus();
+      fetchPosts();
+      if (input.value.length === 0) renderRecentSearches();
+    } else {
+      closeSearch();
+    }
+  });
+
   closeBtn?.addEventListener("click", () => {
     if (input.value.length === 0) {
       closeSearch();
     } else {
       input.value = "";
       input.focus();
-      wrapper?.classList.remove("has-results");
-      // Add a small delay to focus to ensure keyboard stays up on mobile
+      // wrapper?.classList.remove("has-results"); // Don't remove active state totally?
+      // Show recent searches instead of clearing everything
+      renderRecentSearches();
       setTimeout(() => input.focus(), 10);
     }
   });
@@ -530,6 +632,7 @@
       updateSelection();
     } else if (e.key === "Enter" && selectedIndex >= 0) {
       e.preventDefault();
+      saveRecentSearch(input.value);
       (items[selectedIndex] as HTMLElement).click();
     }
   });
