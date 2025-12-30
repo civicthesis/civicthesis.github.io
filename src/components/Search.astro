@@ -67,7 +67,7 @@
     align-items: center;
     background: transparent;
     border-radius: 8px;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
     border: 1px solid transparent;
     position: relative;
     z-index: 20;
@@ -76,9 +76,10 @@
   /* Expanded State */
   .search-wrapper.expanded .search-bar {
     background: var(--color-surface);
-    border-color: var(--color-border);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    /* border-color: var(--color-border); */
+    /* box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); */
     padding-right: 0.5rem;
+    border-bottom: 1px solid var(--color-border);
   }
 
   .icon-btn {
@@ -105,7 +106,6 @@
     width: 0;
     overflow: hidden;
     opacity: 0;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .search-wrapper.expanded .input-container {
@@ -233,8 +233,10 @@
     transition: background 0.15s ease;
   }
 
-  :global(.search-result-item:hover) {
-    background: var(--color-bg-offset);
+  :global(.search-result-item.selected) {
+    background-color: var(--color-bg-offset);
+    /* border-left: 3px solid var(--color-primary); Make selection obvious */
+    /* padding-left: calc(1rem - 3px); Adjust padding to prevent layout shift */
   }
 
   :global(.search-thumb) {
@@ -301,7 +303,7 @@
       justify-content: center; /* Center input */
       z-index: 2000;
       padding: 0 1rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      /* box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); */
 
       /* Force static behavior */
       animation: none;
@@ -346,6 +348,7 @@
 
   let fuse: any;
   let posts: Post[] = [];
+  let selectedIndex = -1;
 
   const wrapper = document.getElementById("search-component");
   const toggleBtn = document.getElementById("search-trigger");
@@ -438,19 +441,49 @@
              `;
           })
           .join("");
+
+        // Attach mouseenter listeners to sync hover state
+        const items = resultsList.querySelectorAll(".search-result-item");
+        items.forEach((item, index) => {
+          item.addEventListener("mouseenter", () => {
+            selectedIndex = index;
+            updateSelection();
+          });
+        });
       }
     } else {
       wrapper?.classList.add("has-results");
       if (resultsList) resultsList.innerHTML = "";
       if (emptyState) emptyState.classList.remove("hidden");
     }
+    selectedIndex = -1; // Reset selection on new input
+  };
+
+  const updateSelection = () => {
+    const items = resultsList?.querySelectorAll(".search-result-item");
+    if (!items) return;
+
+    items.forEach((item, index) => {
+      if (index === selectedIndex) {
+        item.classList.add("selected");
+        item.scrollIntoView({ block: "nearest" });
+      } else {
+        item.classList.remove("selected");
+      }
+    });
   };
 
   toggleBtn?.addEventListener("click", toggleSearch);
   closeBtn?.addEventListener("click", () => {
-    input.value = "";
-    input.focus();
-    wrapper?.classList.remove("has-results");
+    if (input.value.length === 0) {
+      closeSearch();
+    } else {
+      input.value = "";
+      input.focus();
+      wrapper?.classList.remove("has-results");
+      // Add a small delay to focus to ensure keyboard stays up on mobile
+      setTimeout(() => input.focus(), 10);
+    }
   });
 
   input?.addEventListener("input", handleInput);
@@ -470,6 +503,34 @@
       } else {
         input.focus();
       }
+    }
+  });
+
+  input?.addEventListener("keydown", (e) => {
+    if (!wrapper?.classList.contains("has-results")) return;
+
+    const items = resultsList?.querySelectorAll(".search-result-item");
+    if (!items || items.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (selectedIndex === -1) {
+        selectedIndex = 0;
+      } else {
+        selectedIndex = (selectedIndex + 1) % items.length;
+      }
+      updateSelection();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (selectedIndex === -1) {
+        selectedIndex = items.length - 1;
+      } else {
+        selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+      }
+      updateSelection();
+    } else if (e.key === "Enter" && selectedIndex >= 0) {
+      e.preventDefault();
+      (items[selectedIndex] as HTMLElement).click();
     }
   });
 </script>

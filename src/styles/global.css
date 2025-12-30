@@ -2,8 +2,11 @@
 :root {
     /* Color Palette - Light Mode */
     --color-bg: #ffffff;
+    --color-bg-offset: #dfdfdf;
     --color-text: #1a1a1a;
+    --color-text-muted: #666666;                        
     --color-primary: #1B2A41;
+    /* --color-heading: #1B2A41; */
     /* Navy Blue */
     --color-secondary: #C5A059;
     /* Gold */
@@ -17,6 +20,8 @@
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --font-serif: 'Playfair Display', serif;
     --font-mono: 'Fira Code', monospace;
+    --font-carrois: 'Carrois Gothic', sans-serif;
+    --font-barlow: 'Barlow Condensed', sans-serif;
 
     /* Spacing */
     --spacing-sm: 0.5rem;
@@ -28,8 +33,10 @@
 [data-theme="dark"] {
     /* Color Palette - Dark Mode */
     --color-bg: #1F2023;
+    --color-bg-offset: #292929;
     /* Dark Charcoal */
     --color-text: #e2e8f0;
+    --color-text-muted: #666666;
     --color-primary: #ffffff;
     /* White for primary elements in dark mode */
     --color-secondary: #C5A059;
@@ -37,6 +44,7 @@
     --color-accent: #93C5FD;
     --color-border: #333333;
     --color-code-bg: #2a2b2e;
+    /* --color-heading: #ffffff; */
     --color-logo-text: #ffffff;
     /* White for "CIVIC" in dark mode */
 }
@@ -362,7 +370,8 @@ p {
 
 /* Brand Typography */
 .civic {
-    font-family: 'Montserrat', sans-serif;
+    /* font-family: 'Montserrat', sans-serif; */
+    font-family: var(--font-carrois);
     font-weight: 700;
     color: var(--color-logo-text);
     letter-spacing: 0.02em;

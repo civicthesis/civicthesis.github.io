@@ -80,6 +80,7 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
 
   <!-- Category/Tags Navigation -->
   <div class="container mobile-categories">
+    <div id="current-date" class="current-date"></div>
     <nav class="category-scroll">
       <a
         href="/stories"
@@ -136,6 +137,7 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
           <span>Theme</span>
           <ThemeToggle />
         </div>
+        <div id="mobile-date" class="mobile-date"></div>
       </nav>
     </div>
     <div class="mobile-backdrop"></div>
@@ -148,7 +150,7 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
     border-bottom: 1px solid var(--color-border);
     margin-bottom: var(--spacing-xl);
     background-color: var(--color-bg);
-    position: sticky;
+    /* position: sticky; */
     top: 0;
     z-index: 40;
     transition:
@@ -176,6 +178,7 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
 
   .civic {
     font-family: "Montserrat", sans-serif;
+    font-family: var(--font-carrois);
     font-weight: 700;
     font-size: 1.8rem;
     color: var(--color-logo-text);
@@ -205,6 +208,7 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
   }
 
   .desktop-nav a {
+    font-family: var(--font-carrois);
     font-weight: 600;
     font-size: 0.95rem;
     color: var(--color-text);
@@ -253,7 +257,7 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
+    /* backdrop-filter: blur(4px); */
     z-index: 101;
   }
 
@@ -307,6 +311,7 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
   }
 
   .mobile-nav a {
+    font-family: var(--font-carrois);
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--color-text);
@@ -321,6 +326,16 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
     margin-top: 1rem;
     font-weight: 600;
     color: var(--color-text);
+  }
+
+  .mobile-date {
+    font-family: var(--font-carrois);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
   }
 
   /* Responsive Styles */
@@ -356,9 +371,31 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
 
   /* Category Scroll Styles */
   .mobile-categories {
+    /* Category Scroll Styles */
+    /* .mobile-categories { */
     max-width: 950px;
     margin-top: 0.5rem;
     padding-bottom: 0px; /* Slight adjust */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .current-date {
+    font-family: var(--font-carrois);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    text-transform: capitalize;
+    display: none; /* Hidden on small screens */
+  }
+
+  @media (min-width: 768px) {
+    .current-date {
+      display: block;
+    }
   }
 
   .category-scroll {
@@ -368,8 +405,8 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
     /* padding-bottom: 0.5rem; */
     scrollbar-width: none; /* Hide scrollbar Firefox */
     -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
-    mask-image: linear-gradient(to right, black 95%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 95%, transparent 100%);
+    /* mask-image: linear-gradient(to right, black 95%, transparent 100%); */
+    /* -webkit-mask-image: linear-gradient(to right, black 95%, transparent 100%); */
   }
 
   .category-scroll::-webkit-scrollbar {
@@ -378,33 +415,19 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
 
   .category-link {
     white-space: nowrap;
-    color: var(--color-text-muted); /* fallback if variable exists */
-    color: #666;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-family: var(--font-carrois);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text);
     transition: all 0.2s;
     flex-shrink: 0;
     text-transform: capitalize;
     position: relative;
   }
 
-  /* Add theme variable support manually if needed, or rely on global */
-  :global([data-theme="dark"]) .category-link {
-    color: #a1a1aa;
-  }
-
-  .category-link:hover,
   .category-link.active {
-    color: var(--color-text);
-  }
-
-  .category-link.active {
-    border-bottom: 2px solid var(--color-text);
+    border-bottom: 2px solid var(--color-heading);
     padding-bottom: 4px; /* Ensure border doesn't clip text */
-  }
-
-  :global([data-theme="dark"]) .category-link:hover {
-    color: #fff;
   }
 </style>
 
@@ -430,4 +453,23 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
   mobileLinks.forEach((link) => {
     link.addEventListener("click", toggleMenu);
   });
+
+  // Date Logic
+  const dateElement = document.getElementById("current-date");
+  if (dateElement) {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString("en-US", options);
+    dateElement.textContent = formattedDate;
+
+    const mobileDateElement = document.getElementById("mobile-date");
+    if (mobileDateElement) {
+      mobileDateElement.textContent = formattedDate;
+    }
+  }
 </script>
