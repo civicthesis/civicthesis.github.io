@@ -3,6 +3,7 @@ title: "Tech Giants Unveil Revolutionary AI Assistant"
 description: "A new era of personal computing begins with the launch of an AI that truly understands context and emotion."
 pubDate: 2023-11-20
 image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=2070"
+category: "Technology"
 tags: ["Technology", "AI"]
 ---
 

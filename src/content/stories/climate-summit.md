@@ -3,6 +3,7 @@ title: "Global Summit Addresses Climate Crisis"
 description: "World leaders gather to forge a new path towards carbon neutrality and environmental protection."
 pubDate: 2023-11-25
 image: "https://images.unsplash.com/photo-1621274790572-7c32596bc67f?auto=format&fit=crop&q=80&w=2070"
+category: "Environment"
 tags: ["Politics", "Climate"]
 ---
 

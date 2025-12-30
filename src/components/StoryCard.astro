@@ -7,10 +7,19 @@ interface Props {
     date: Date;
     image?: string;
     href: string;
+    category: string;
     tags?: string[];
 }
 
-const { title, description, date, image, href, tags = [] } = Astro.props;
+const {
+    title,
+    description,
+    date,
+    image,
+    href,
+    tags = [],
+    category,
+} = Astro.props;
 ---
 
 <div class="story-card group">
@@ -23,9 +32,9 @@ const { title, description, date, image, href, tags = [] } = Astro.props;
         {image && <img src={image} alt={title} loading="lazy" />}
         <div class="overlay"></div>
         {
-            tags.length > 0 && (
-                <a href={`/stories/tags/${tags[0]}`} class="floating-tag">
-                    {tags[0]}
+            category && (
+                <a href={`/${category}`} class="floating-tag">
+                    {category}
                 </a>
             )
         }

@@ -8,14 +8,14 @@ const blogEntries = await getCollection("blog");
 const storyEntries = await getCollection("stories");
 
 const allTags = [
-  ...blogEntries.map((e) => e.data.tags).flat(),
-  ...storyEntries.map((e) => e.data.tags || []).flat(),
+  ...storyEntries.map((e) => (e.data.category ? [e.data.category] : [])).flat(),
+  // ...blogEntries.map((e) => e.data.tags).flat(),
 ];
 
 // Count tag frequency
 const tagCounts = allTags.reduce(
   (acc, tag) => {
-    const normalizedTag = tag.trim().toLowerCase();
+    const normalizedTag = tag.trim();
     acc[normalizedTag] = (acc[normalizedTag] || 0) + 1;
     return acc;
   },
@@ -88,7 +88,7 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
       >
       {
         topTags.map((tag) => {
-          const tagPath = `/stories/tags/${tag}`;
+          const tagPath = `/${tag}`;
           const isActive = pathname.includes(tagPath);
           return (
             <a

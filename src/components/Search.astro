@@ -540,7 +540,8 @@
       // Attach click handlers
       const items = resultsList.querySelectorAll(".recent-search-item");
       items.forEach((item) => {
-        item.addEventListener("click", () => {
+        item.addEventListener("click", (e) => {
+          e.stopPropagation();
           const query =
             item.querySelector(".search-result-title")?.textContent || "";
           input.value = query;

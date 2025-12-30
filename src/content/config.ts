@@ -20,6 +20,7 @@ const storiesCollection = defineCollection({
         pubDate: z.date(),
         image: z.string().optional(),
         tags: z.array(z.string()).default([]),
+        category: z.string().default('General'),
     }),
 });
 
