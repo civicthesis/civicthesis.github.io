@@ -1,10 +1,30 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import FeaturedStoryCard from "../components/FeaturedStoryCard.astro";
+import StoryCard from "../components/StoryCard.astro";
+import GridCard from "../components/GridCard.astro";
 import { getCollection } from "astro:content";
 
 const posts = (await getCollection("blog")).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
+
+const stories = (await getCollection("stories")).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+// Try to find OG Crew, otherwise default to first story
+const featuredStoryIndex = stories.findIndex((s) => s.slug.includes("og-crew"));
+const featuredStory =
+	featuredStoryIndex >= 0 ? stories[featuredStoryIndex] : stories[0];
+
+// Get next 4 stories for sub-features (excluding the featured one)
+const allFilteredStories = stories.filter((_, index) =>
+	featuredStoryIndex >= 0 ? index !== featuredStoryIndex : index !== 0,
+);
+
+const subStories = allFilteredStories.slice(0, 4);
+const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for grid
 ---
 
 <Layout
@@ -20,6 +40,53 @@ const posts = (await getCollection("blog")).sort(
 		<p class="subtitle">
 			Exploring data, society, and technology through a modern lens.
 		</p>
+	</section>
+
+	<section class="featured-grid animate-fade-in">
+		<div class="main-feature">
+			{
+				featuredStory && (
+					<FeaturedStoryCard
+						title={featuredStory.data.title}
+						description={featuredStory.data.description}
+						date={featuredStory.data.pubDate}
+						image={featuredStory.data.image}
+						href={`/stories/${featuredStory.slug}`}
+						category={featuredStory.data.category}
+					/>
+				)
+			}
+		</div>
+		<div class="sub-features">
+			{
+				subStories.map((story) => (
+					<StoryCard
+						title={story.data.title}
+						description={story.data.description}
+						date={story.data.pubDate}
+						image={story.data.image}
+						href={`/stories/${story.slug}`}
+						category={story.data.category}
+						tags={story.data.tags}
+					/>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="secondary-grid animate-fade-in">
+		{
+			secondaryStories.map((story) => (
+				<GridCard
+					title={story.data.title}
+					description={story.data.description}
+					date={story.data.pubDate}
+					image={story.data.image}
+					href={`/stories/${story.slug}`}
+					category={story.data.category}
+				/>
+			))
+		}
 	</section>
 
 	<section class="posts-grid">
@@ -149,6 +216,53 @@ const posts = (await getCollection("blog")).sort(
 	@media (max-width: 768px) {
 		.hero h1 {
 			font-size: 2.5rem;
+		}
+	}
+
+	.featured-grid {
+		display: grid;
+		grid-template-columns: 1.5fr 1fr;
+		gap: var(--spacing-lg);
+		margin-bottom: var(--spacing-xl);
+	}
+
+	.main-feature {
+		height: 100%;
+	}
+
+	/* Force FeaturedStoryCard to fill height */
+	.main-feature :global(.featured-card) {
+		height: 100%;
+		margin-bottom: 0;
+	}
+
+	.sub-features {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: var(--spacing-md);
+		align-content: start;
+	}
+
+	@media (max-width: 1024px) {
+		.featured-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.sub-features {
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		}
+	}
+
+	.secondary-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--spacing-lg);
+		margin-bottom: var(--spacing-xl);
+	}
+
+	@media (max-width: 900px) {
+		.secondary-grid {
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 		}
 	}
 </style>

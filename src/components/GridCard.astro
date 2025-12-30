@@ -1,0 +1,155 @@
+---
+import { formatDate } from "../utils";
+
+interface Props {
+    title: string;
+    description: string;
+    date: Date;
+    image?: string;
+    href: string;
+    category: string;
+    author?: string;
+}
+
+const {
+    title,
+    description,
+    date,
+    image,
+    href,
+    category,
+    author = "Civic Team",
+} = Astro.props;
+---
+
+<article class="grid-card">
+    <a href={href} class="card-link" aria-label={`Read ${title}`}>
+        <!-- <span class="sr-only">Read Story</span> -->
+    </a>
+    <div class="image-wrapper">
+        {image && <img src={image} alt={title} loading="lazy" />}
+    </div>
+    <div class="content">
+        <div class="meta">
+            <span class="category">{category}</span>
+        </div>
+        <h3 class="title">{title}</h3>
+        <p class="description">{description}</p>
+        <div class="footer">
+            <span class="author">{author}</span>
+            <span class="separator">•</span>
+            <time datetime={date.toISOString()}>{formatDate(date)}</time>
+        </div>
+    </div>
+</article>
+
+<style>
+    .grid-card {
+        position: relative;
+        background: #141212; /* GitHub dark bg typical */
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            border-color 0.2s ease;
+        height: 100%;
+    }
+
+    .grid-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        border-color: #8b949e;
+    }
+
+    /* Make the card link cover the whole card */
+    .card-link {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+    }
+
+    .image-wrapper {
+        width: 100%;
+        aspect-ratio: 16/9;
+        overflow: hidden;
+        position: relative;
+        border-bottom: 1px solid #30363d;
+    }
+
+    .image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .grid-card:hover .image-wrapper img {
+        transform: scale(1.05);
+    }
+
+    .content {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        color: #c9d1d9; /* GitHub text color */
+    }
+
+    .meta {
+        margin-bottom: 1rem;
+    }
+
+    .category {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #58a6ff; /* GitHub blue */
+        letter-spacing: 0.05em;
+    }
+
+    .title {
+        font-family: var(--font-sans);
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 0.75rem;
+        line-height: 1.3;
+    }
+
+    .description {
+        font-size: 0.95rem;
+        color: #8b949e;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex-grow: 1;
+    }
+
+    .footer {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        color: #8b949e;
+        margin-top: auto;
+    }
+
+    .author {
+        font-weight: 600;
+        color: #c9d1d9;
+    }
+
+    /* Light mode override if needed, or stick to dark card style even in light mode for distinct look */
+    /* For now keeping it forced dark as "GitHub style" usually implies that aesthetic */
+    :global([data-theme="light"]) .grid-card {
+        /* Optional: Invert if user wants, but dark cards on light bg can look cool as featured items */
+        /* border-color: #e1e4e8; */
+    }
+</style>

@@ -1,0 +1,210 @@
+---
+import { formatDate } from "../utils";
+
+interface Props {
+    title: string;
+    description: string;
+    date: Date;
+    image?: string;
+    href: string;
+    category: string;
+}
+
+const { title, description, date, image, href, category } = Astro.props;
+---
+
+<article class="featured-card group">
+    <div class="image-container">
+        {image && <img src={image} alt={title} loading="eager" />}
+        <div class="overlay"></div>
+    </div>
+
+    <div class="content">
+        <div class="meta">
+            <span class="badge">Featured Story</span>
+            {category && <span class="category">{category}</span>}
+        </div>
+
+        <h2 class="title">
+            <a href={href}>{title}</a>
+        </h2>
+
+        <p class="description">{description}</p>
+
+        <div class="footer">
+            <time datetime={date.toISOString()}>{formatDate(date)}</time>
+            <a href={href} class="read-btn">
+                Read Story
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </a>
+        </div>
+    </div>
+</article>
+
+<style>
+    .featured-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        background: var(--color-surface);
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid var(--color-border);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+        margin-bottom: var(--spacing-xl);
+        min-height: 600px; /* Increased height for vertical stack */
+    }
+
+    .image-container {
+        position: relative;
+        height: 60%; /* Take up top 60% of card */
+        width: 100%;
+        overflow: hidden;
+        min-height: 350px;
+    }
+
+    .image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .featured-card:hover .image-container img {
+        transform: scale(1.03);
+    }
+
+    .overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            to right,
+            rgba(0, 0, 0, 0) 0%,
+            rgba(0, 0, 0, 0.1) 100%
+        );
+        display: none; /* Only need overlay if text is on image, here specific layout */
+    }
+
+    .content {
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: var(--color-surface); /* Ensure contrast */
+        position: relative;
+        z-index: 2;
+    }
+
+    .meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .badge {
+        background: var(--color-primary);
+        color: var(--color-bg);
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .category {
+        color: var(--color-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.85rem;
+    }
+
+    .title {
+        font-family: var(--font-carrois); /* Using new user font */
+        font-size: 3.5rem;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+    }
+
+    .title a {
+        color: var(--color-heading);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .title a:hover {
+        color: var(--color-secondary);
+    }
+
+    .description {
+        font-size: 1.125rem;
+        color: var(--color-text-muted);
+        margin-bottom: 2rem;
+        line-height: 1.7;
+        max-width: 100%; /* Full width for vertical layout */
+    }
+
+    .footer {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-top: auto;
+    }
+
+    time {
+        color: var(--color-text-muted);
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .read-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--color-primary);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.05em;
+        padding-bottom: 2px;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+    .read-btn:hover {
+        gap: 0.75rem;
+        border-bottom-color: var(--color-primary);
+    }
+
+    @media (max-width: 900px) {
+        .featured-card {
+            grid-template-columns: 1fr;
+            grid-template-rows: 300px auto;
+            min-height: auto;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .title {
+            font-size: 2.5rem;
+        }
+    }
+</style>

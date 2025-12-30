@@ -4,7 +4,7 @@
     --color-bg: #ffffff;
     --color-bg-offset: #dfdfdf;
     --color-text: #1a1a1a;
-    --color-text-muted: #666666;                        
+    --color-text-muted: #666666;
     --color-primary: #1B2A41;
     /* --color-heading: #1B2A41; */
     /* Navy Blue */
@@ -97,7 +97,8 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: var(--font-sans);
+    /* font-family: var(--font-sans); */
+    font-family: var(--font-carrois);
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: var(--spacing-md);
@@ -117,6 +118,8 @@ h3 {
 
 p {
     margin-bottom: var(--spacing-md);
+    font-family: var(--font-sans);
+    /* font-family: var(--font-carrois); */
 }
 
 /* Layout Utilities */
@@ -126,7 +129,7 @@ p {
 
 .container {
     width: 100%;
-    max-width: 800px;
+    max-width: 1250px;
     margin: 0 auto;
     padding: 0 var(--spacing-md);
 }

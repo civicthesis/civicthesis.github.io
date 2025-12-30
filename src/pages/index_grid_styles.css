@@ -1,0 +1,33 @@
+	.featured-grid {
+	    display: grid;
+	    grid-template-columns: 1.5fr 1fr;
+	    gap: var(--spacing-lg);
+	    margin-bottom: var(--spacing-xl);
+	}
+
+	.main-feature {
+	    height: 100%;
+	}
+
+	/* Force FeaturedStoryCard to fill height */
+	.main-feature :global(.featured-card) {
+	    height: 100%;
+	    margin-bottom: 0;
+	}
+
+	.sub-features {
+	    display: grid;
+	    grid-template-columns: repeat(2, 1fr);
+	    gap: var(--spacing-md);
+	    align-content: start;
+	}
+
+	@media (max-width: 1024px) {
+	    .featured-grid {
+	        grid-template-columns: 1fr;
+	    }
+
+	    .sub-features {
+	        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	    }
+	}
