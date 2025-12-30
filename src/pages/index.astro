@@ -32,7 +32,7 @@ const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for gr
 	description="Exploring data, society, and technology through a modern lens."
 	image="/logo.png"
 >
-	<section class="hero animate-fade-in">
+	<!-- <section class="hero animate-fade-in">
 		<h1>
 			<span class="civic">CIVIC</span>
 			<span class="thesis">Thesis</span>
@@ -40,7 +40,7 @@ const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for gr
 		<p class="subtitle">
 			Exploring data, society, and technology through a modern lens.
 		</p>
-	</section>
+	</section> -->
 
 	<section class="featured-grid animate-fade-in">
 		<div class="main-feature">
@@ -114,6 +114,16 @@ const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for gr
 				</article>
 			))
 		}
+	</section>
+
+	<section class="hero animate-fade-in">
+		<h1>
+			<span class="civic">CIVIC</span>
+			<span class="thesis">Thesis</span>
+		</h1>
+		<p class="subtitle">
+			Exploring data, society, and technology through a modern lens.
+		</p>
 	</section>
 </Layout>
 
@@ -224,6 +234,12 @@ const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for gr
 		grid-template-columns: 1.5fr 1fr;
 		gap: var(--spacing-lg);
 		margin-bottom: var(--spacing-xl);
+	}
+
+	@media (max-width: 1024px) {
+		.featured-grid {
+			margin-top: var(--spacing-xl);
+		}
 	}
 
 	.main-feature {

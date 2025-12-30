@@ -31,7 +31,7 @@ const { title, description, date, image, href, category } = Astro.props;
 
         <p class="description">{description}</p>
 
-        <div class="footer">
+        <!-- <div class="footer">
             <time datetime={date.toISOString()}>{formatDate(date)}</time>
             <a href={href} class="read-btn">
                 Read Story
@@ -50,7 +50,7 @@ const { title, description, date, image, href, category } = Astro.props;
                     <polyline points="12 5 19 12 12 19"></polyline>
                 </svg>
             </a>
-        </div>
+        </div> -->
     </div>
 </article>
 
@@ -63,9 +63,9 @@ const { title, description, date, image, href, category } = Astro.props;
         border-radius: 24px;
         overflow: hidden;
         border: 1px solid var(--color-border);
-        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+        /* box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1); */
         margin-bottom: var(--spacing-xl);
-        min-height: 600px; /* Increased height for vertical stack */
+        min-height: 500px; /* Increased height for vertical stack */
     }
 
     .image-container {
@@ -99,7 +99,7 @@ const { title, description, date, image, href, category } = Astro.props;
     }
 
     .content {
-        padding: 3rem;
+        padding: 1.5rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -136,7 +136,7 @@ const { title, description, date, image, href, category } = Astro.props;
 
     .title {
         font-family: var(--font-carrois); /* Using new user font */
-        font-size: 3.5rem;
+        font-size: 3rem;
         line-height: 1.1;
         margin-bottom: 1.5rem;
         font-weight: 700;
