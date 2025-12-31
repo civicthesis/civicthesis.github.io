@@ -1,0 +1,100 @@
+---
+interface Props {
+    author?: string;
+    role?: string;
+    class?: string;
+    variant?: "default" | "centered";
+}
+
+const { author, role, class: className, variant = "default" } = Astro.props;
+---
+
+<figure class:list={["ted-quote", `variant-${variant}`, className]}>
+    <blockquote cite={author}>
+        <slot />
+    </blockquote>
+    {
+        author && (
+            <figcaption>
+                <span class="author">{author}</span>
+                {role && <span class="role">, {role}</span>}
+            </figcaption>
+        )
+    }
+</figure>
+
+<style>
+    .ted-quote {
+        margin: 2.5rem 0;
+        padding: 0 1rem;
+        background: transparent;
+    }
+
+    /* Default Style (Left Border) */
+    .variant-default {
+        border-left: 4px solid var(--color-accent);
+    }
+
+    .variant-default blockquote {
+        font-family: var(--font-serif);
+        font-size: 1.5rem;
+        font-style: italic;
+        line-height: 1.4;
+        color: var(--color-heading);
+        margin: 0 0 1rem 0;
+    }
+
+    .variant-default figcaption {
+        font-family: var(--font-sans);
+        font-size: 0.9rem;
+        color: var(--color-text-muted);
+    }
+
+    /* Centered Style (Image Inspiration) */
+    .variant-centered {
+        text-align: center;
+        max-width: 80%;
+        margin: 3rem auto;
+        padding: 2rem;
+        border-radius: 8px;
+        border: none;
+    }
+
+    .variant-centered blockquote {
+        font-family: "Playfair Display", serif !important;
+        font-size: 1.75rem;
+        font-style: italic;
+        /* color: var(--color-heading); */
+        color: #555555; /* Matching the inspector code color roughly */
+        margin-bottom: 1.5rem;
+    }
+
+    /* Dark mode adjustment for centered quote text */
+    :global([data-theme="dark"]) .variant-centered blockquote {
+        color: #e2e8f0;
+    }
+
+    .variant-centered figcaption {
+        font-family: var(--font-sans);
+        font-size: 1rem;
+        color: var(--color-text-muted);
+        border-top: 1px solid var(--color-border);
+        display: inline-block;
+        padding-top: 0.5rem;
+    }
+
+    .author {
+        font-weight: 700;
+        color: var(--color-text);
+    }
+
+    .role {
+        font-style: normal;
+    }
+
+    @media (max-width: 768px) {
+        blockquote {
+            font-size: 1.25rem;
+        }
+    }
+</style>

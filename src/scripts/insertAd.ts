@@ -8,11 +8,11 @@ export function insertAd(proseSelector: string, adContainerId: string) {
 
     if (!prose || !adPlaceholder || !adContent) return;
 
-    const headings = prose.querySelectorAll('h2');
+    const headings = prose.querySelectorAll('h2, h3');
 
     // Priority 1: Before 2nd Heading (typically separating intro/first section from second)
-    if (headings.length >= 2) {
-        headings[1].insertAdjacentElement('beforebegin', adContent);
+    if (headings.length >= 3) {
+        headings[2].insertAdjacentElement('beforebegin', adContent);
         return;
     }
 
