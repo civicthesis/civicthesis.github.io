@@ -18,6 +18,9 @@ import ScribbleCheck from "../../components/scribble/ScribbleCheck.astro";
 import ScribbleLine from "../../components/scribble/ScribbleLine.astro";
 import BarChart from "../../components/BarChart.astro";
 import CustomTable from "../../components/CustomTable.astro";
+import InArticleAd from "../../components/ads/InArticleAd.astro";
+import InFeedAd from "../../components/ads/InFeedAd.astro";
+import StoryCard from "../../components/StoryCard.astro";
 
 export async function getStaticPaths() {
 	const posts = await getCollection("blog");
@@ -48,6 +51,43 @@ const components = {
 const post = Astro.props;
 const { Content } = await post.render();
 const url = new URL(Astro.url.pathname, Astro.site);
+
+// Get all posts for functionality related logic
+const allPosts = await getCollection("blog");
+
+// Logic to find related posts
+const currentTags = post.data.tags || [];
+const relatedPosts = allPosts
+	.filter((p) => p.slug !== post.slug) // Exclude current post
+	.map((p) => {
+		const otherTags = p.data.tags || [];
+		const intersection = currentTags.filter((tag) =>
+			otherTags.includes(tag),
+		);
+		return {
+			post: p,
+			matchingTags: intersection.length,
+		};
+	})
+	.filter((item) => item.matchingTags > 0) // Only include posts with at least one matching tag
+	.sort((a, b) => b.matchingTags - a.matchingTags) // Sort by number of matching tags
+	.slice(0, 3) // Take top 2
+	.map((item) => item.post);
+
+// Fallback: If not enough related posts, fill with recent posts
+if (relatedPosts.length < 3) {
+	const remainingCount = 3 - relatedPosts.length;
+	const existingSlugs = new Set([
+		post.slug,
+		...relatedPosts.map((p) => p.slug),
+	]);
+	const recentPosts = allPosts
+		.filter((p) => !existingSlugs.has(p.slug))
+		.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+		.slice(0, remainingCount);
+
+	relatedPosts.push(...recentPosts);
+}
 ---
 
 <Layout
@@ -81,7 +121,43 @@ const url = new URL(Astro.url.pathname, Astro.site);
 			<Content components={components} />
 		</div>
 
+		<!-- Hidden ad container to be moved by script -->
+		<div id="blog-ad-placeholder" style="display:none;">
+			<InArticleAd />
+		</div>
+
+		<script>
+			import { insertAd } from "../../scripts/insertAd";
+			document.addEventListener("DOMContentLoaded", () => {
+				insertAd(".prose", "blog-ad-placeholder");
+			});
+		</script>
+
 		<ShareButtons title={post.data.title} url={url} />
+
+		{
+			relatedPosts.length > 0 && (
+				<section class="related-posts">
+					<h2>You might also like</h2>
+					<div class="related-grid">
+						{relatedPosts.map((related, index) => (
+							<>
+								<StoryCard
+									title={related.data.title}
+									description={related.data.description}
+									date={related.data.pubDate}
+									image={related.data.image}
+									href={`/blog/${related.slug}`}
+									category="blog"
+									tags={related.data.tags}
+								/>
+								{index === 0 && <InFeedAd />}
+							</>
+						))}
+					</div>
+				</section>
+			)
+		}
 	</article>
 </Layout>
 
@@ -128,5 +204,23 @@ const url = new URL(Astro.url.pathname, Astro.site);
 		border-radius: 99px;
 		color: var(--color-text);
 		font-family: var(--font-mono);
+	}
+
+	.related-posts {
+		margin-top: var(--spacing-xl);
+		padding-top: var(--spacing-xl);
+		border-top: 1px solid var(--color-border);
+	}
+
+	.related-posts h2 {
+		font-size: 2rem;
+		margin-bottom: var(--spacing-lg);
+		text-align: center;
+	}
+
+	.related-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: var(--spacing-md);
 	}
 </style>

@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import FeaturedStoryCard from "../components/FeaturedStoryCard.astro";
 import StoryCard from "../components/StoryCard.astro";
 import GridCard from "../components/GridCard.astro";
+import InFeedAd from "../components/ads/InFeedAd.astro";
 import { getCollection } from "astro:content";
 
 const posts = (await getCollection("blog")).sort(
@@ -116,7 +117,7 @@ const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for gr
 		}
 	</section>
 
-	<section class="hero animate-fade-in">
+	<!-- <section class="hero animate-fade-in">
 		<h1>
 			<span class="civic">CIVIC</span>
 			<span class="thesis">Thesis</span>
@@ -124,11 +125,11 @@ const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for gr
 		<p class="subtitle">
 			Exploring data, society, and technology through a modern lens.
 		</p>
-	</section>
+	</section> -->
 </Layout>
 
 <style>
-	.hero {
+	/* .hero {
 		text-align: center;
 		padding: var(--spacing-xl) 0;
 		margin-bottom: var(--spacing-xl);
@@ -148,7 +149,7 @@ const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for gr
 		color: #666;
 		max-width: 600px;
 		margin: 0 auto;
-	}
+	} */
 
 	.posts-grid {
 		display: grid;
@@ -223,11 +224,11 @@ const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for gr
 		font-family: var(--font-mono);
 	}
 
-	@media (max-width: 768px) {
+	/* @media (max-width: 768px) {
 		.hero h1 {
 			font-size: 2.5rem;
 		}
-	}
+	} */
 
 	.featured-grid {
 		display: grid;

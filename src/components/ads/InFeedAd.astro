@@ -1,0 +1,64 @@
+---
+
+---
+
+<div class="in-feed-ad">
+    <div class="ad-label">Sponsored</div>
+    <script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7993314093599705"
+        crossorigin="anonymous"></script>
+    <ins
+        class="adsbygoogle"
+        style="display:block"
+        data-ad-format="fluid"
+        data-ad-layout-key="-fb+5w+4e-db+86"
+        data-ad-client="ca-pub-7993314093599705"
+        data-ad-slot="1234567890"></ins>
+    <script is:inline>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
+
+<style>
+    .in-feed-ad {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 16px;
+        padding: 1rem;
+        min-height: 250px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        position: relative; /* Needed for absolute positioning of label */
+    }
+    .ad-label {
+        position: absolute;
+        top: 1rem;
+        left: 1rem; /* Positioning on left based on screenshot preference, or sticking to right if desired. User asked to 'match other cards' which are usually right, but screenshot shows left.. wait, the screenshot shows the "SPONSORED" text on the LEFT in the white box? No, actually, standard UI usually puts tags on top right. But looking at the screenshot provided by user, the "SPONSORED" text is simply "Sponsored" in small caps on the left. The user says "style the sponsered ad label to match other cards". In `StoryCard` the tag is on the right. I will place it on the right to match `StoryCard` exactly as requested. */
+        right: 1rem;
+        left: auto;
+
+        background: rgba(255, 255, 255, 0.95);
+        color: var(
+            --color-text-muted
+        ); /* Using muted color for sponsored/ad label typically */
+        padding: 0.35rem 0.85rem;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(4px);
+        z-index: 10;
+        margin-bottom: 0; /* Removing margin since it is absolute now */
+    }
+
+    /* Dark mode support for the tag background if needed, standardizing with StoryCard which uses white with transparency. */
+    :global(.dark) .ad-label {
+        background: rgba(30, 30, 30, 0.95);
+        color: var(--color-text-muted);
+    }
+</style>
