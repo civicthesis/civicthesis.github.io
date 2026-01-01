@@ -136,7 +136,7 @@ const { title, description, date, image, href, category } = Astro.props;
 
     .title {
         font-family: var(--font-carrois); /* Using new user font */
-        font-size: 3rem;
+        font-size: 2rem;
         line-height: 1.1;
         margin-bottom: 1.5rem;
         font-weight: 700;
@@ -199,12 +199,25 @@ const { title, description, date, image, href, category } = Astro.props;
             min-height: auto;
         }
 
+        .image-container {
+            height: 60%;
+            min-height: 0;
+        }
+
         .content {
             padding: 2rem;
         }
 
         .title {
-            font-size: 2.5rem;
+            font-size: 1.5rem;
+        }
+
+        .description {
+            display: none;
+        }
+
+        .badge {
+            display: none;
         }
     }
 </style>

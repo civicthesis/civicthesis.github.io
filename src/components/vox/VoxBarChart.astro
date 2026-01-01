@@ -354,6 +354,11 @@ const uniqueId = Math.random().toString(36).substr(2, 9);
         fill: var(--color-primary);
     }
 
+    /* Force dark text for axis labels when inside a light theme container, even in dark mode */
+    :global(.vox-container.theme-light) .axis-label {
+        fill: #333333;
+    }
+
     .value-label {
         /* font-size: 12px; */
         font-size: 14px;
@@ -364,12 +369,20 @@ const uniqueId = Math.random().toString(36).substr(2, 9);
         transition: opacity 0.5s ease 1s;
     }
 
-    /* :global(.theme-dark) .axis-label {
-        fill: #aaa;
-    } */
-    /* :global(.theme-dark) .value-label {
-        fill: #fff;
-    } */
+    /* Force dark text for value labels when inside a light theme container */
+    :global(.vox-container.theme-light) .value-label {
+        fill: #111111;
+    }
+
+    /* Force light text for axis labels when inside a dark theme container */
+    :global(.vox-container.theme-dark) .axis-label {
+        fill: #e5e5e5;
+    }
+
+    /* Force light text for value labels when inside a dark theme container */
+    :global(.vox-container.theme-dark) .value-label {
+        fill: #ffffff;
+    }
 
     .bar-rect {
         transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);

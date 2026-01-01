@@ -3,29 +3,48 @@ import Layout from "../layouts/Layout.astro";
 import FeaturedStoryCard from "../components/FeaturedStoryCard.astro";
 import StoryCard from "../components/StoryCard.astro";
 import GridCard from "../components/GridCard.astro";
-import InFeedAd from "../components/ads/InFeedAd.astro";
+import StoryCardHorizontal from "../components/StoryCardHorizontal.astro";
 import { getCollection } from "astro:content";
 
+// Define simpler types for content collection entries if full types aren't available
+type CollectionEntry = {
+	data: {
+		title: string;
+		description: string;
+		pubDate: Date;
+		image?: string;
+		category?: string;
+		tags?: string[];
+	};
+	slug: string;
+};
+
 const posts = (await getCollection("blog")).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+	(a: CollectionEntry, b: CollectionEntry) =>
+		b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 
 const stories = (await getCollection("stories")).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+	(a: CollectionEntry, b: CollectionEntry) =>
+		b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 
 // Try to find OG Crew, otherwise default to first story
-const featuredStoryIndex = stories.findIndex((s) => s.slug.includes("og-crew"));
+const featuredStoryIndex = stories.findIndex((s: CollectionEntry) =>
+	s.slug.includes("og-crew"),
+);
 const featuredStory =
 	featuredStoryIndex >= 0 ? stories[featuredStoryIndex] : stories[0];
 
 // Get next 4 stories for sub-features (excluding the featured one)
-const allFilteredStories = stories.filter((_, index) =>
-	featuredStoryIndex >= 0 ? index !== featuredStoryIndex : index !== 0,
+const allFilteredStories = stories.filter(
+	(_: CollectionEntry, index: number) =>
+		featuredStoryIndex >= 0 ? index !== featuredStoryIndex : index !== 0,
 );
 
 const subStories = allFilteredStories.slice(0, 4);
 const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for grid
+const horizontalStories = allFilteredStories.slice(7, 13); // Taking next 6 for horizontal grid
 ---
 
 <Layout
@@ -90,6 +109,26 @@ const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for gr
 		}
 	</section>
 
+	<section class="horizontal-grid animate-fade-in">
+		{
+			horizontalStories.map((story) => (
+				<StoryCardHorizontal
+					title={story.data.title}
+					description={story.data.description}
+					date={story.data.pubDate}
+					image={story.data.image}
+					href={`/stories/${story.slug}`}
+					category={story.data.category}
+				/>
+			))
+		}
+	</section>
+
+	<div class="section-header">
+		<h2 class="section-title">Latest from Blog</h2>
+		<a href="/blog" class="see-all-link">See All →</a>
+	</div>
+
 	<section class="posts-grid">
 		{
 			posts.map((post) => (
@@ -150,6 +189,36 @@ const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for gr
 		max-width: 600px;
 		margin: 0 auto;
 	} */
+
+	.section-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		margin-bottom: var(--spacing-lg);
+		padding-top: var(--spacing-xl);
+		border-top: 1px solid var(--color-border);
+	}
+
+	.section-title {
+		font-family: var(--font-carrois);
+		font-size: 1.5rem;
+		font-weight: 700;
+		margin-bottom: 0;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.see-all-link {
+		font-family: var(--font-mono);
+		font-size: 0.9rem;
+		color: var(--color-primary);
+		font-weight: 600;
+		text-decoration: none;
+	}
+
+	.see-all-link:hover {
+		text-decoration: underline;
+	}
 
 	.posts-grid {
 		display: grid;
@@ -232,7 +301,7 @@ const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for gr
 
 	.featured-grid {
 		display: grid;
-		grid-template-columns: 1.5fr 1fr;
+		grid-template-columns: 1fr 1fr;
 		gap: var(--spacing-lg);
 		margin-bottom: var(--spacing-xl);
 	}
@@ -280,6 +349,19 @@ const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for gr
 	@media (max-width: 900px) {
 		.secondary-grid {
 			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		}
+	}
+
+	.horizontal-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--spacing-lg);
+		margin-bottom: var(--spacing-xl);
+	}
+
+	@media (max-width: 900px) {
+		.horizontal-grid {
+			grid-template-columns: 1fr;
 		}
 	}
 </style>

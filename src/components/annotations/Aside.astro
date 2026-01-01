@@ -50,16 +50,17 @@ const { type = "note", title } = Astro.props;
     /* Dark Mode Overrides */
     :global([data-theme="dark"]) .type-tip {
         --aside-border: #34d399;
-        --aside-bg: rgba(16, 185, 129, 0.1);
+        /* Increase opacity for better visibility */
+        --aside-bg: rgba(16, 185, 129, 0.15);
     }
 
     :global([data-theme="dark"]) .type-warn {
         --aside-border: #fbbf24;
-        --aside-bg: rgba(245, 158, 11, 0.1);
+        --aside-bg: rgba(245, 158, 11, 0.15);
     }
 
     :global([data-theme="dark"]) .type-note {
-        --aside-bg: rgba(255, 255, 255, 0.05);
+        --aside-bg: rgba(255, 255, 255, 0.08);
     }
 
     .aside-title {

@@ -342,6 +342,17 @@ const theme = colors[color];
         background-color: var(--theme-bg);
     }
 
+    /* Dark mode fix: Mix theme color with dark background for subtle tint instead of bright pastel */
+    :global([data-theme="dark"]) .style-bold-colorful tr:nth-child(even) {
+        background-color: color-mix(
+            in srgb,
+            var(--theme-border) 15%,
+            transparent
+        );
+        /* If text is still hard to read, ensure it's white */
+        color: var(--color-text);
+    }
+
     .style-bold-colorful td {
         border-bottom: 1px solid var(--theme-border);
         font-weight: 500;

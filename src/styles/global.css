@@ -574,7 +574,9 @@ p {
 
 /* Specific color override for light/dark mode on table headers if needed */
 [data-theme="dark"] .prose thead {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: #2d3748;
+    /* Darker blue-gray for header */
+    color: #e2e8f0;
 }
 
 [data-theme="light"] .prose thead {
@@ -597,6 +599,11 @@ p {
     transition: background-color 0.2s ease;
 }
 
+[data-theme="dark"] .prose tr:hover td {
+    background-color: rgba(255, 255, 255, 0.05);
+    /* Subtle hover for dark mode */
+}
+
 /* Responsive Tables */
 @media (max-width: 640px) {
     .prose table {
@@ -604,4 +611,28 @@ p {
         overflow-x: auto;
         white-space: nowrap;
     }
+}
+
+/* Prose Divider Styles */
+.prose hr {
+    border: 0;
+    border-top: 1px solid var(--color-border);
+    margin: 3rem auto;
+    width: 30%;
+    position: relative;
+    overflow: visible;
+}
+
+.prose hr::after {
+    content: "•••";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--color-bg);
+    padding: 0 1rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-serif);
+    font-size: 1.2rem;
+    letter-spacing: 0.2em;
 }

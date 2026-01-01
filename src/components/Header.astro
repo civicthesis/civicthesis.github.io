@@ -81,26 +81,62 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
   <!-- Category/Tags Navigation -->
   <div class="container mobile-categories">
     <div id="current-date" class="current-date"></div>
-    <nav class="category-scroll">
-      <a
-        href="/stories"
-        class={`category-link ${isStoriesActive ? "active" : ""}`}>All</a
+    <div class="category-nav-wrapper">
+      <button id="scroll-left" class="scroll-btn left" aria-label="Scroll left">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <nav class="category-scroll" id="category-scroll-container">
+        <a
+          href="/stories"
+          class={`category-link ${isStoriesActive ? "active" : ""}`}>All</a
+        >
+        {
+          topTags.map((tag) => {
+            const tagPath = `/${tag}`;
+            const isActive = pathname.includes(tagPath);
+            return (
+              <a
+                href={tagPath}
+                class={`category-link ${isActive ? "active" : ""}`}
+              >
+                {capitalize(tag)}
+              </a>
+            );
+          })
+        }
+      </nav>
+      <button
+        id="scroll-right"
+        class="scroll-btn right"
+        aria-label="Scroll right"
       >
-      {
-        topTags.map((tag) => {
-          const tagPath = `/${tag}`;
-          const isActive = pathname.includes(tagPath);
-          return (
-            <a
-              href={tagPath}
-              class={`category-link ${isActive ? "active" : ""}`}
-            >
-              {capitalize(tag)}
-            </a>
-          );
-        })
-      }
-    </nav>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
   </div>
 
   <!-- Mobile Menu Overlay -->
@@ -342,6 +378,7 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
   @media (max-width: 768px) {
     header {
       margin-bottom: 0;
+      padding-bottom: 0;
     }
 
     .desktop-nav {
@@ -390,6 +427,7 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
     white-space: nowrap;
     text-transform: capitalize;
     display: none; /* Hidden on small screens */
+    min-width: 169px;
   }
 
   @media (min-width: 768px) {
@@ -398,17 +436,53 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
     }
   }
 
+  .category-nav-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    position: relative;
+    min-width: 0;
+    gap: 0.5rem;
+  }
+
+  .scroll-btn {
+    display: none; /* Hidden on mobile by default, shown via JS/media query if needed */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    padding: 4px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .scroll-btn:hover {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  @media (min-width: 768px) {
+    .scroll-btn {
+      display: flex; /* Show on desktop */
+    }
+  }
+
   .category-scroll {
     display: flex;
     gap: 1.5rem;
     overflow-x: auto;
-    /* padding-bottom: 0.5rem; */
+    padding-bottom: 0px;
     scrollbar-width: none; /* Hide scrollbar Firefox */
     -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
-    /* mask-image: linear-gradient(to right, black 95%, transparent 100%); */
-    /* -webkit-mask-image: linear-gradient(to right, black 95%, transparent 100%); */
+    flex: 1;
+    scroll-behavior: smooth;
+    align-items: center;
   }
 
+  /* Hide scrollbar for Webkit */
   .category-scroll::-webkit-scrollbar {
     display: none;
   }
@@ -423,11 +497,16 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
     flex-shrink: 0;
     text-transform: capitalize;
     position: relative;
+    padding: 0.25rem 0; /* Add touch target area */
+  }
+
+  .category-link:hover {
+    color: var(--color-primary);
   }
 
   .category-link.active {
     border-bottom: 2px solid var(--color-heading);
-    padding-bottom: 4px; /* Ensure border doesn't clip text */
+    color: var(--color-heading);
   }
 </style>
 
@@ -471,5 +550,22 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
     if (mobileDateElement) {
       mobileDateElement.textContent = formattedDate;
     }
+  }
+
+  // Category Scroll Logic
+  const scrollContainer = document.getElementById("category-scroll-container");
+  const scrollLeftBtn = document.getElementById("scroll-left");
+  const scrollRightBtn = document.getElementById("scroll-right");
+
+  if (scrollContainer && scrollLeftBtn && scrollRightBtn) {
+    const scrollAmount = 200; // Adjust as needed
+
+    scrollLeftBtn.addEventListener("click", () => {
+      scrollContainer.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+    });
+
+    scrollRightBtn.addEventListener("click", () => {
+      scrollContainer.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    });
   }
 </script>

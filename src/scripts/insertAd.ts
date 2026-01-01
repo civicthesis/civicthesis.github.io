@@ -8,7 +8,8 @@ export function insertAd(proseSelector: string, adContainerId: string) {
 
     if (!prose || !adPlaceholder || !adContent) return;
 
-    const headings = prose.querySelectorAll('h2, h3');
+    // Use :scope > to select only direct children headings, avoiding headers inside components like VoxContainer
+    const headings = prose.querySelectorAll(':scope > h2, :scope > h3');
 
     // Priority 1: Before 2nd Heading (typically separating intro/first section from second)
     if (headings.length >= 3) {
@@ -23,7 +24,7 @@ export function insertAd(proseSelector: string, adContainerId: string) {
     }
 
     // Priority 3: Paragraph based fallback
-    const paragraphs = prose.querySelectorAll('p');
+    const paragraphs = prose.querySelectorAll(':scope > p');
 
     // Before 3rd paragraph (approx mid-intro)
     if (paragraphs.length >= 3) {

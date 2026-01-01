@@ -1,0 +1,200 @@
+---
+title: "The Ultimate VOX Chart System Gallery"
+description: "A comprehensive showcase of our VOX-style data visualization components, testing light mode, dark mode, and various data configurations."
+pubDate: 2026-01-01
+author: "Design System Team"
+tags: ["design-system", "charts", "vox-style", "components"]
+image: "/images/charts-gallery.png"
+---
+
+import VoxBarChart from "../../components/vox/VoxBarChart.astro";
+import VoxPieChart from "../../components/vox/VoxPieChart.astro";
+import VoxContainer from "../../components/vox/VoxContainer.astro";
+
+# The VOX Chart System
+
+This gallery demonstrates the flexibility of our data visualization components. We test them inside containers, outside containers, in light mode, and in dark mode.
+
+## 1. Bar Charts in Containers
+
+### Light Theme Container (Default)
+
+<VoxContainer 
+    title="Global EV Market Share (2025)" 
+    subtitle="The rapid rise of Chinese manufacturers continues to reshape the landscape."
+    source="International Energy Agency (IEA)"
+    theme="light"
+>
+    <VoxBarChart 
+        data={[
+            { label: "BYD", value: 35, color: "#3B82F6" },
+            { label: "Tesla", value: 18, color: "#10B981" },
+            { label: "VW Group", value: 12, color: "#F59E0B" },
+            { label: "SAIC", value: 8, color: "#EF4444" },
+            { label: "Geely", value: 6, color: "#8B5CF6" },
+            { label: "Others", value: 21, color: "#9CA3AF" }
+        ]}
+        height={350}
+    />
+</VoxContainer>
+
+### Dark Theme Container
+
+<VoxContainer 
+    title="Space Launch Costs to LEO ($/kg)" 
+    subtitle="SpaceX's Starship is projected to drop costs dramatically compared to legacy launchers."
+    source="Center for Strategic and International Studies"
+    theme="dark"
+>
+    <VoxBarChart 
+        data={[
+            { label: "Shuttle", value: 54500, color: "#F87171" },
+            { label: "SLS", value: 22000, color: "#FBBF24" },
+            { label: "Delta IV", value: 11000, color: "#34D399" },
+            { label: "Falcon 9", value: 2720, color: "#60A5FA" },
+            { label: "Falcon Heavy", value: 1400, color: "#818CF8" },
+            { label: "Starship", value: 200, color: "#A78BFA" }
+        ]}
+        height={350}
+        colors={["#F87171", "#FBBF24", "#34D399", "#60A5FA", "#818CF8", "#A78BFA"]}
+    />
+</VoxContainer>
+
+---
+
+## 2. Stacked Bar Charts
+
+### Horizontal Stacked (Light Container)
+
+<VoxContainer 
+    title="Smartphone Market: OS Dominance" 
+    subtitle="Market share distribution across key regions."
+    source="StatCounter Global Stats"
+    theme="light"
+>
+    <VoxBarChart 
+        orientation="horizontal"
+        stackedData={[
+            { label: "North America", segments: { iOS: 55, Android: 44, Other: 1 } },
+            { label: "Europe", segments: { iOS: 35, Android: 62, Other: 3 } },
+            { label: "Asia", segments: { iOS: 18, Android: 80, Other: 2 } },
+            { label: "Africa", segments: { iOS: 12, Android: 85, Other: 3 } },
+        ]}
+        keys={["iOS", "Android", "Other"]}
+        colors={["#000000", "#3DDC84", "#999999"]}
+        height={400}
+    />
+</VoxContainer>
+
+---
+
+## 3. Pie Charts
+
+### Pie Chart in Dark Container
+
+<VoxContainer 
+    title="Global Electricity Mix (2025)" 
+    subtitle="Renewables are gaining ground, but fossil fuels remain dominant."
+    source="Ember Climate"
+    theme="dark"
+>
+    <VoxPieChart 
+        data={[
+            { label: "Coal", value: 34, color: "#555555" },
+            { label: "Gas", value: 22, color: "#777777" },
+            { label: "Hydro", value: 15, color: "#60A5FA" },
+            { label: "Nuclear", value: 9, color: "#FBBF24" },
+            { label: "Wind & Solar", value: 18, color: "#34D399" },
+            { label: "Bio/Other", value: 2, color: "#EC4899" }
+        ]}
+        height={350}
+    />
+</VoxContainer>
+
+---
+
+## 4. Standalone Components (No Container)
+
+Sometimes you want to embed a chart directly into the flow of the text without the card wrapper.
+
+### Naked Bar Chart (Horizontal)
+
+<VoxBarChart 
+    orientation="horizontal"
+    data={[
+        { label: "Python", value: 45, color: "#306998" },
+        { label: "JavaScript", value: 38, color: "#F7DF1E" },
+        { label: "Java", value: 30, color: "#E76F00" },
+        { label: "C++", value: 20, color: "#00599C" },
+        { label: "Rust", value: 15, color: "#DEA584" }
+    ]}
+    height={300}
+/>
+
+### Naked Stacked Chart
+
+<VoxBarChart 
+    stackedData={[
+        { label: "Q1", segments: { Revenue: 100, Profit: 20 } },
+        { label: "Q2", segments: { Revenue: 120, Profit: 25 } },
+        { label: "Q3", segments: { Revenue: 110, Profit: 15 } },
+        { label: "Q4", segments: { Revenue: 150, Profit: 40 } },
+    ]}
+    keys={["Revenue", "Profit"]}
+    colors={["#6366f1", "#10b981"]}
+    height={300}
+/>
+
+---
+
+## 5. Fullscreen Interactive Mode
+
+Charts with dense data often benefit from a fullscreen view. Click the expand icon (top-right) or double-click the chart container to view it in fullscreen.
+
+### Fullscreen Enabled Container
+
+<VoxContainer 
+    title="US Tech Sector Layoffs (2022-2025)" 
+    subtitle="A monthly breakdown of workforce reductions across major tech hubs."
+    source="Layoffs.fyi"
+    theme="light"
+    allowFullscreen={true}
+>
+    <VoxBarChart 
+        data={[
+            { label: "Jan '23", value: 89000, color: "#EF4444" },
+            { label: "Feb '23", value: 45000, color: "#F87171" },
+            { label: "Mar '23", value: 38000, color: "#FCA5A5" },
+            { label: "Apr '23", value: 22000, color: "#FECACA" },
+            { label: "May '23", value: 15000, color: "#D1D5DB" },
+            { label: "Jun '23", value: 12000, color: "#D1D5DB" },
+            { label: "Jan '24", value: 32000, color: "#EF4444" },
+            { label: "Feb '24", value: 18000, color: "#F87171" },
+            { label: "Jan '25", value: 41000, color: "#DC2626" },
+        ]}
+        height={400}
+    />
+</VoxContainer>
+
+<br/>
+
+<VoxContainer 
+    title="Global GDP Growth Projections" 
+    subtitle="Dark mode fullscreen experience."
+    source="IMF World Economic Outlook"
+    theme="dark"
+    allowFullscreen={true}
+>
+    <VoxBarChart 
+        orientation="horizontal"
+        data={[
+            { label: "India", value: 6.5, color: "#34D399" },
+            { label: "China", value: 4.6, color: "#60A5FA" },
+            { label: "USA", value: 2.1, color: "#A78BFA" },
+            { label: "Euro Area", value: 0.9, color: "#FBBF24" },
+            { label: "Japan", value: 0.9, color: "#F87171" },
+            { label: "UK", value: 0.6, color: "#9CA3AF" }
+        ]}
+        height={350}
+    />
+</VoxContainer>
