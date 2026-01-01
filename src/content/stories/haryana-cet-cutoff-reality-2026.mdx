@@ -1,0 +1,100 @@
+---
+title: "The 50% Myth: Why 'Qualifying' for Haryana CET Isn't Enough"
+description: "Qualifying marks are fixed at 50%, but the real cut-off for a Clerk seat is a different beast entirely. Here's the data for 2026 aspirants."
+pubDate: 2026-01-02
+image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1000"
+tags: ["education", "haryana", "cut-off", "analysis"]
+category: "Analysis"
+---
+
+import VoxBarChart from "../../components/vox/VoxBarChart.astro";
+import VoxContainer from "../../components/vox/VoxContainer.astro";
+import CustomTable from "../../components/CustomTable.astro";
+import Aside from "../../components/annotations/Aside.astro";
+import Highlight from "../../components/annotations/Highlight.astro";
+import ScribbleCheck from "../../components/scribble/ScribbleCheck.astro";
+
+If you check the official notification for Haryana CET Group C, the "Qualifying Marks" seem approachable: **50% for General** and **40% for Reserved** categories.
+
+But here is the hard truth: scoring the qualifying marks makes you *eligible*, not *selected*. The gap between "Passing" and "Getting a Job" is massive.
+
+---
+
+## 1. Qualifying vs. Cut-Off: Know the Difference
+
+<CustomTable
+    headers={["Feature", "Qualifying Marks", "Actual Cut-Off Marks"]}
+    rows={[
+        ["Definition", "Minimum score to be eligible", "Score needed to get a seat"],
+        ["General Rule", "Fixed at 50%", "High (Based on vacancies)"],
+        ["Reserved Rule", "Fixed at 40%", "Variable (Based on difficulty)"],
+        ["Result", "You enter the pool", "You get the job"]
+    ]}
+    style="sketchy"
+    color="orange"
+    animation="slide-left"
+    trigger="visible"
+/>
+
+For popular posts like **Clerk**, where lakhs of candidates apply for a few thousand seats, the cut-off skyrockets.
+
+---
+
+## 2. The Real Target: Cut-Off Ranges (2025 Trends)
+
+Based on recent trends and expert analysis, here is what the "Safe Zone" looks like for Group C posts.
+
+<VoxContainer 
+    title="Expected Cut-Off Ranges" 
+    subtitle="CET Group C (Non-Technical)" 
+    source="Exam Analysis 2025"
+>
+    <VoxBarChart
+        data={[
+            { label: 'General (UR)', value: 75, color: '#EF4444' },
+            { label: 'BCA / BCB', value: 69, color: '#3B82F6' },
+            { label: 'SC', value: 65, color: '#10B981' },
+            { label: 'EWS', value: 65, color: '#F59E0B' },
+        ]}
+        height={300}
+        trigger="visible"
+        orientation="vertical"
+    />
+    <div style="text-align: center; margin-top: 1rem; color: #666; font-size: 0.9rem;">
+        *Upper end of expected ranges (out of 100)
+    </div>
+</VoxContainer>
+
+**Real-world Data:**
+In the 2024-25 cycle, the final cut-off for the combined merit list touched **~77.83** for General and **~75** for EWS/BC categories. This proves that a "pass" is far from meaningful.
+
+---
+
+## 3. What Should You Aim For?
+
+As a Clerk aspirant, forget the "50%" figure. It is a distraction.
+
+<div style="margin: 2rem 0; display: flex; flex-direction: column; gap: 1rem;">
+  <div style="display: flex; gap: 1rem;">
+    <ScribbleCheck checked={true} color="blue" />
+    <div>
+      <strong>General / UR:</strong> Target <Highlight>70+ Marks</Highlight> to stay safe.
+    </div>
+  </div>
+  <div style="display: flex; gap: 1rem;">
+    <ScribbleCheck checked={true} color="green" />
+    <div>
+      <strong>Reserved Categories:</strong> Target <Highlight>65+ Marks</Highlight>.
+    </div>
+  </div>
+  <div style="display: flex; gap: 1rem;">
+    <ScribbleCheck checked={true} color="red" />
+    <div>
+      <strong>The Buffer Rule:</strong> Always aim 10–15 marks *above* the expected cut-off to account for normalization or errors.
+    </div>
+  </div>
+</div>
+
+<Aside type="warn" title="Clerk Competition">
+  Clerical posts often have *higher* cut-offs than technical posts because any graduate can apply, massively increasing the competition pool.
+</Aside>

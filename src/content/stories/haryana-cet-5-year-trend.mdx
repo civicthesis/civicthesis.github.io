@@ -1,0 +1,86 @@
+---
+title: "The Missing 5-Year Data: Analyzing Haryana CET Clerk Trends"
+description: "Why you can't find a clean 5-year cut-off table for Haryana Clerks, and what the available data actually tells us."
+pubDate: 2026-01-02
+image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1000"
+tags: ["education", "haryana", "data-analysis", "cut-off"]
+category: "Analysis"
+---
+
+import CustomTable from "../../components/CustomTable.astro";
+import VoxContainer from "../../components/vox/VoxContainer.astro";
+import Aside from "../../components/annotations/Aside.astro";
+import Highlight from "../../components/annotations/Highlight.astro";
+import ScribbleBox from "../../components/scribble/ScribbleBox.astro";
+
+A common question from aspirants is: *"What was the Clerk cut-off for the last 5 years?"*
+
+The answer is complicated because **Haryana CET is new.** It was first held in **2022**, meaning a 5-year history of "CET Cut-offs" simply doesn't exist. Before 2022, HSSC conducted recruitment differently.
+
+---
+
+## 1. The "CET Era" Trend (2022–2025)
+
+What we *do* have is a clear picture of how competition has spiked since the CET was introduced.
+
+<VoxContainer 
+    title="The Competition Spike" 
+    subtitle="CET Group C Cut-off Evolution" 
+    source="HSSC Official Results"
+>
+    <div style="margin-bottom: 2rem;">
+        <CustomTable
+            headers={["Cycle", "General Cut-off", "Context"]}
+            rows={[
+                ["2022 (First CET)", "47.5", "Baseline (Qualifying Marks)"],
+                ["2024-25 (Final)", "~77.83", "High Competition (Combined Group C)"]
+            ]}
+            style="bold-colorful"
+            color="red"
+            animation="slide-up"
+            trigger="visible"
+        />
+    </div>
+    <div style="text-align: center; color: #666; font-size: 0.9rem;">
+        *Note: The 2024-25 figure represents the final cut-off for the combined Group C merit list.
+    </div>
+</VoxContainer>
+
+---
+
+## 2. Clerk-Specific Data Points
+
+While official "Clerk-Only" lists are rare, we found specific data points buried in shortlisting PDFs.
+
+*   **Post Code 380 (Clerk):** In the Group 56-57 shortlisting, the unreserved cut-off was observed around <Highlight>65.69 Marks</Highlight>.
+*   **Technical Posts:** Group 6 lists show cut-offs ranging from 60–72, placing Clerk firmly in the **Mid-60s to High-70s** competitive band.
+
+<div style="margin: 2rem 0;">
+  <ScribbleBox color="blue">
+    <p style="font-size: 1.1rem; text-align: center; margin: 0;">
+      <strong>The Takeaway:</strong> The days of qualifying with 47.5 marks are over. The new normal for a Clerk seat is a score consistently above 70.
+    </p>
+  </ScribbleBox>
+</div>
+
+---
+
+## 3. Practical Targets for 2026
+
+Given this upward trend, relying on old data is dangerous. Here is your safe target based on the current trajectory.
+
+<CustomTable
+    headers={["Category", "Safe Score Target"]}
+    rows={[
+        ["General (UR)", "75 – 80+"],
+        ["Reserved (SC/BCA/BCB)", "70 – 75+"]
+    ]}
+    style="sketchy"
+    color="green"
+    animation="slide-left"
+    trigger="visible"
+/>
+
+<Aside type="note" title="Normalization Factor">
+    Scores often shift due to normalization across shifts. Aiming for the upper end of these targets accounts for any bad luck on exam day.
+</Aside>

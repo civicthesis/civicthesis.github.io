@@ -1,0 +1,184 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const stories = await getCollection("stories");
+
+// Calculate category counts
+const categoryCounts = stories.reduce(
+    (acc, story) => {
+        const category = story.data.category || "Uncategorized";
+        acc[category] = (acc[category] || 0) + 1;
+        return acc;
+    },
+    {} as Record<string, number>,
+);
+
+const categories = Object.entries(categoryCounts).map(([name, count]) => ({
+    name,
+    count,
+}));
+
+// Sort alphabetically
+categories.sort((a, b) => a.name.localeCompare(b.name));
+---
+
+<Layout title="Categories | CivicThesis">
+    <main>
+        <section class="hero">
+            <div class="container">
+                <span class="label">EXPLORE</span>
+                <h1>Categories</h1>
+                <p class="subtitle">Browse stories by topic and interests.</p>
+            </div>
+        </section>
+
+        <section class="categories-grid">
+            <div class="container">
+                <div class="grid">
+                    {
+                        categories.map(({ name, count }) => (
+                            <a href={`/${name}`} class="category-card">
+                                <div class="card-content">
+                                    <h2>{name}</h2>
+                                    <span class="count">
+                                        {count}{" "}
+                                        {count === 1 ? "Story" : "Stories"}
+                                    </span>
+                                </div>
+                                <div class="card-arrow">→</div>
+                            </a>
+                        ))
+                    }
+                </div>
+            </div>
+        </section>
+    </main>
+</Layout>
+
+<style>
+    main {
+        width: 100%;
+        min-height: 80vh;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    .hero {
+        padding: 4rem 0 3rem;
+        text-align: center;
+        background: linear-gradient(
+            to bottom,
+            var(--color-bg) 0%,
+            var(--color-surface) 100%
+        );
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .label {
+        font-family: var(--font-mono);
+        font-size: 0.875rem;
+        letter-spacing: 0.1em;
+        color: var(--color-accent);
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 1rem;
+    }
+
+    h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 4rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--color-heading);
+        line-height: 1.1;
+    }
+
+    .subtitle {
+        font-size: 1.25rem;
+        color: var(--color-text-muted);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .categories-grid {
+        padding: 4rem 0 6rem;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .category-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2rem;
+        background: var(--color-card-bg);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+        border-color: var(--color-accent);
+    }
+
+    .card-content h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--color-heading);
+        margin-bottom: 0.5rem;
+        transition: color 0.3s ease;
+    }
+
+    .category-card:hover h2 {
+        color: var(--color-accent);
+    }
+
+    .count {
+        font-family: var(--font-mono);
+        font-size: 0.875rem;
+        color: var(--color-text-muted);
+        background: var(--color-surface);
+        padding: 0.25rem 0.75rem;
+        border-radius: 100px;
+        border: 1px solid var(--color-border);
+    }
+
+    .card-arrow {
+        font-size: 1.5rem;
+        color: var(--color-text-muted);
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: all 0.3s ease;
+    }
+
+    .category-card:hover .card-arrow {
+        opacity: 1;
+        transform: translateX(0);
+        color: var(--color-accent);
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

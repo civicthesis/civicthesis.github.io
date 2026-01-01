@@ -4,48 +4,114 @@ const today = new Date();
 
 <footer>
   <div class="container">
-    <p>
-      &copy; {today.getFullYear()}
-      <span class="civic" style="font-size: 1rem; color: #666;">CIVIC</span>
-      <span class="thesis" style="font-size: 1rem; color: #666;">Thesis</span>.
-      All rights reserved.
-    </p>
-    <div class="social-links">
-      <a href="/about">About</a>
-      <a href="#" target="_blank" rel="noopener noreferrer">Twitter</a>
-      <a href="#" target="_blank" rel="noopener noreferrer">GitHub</a>
+    <div class="footer-content">
+      <div class="brand-section">
+        <p>
+          &copy; {today.getFullYear()}
+          <span class="civic" style="font-size: 1rem; color: #666;">CIVIC</span>
+          <span class="thesis" style="font-size: 1rem; color: #666;"
+            >Thesis</span
+          >. All rights reserved.
+        </p>
+      </div>
+
+      <div class="links-section">
+        <div class="link-group">
+          <span class="group-title">Discover</span>
+          <a href="/categories">Categories</a>
+          <a href="/stories/tags">Tags</a>
+          <a href="/stories">All Stories</a>
+          <a href="/blog">Blog</a>
+        </div>
+
+        <div class="social-links">
+          <span class="group-title">Connect</span>
+          <a href="/about">About</a>
+          <a href="#" target="_blank" rel="noopener noreferrer">Twitter</a>
+          <a href="#" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
     </div>
   </div>
 </footer>
 
 <style>
   footer {
-    margin-top: 2rem;
-    padding: var(--spacing-xl) 0;
+    margin-top: 4rem;
+    padding: 3rem 0;
     border-top: 1px solid var(--color-border);
     color: #666;
+    background: var(--color-bg);
   }
 
   .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
   }
 
+  .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .links-section {
+    display: flex;
+    gap: 4rem;
+  }
+
+  .link-group,
   .social-links {
     display: flex;
-    gap: var(--spacing-md);
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  /* Retain social-links name strictly for compatibility but style as vertical list here */
+  .social-links {
+    align-items: flex-start;
+  }
+
+  .group-title {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    color: var(--color-heading, #333);
+    margin-bottom: 0.25rem;
+  }
+
+  a {
+    color: #666;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
   }
 
   a:hover {
     color: var(--color-primary);
   }
 
-  @media (max-width: 640px) {
-    .container {
-      flex-direction: column;
-      gap: var(--spacing-md);
+  @media (max-width: 768px) {
+    .footer-content {
+      flex-direction: column-reverse;
+      gap: 3rem;
+    }
+
+    .links-section {
+      width: 100%;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .brand-section {
       text-align: center;
+      width: 100%;
+      padding-top: 2rem;
+      border-top: 1px solid var(--color-border);
     }
   }
 </style>
