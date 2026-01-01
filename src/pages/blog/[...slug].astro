@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
-import ShareButtons from "../../components/ShareButtons.astro";
+import ShareButtons from "../../components/layout/ShareButtons.astro";
 import ScribbleBox from "../../components/scribble/ScribbleBox.astro";
 import ScribbleHighlight from "../../components/scribble/ScribbleHighlight.astro";
 import ScribbleCircle from "../../components/scribble/ScribbleCircle.astro";
@@ -20,7 +20,7 @@ import BarChart from "../../components/BarChart.astro";
 import CustomTable from "../../components/CustomTable.astro";
 import InArticleAd from "../../components/ads/InArticleAd.astro";
 import InFeedAd from "../../components/ads/InFeedAd.astro";
-import StoryCard from "../../components/StoryCard.astro";
+import StoryCard from "../../components/layout/StoryCard.astro";
 
 export async function getStaticPaths() {
 	const posts = await getCollection("blog");
