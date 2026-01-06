@@ -1,0 +1,160 @@
+---
+interface Props {
+    leftTitle?: string;
+    rightTitle?: string;
+    leftColor?: string;
+    rightColor?: string;
+}
+
+const {
+    leftTitle = "The Wrong Way",
+    rightTitle = "The TED-Ed Way",
+    leftColor = "red",
+    rightColor = "green",
+} = Astro.props;
+---
+
+<div class="comparison-box">
+    <div class="column left">
+        <div class="header">
+            <span class="icon">❌</span>
+            <h3>{leftTitle}</h3>
+        </div>
+        <div class="content">
+            <slot name="left" />
+        </div>
+    </div>
+
+    <div class="divider">
+        <span>VS</span>
+    </div>
+
+    <div class="column right">
+        <div class="header">
+            <span class="icon">✅</span>
+            <h3>{rightTitle}</h3>
+        </div>
+        <div class="content">
+            <slot name="right" />
+        </div>
+    </div>
+</div>
+
+<style>
+    .comparison-box {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 1rem;
+        background: var(--color-surface-2, #f8f9fa);
+        border: 2px solid var(--color-border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        align-items: stretch;
+    }
+
+    .column {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-bottom: 2px solid var(--color-border);
+        padding-bottom: 0.5rem;
+    }
+
+    .header h3 {
+        margin: 0;
+        font-family: "Playfair Display", serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        color: var(--color-text-muted);
+        font-style: italic;
+        position: relative;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: "";
+        position: absolute;
+        height: 40%;
+        width: 1px;
+        background: var(--color-border);
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .divider::before {
+        top: 0;
+    }
+    .divider::after {
+        bottom: 0;
+    }
+
+    .divider span {
+        background: var(--color-surface);
+        padding: 0.5rem;
+        border-radius: 50%;
+        border: 1px solid var(--color-border);
+        z-index: 2;
+    }
+
+    .content {
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+
+    @media (max-width: 768px) {
+        .comparison-box {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .divider {
+            height: 40px;
+            width: 100%;
+        }
+
+        .divider::before,
+        .divider::after {
+            width: 40%;
+            height: 1px;
+            top: 50%;
+        }
+
+        .divider::before {
+            left: 0;
+            transform: none;
+        }
+        .divider::after {
+            right: 0;
+            transform: none;
+            left: auto;
+        }
+    }
+
+    :global([data-theme="dark"]) .comparison-box {
+        background: var(--color-surface-1, #1f2937);
+        border-color: var(--color-border);
+    }
+
+    :global([data-theme="dark"]) .header h3 {
+        color: var(--color-heading);
+    }
+
+    :global([data-theme="dark"]) .divider span {
+        background: var(--color-surface-1, #1f2937);
+        color: var(--color-text);
+    }
+</style>
