@@ -26,7 +26,7 @@ Thank you for your interest in contributing to CivicThesis! This guide will help
 
 ```bash
 # Fork the repository on GitHub, then clone your fork
-git clone https://github.com/YOUR_USERNAME/CivicThesis.git
+git clone https://github.com/civicthesis/CivicThesis.git
 cd CivicThesis
 
 # Add upstream remote
