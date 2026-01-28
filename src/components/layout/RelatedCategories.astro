@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import CategoryCard from "./CategoryCard.astro";
 
 interface Props {
     currentCategory: string;
@@ -70,25 +71,13 @@ const relatedCategories = Array.from(categoryData.entries())
             <h3 class="section-title">Related Topics</h3>
             <div class="categories-grid">
                 {relatedCategories.map((item) => (
-                    <a href={`/${item.category}`} class="category-card">
-                        {item.image && (
-                            <div class="category-image">
-                                <img
-                                    src={item.image}
-                                    alt={item.category}
-                                    loading="lazy"
-                                />
-                                <div class="image-overlay" />
-                            </div>
-                        )}
-                        <div class="category-info">
-                            <h4 class="category-name">{item.category}</h4>
-                            <p class="category-count">
-                                {item.count}{" "}
-                                {item.count === 1 ? "story" : "stories"}
-                            </p>
-                        </div>
-                    </a>
+                    <CategoryCard
+                        category={item.category}
+                        count={item.count}
+                        image={item.image}
+                        href={`/${item.category.toLowerCase()}`}
+                        showArrow={false}
+                    />
                 ))}
             </div>
         </section>
