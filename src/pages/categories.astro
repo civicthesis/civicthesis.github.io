@@ -53,7 +53,7 @@ const categories = Array.from(categoryData.entries())
         </section>
 
         <section class="categories-section">
-            <div class="container">
+            <div class="content-container">
                 <div class="grid">
                     {
                         categories.map(({ name, count, image }) => (
@@ -77,10 +77,10 @@ const categories = Array.from(categoryData.entries())
         min-height: 80vh;
     }
 
-    .container {
+    .content-container {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 0 1.5rem;
+        padding: 0;
     }
 
     .hero {
