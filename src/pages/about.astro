@@ -1,5 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import RecentContent from "../components/layout/RecentContent.astro";
+import { socialLinks } from "../config/social";
 ---
 
 <Layout
@@ -18,9 +20,24 @@ import Layout from "../layouts/Layout.astro";
         <h1 class="name">Aryan</h1>
         <p class="tagline">Digital Craftsman & Civic Technologist</p>
         <div class="social-links">
-          <a href="#" class="social-btn">Twitter</a>
-          <a href="#" class="social-btn">GitHub</a>
-          <a href="#" class="social-btn">LinkedIn</a>
+          <a
+            href={socialLinks.twitter}
+            class="social-btn"
+            target="_blank"
+            rel="noopener noreferrer">Twitter</a
+          >
+          <a
+            href={socialLinks.github}
+            class="social-btn"
+            target="_blank"
+            rel="noopener noreferrer">GitHub</a
+          >
+          <a
+            href={socialLinks.linkedin}
+            class="social-btn"
+            target="_blank"
+            rel="noopener noreferrer">LinkedIn</a
+          >
         </div>
       </div>
     </div>
@@ -54,8 +71,7 @@ import Layout from "../layouts/Layout.astro";
       <h3>What I Do</h3>
       <ul class="skills-list">
         <li>
-          <strong>Full-Stack Development:</strong> Building robust, scalable web
-          applications.
+          <strong>Full-Stack Development:</strong> Building robust, scalable web applications.
         </li>
         <li>
           <strong>Data Visualization:</strong> Turning raw numbers into compelling
@@ -67,6 +83,9 @@ import Layout from "../layouts/Layout.astro";
         </li>
       </ul>
     </div>
+
+    <RecentContent type="stories" count={3} title="Recent Stories" />
+    <RecentContent type="blog" count={3} title="Recent Blog Posts" />
   </section>
 </Layout>
 

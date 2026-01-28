@@ -1,11 +1,17 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import StoryCard from "../components/layout/StoryCard.astro";
+import FilterControls from "../components/layout/FilterControls.astro";
 import { getCollection } from "astro:content";
 
 const stories = (await getCollection("stories")).sort(
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
+
+// Get unique categories
+const uniqueCategories = [
+    ...new Set(stories.map((story) => story.data.category).filter(Boolean)),
+] as string[];
 ---
 
 <Layout title="Stories | News & Updates">
@@ -19,22 +25,43 @@ const stories = (await getCollection("stories")).sort(
             </div>
         </section>
 
-        <section class="stories-grid">
+        <section class="stories-section">
             <div class="container">
-                <div class="grid">
+                <FilterControls
+                    categories={uniqueCategories}
+                    searchPlaceholder="Search stories..."
+                />
+
+                <div class="grid" id="stories-grid">
                     {
                         stories.map((story) => (
-                            <StoryCard
-                                title={story.data.title}
-                                description={story.data.description}
-                                date={story.data.pubDate}
-                                image={story.data.image}
-                                href={`/stories/${story.slug}`}
-                                tags={story.data.tags}
-                                category={story.data.category}
-                            />
+                            <div
+                                class="story-item"
+                                data-category={story.data.category}
+                                data-title={story.data.title.toLowerCase()}
+                                data-description={story.data.description.toLowerCase()}
+                                data-tags={
+                                    story.data.tags?.join(",").toLowerCase() ||
+                                    ""
+                                }
+                                data-date={story.data.pubDate.valueOf()}
+                            >
+                                <StoryCard
+                                    title={story.data.title}
+                                    description={story.data.description}
+                                    date={story.data.pubDate}
+                                    image={story.data.image}
+                                    href={`/stories/${story.slug}`}
+                                    tags={story.data.tags}
+                                    category={story.data.category}
+                                />
+                            </div>
                         ))
                     }
+                </div>
+
+                <div id="no-results" class="no-results" style="display: none;">
+                    <p>No stories found matching your criteria.</p>
                 </div>
             </div>
         </section>
@@ -106,4 +133,208 @@ const stories = (await getCollection("stories")).sort(
             grid-template-columns: 1fr;
         }
     }
+
+    .stories-section {
+        padding: 4rem 0 6rem;
+    }
+
+    :global(.story-item) {
+        transition:
+            opacity 0.3s ease,
+            transform 0.3s ease;
+    }
+
+    :global(.story-item.hidden) {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    :global(.no-results) {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--color-text-muted);
+        font-size: 1.1rem;
+    }
 </style>
+
+<script>
+    import Fuse from "fuse.js";
+
+    // Wait for DOM to be fully loaded
+    document.addEventListener("DOMContentLoaded", () => {
+        // Get all story items
+        const storyItems = Array.from(
+            document.querySelectorAll(".story-item"),
+        ) as HTMLElement[];
+
+        // Try multiple ways to get the grid
+        let storiesGrid = document.getElementById("stories-grid");
+        if (!storiesGrid) {
+            storiesGrid = document.querySelector(".grid") as HTMLElement;
+        }
+        if (!storiesGrid) {
+            storiesGrid = document.querySelector(
+                "#stories-grid",
+            ) as HTMLElement;
+        }
+
+        const noResults = document.getElementById("no-results");
+
+        console.log("Story items found:", storyItems.length);
+        console.log("Stories grid:", storiesGrid);
+        console.log("Stories grid ID:", storiesGrid?.id);
+        console.log("Stories grid class:", storiesGrid?.className);
+        console.log("No results element:", noResults);
+
+        // Prepare data for Fuse.js search
+        const storiesData = storyItems.map((item) => ({
+            element: item,
+            title: item.dataset.title || "",
+            description: item.dataset.description || "",
+            tags: item.dataset.tags || "",
+            category: item.dataset.category || "",
+            date: parseInt(item.dataset.date || "0"),
+        }));
+
+        console.log("Stories data prepared:", storiesData.length);
+
+        // Initialize Fuse.js for fuzzy search
+        const fuse = new Fuse(storiesData, {
+            keys: ["title", "description", "tags"],
+            threshold: 0.3,
+            includeScore: true,
+        });
+
+        // State
+        let currentCategory = "All";
+        let currentSearch = "";
+        let currentSort = "newest";
+
+        // Filter and display stories
+        function filterStories() {
+            console.log("Filtering with:", {
+                currentCategory,
+                currentSearch,
+                currentSort,
+            });
+            let filteredStories = [...storiesData];
+
+            // Apply category filter
+            if (currentCategory !== "All") {
+                filteredStories = filteredStories.filter(
+                    (story) => story.category === currentCategory,
+                );
+            }
+
+            // Apply search filter
+            if (currentSearch) {
+                const searchResults = fuse.search(currentSearch);
+                const searchedIds = new Set(
+                    searchResults.map((result) => result.item.element),
+                );
+                filteredStories = filteredStories.filter((story) =>
+                    searchedIds.has(story.element),
+                );
+            }
+
+            // Apply sorting
+            filteredStories.sort((a, b) => {
+                switch (currentSort) {
+                    case "newest":
+                        return b.date - a.date;
+                    case "oldest":
+                        return a.date - b.date;
+                    case "title-asc":
+                        return a.title.localeCompare(b.title);
+                    case "title-desc":
+                        return b.title.localeCompare(a.title);
+                    default:
+                        return 0;
+                }
+            });
+
+            // Hide all stories first
+            storyItems.forEach((item) => {
+                item.classList.add("hidden");
+            });
+
+            // Reorder and show filtered stories
+            filteredStories.forEach((story, index) => {
+                story.element.classList.remove("hidden");
+                // Reorder in DOM
+                if (storiesGrid) {
+                    storiesGrid.appendChild(story.element);
+                }
+            });
+
+            console.log("Filtered stories count:", filteredStories.length);
+
+            // Show/hide no results message
+            if (filteredStories.length === 0 && noResults) {
+                noResults.style.display = "block";
+            } else if (noResults) {
+                noResults.style.display = "none";
+            }
+        }
+
+        // Category filter tabs
+        const categoryTabs = document.querySelectorAll(".category-tab");
+        console.log("Category tabs found:", categoryTabs.length);
+
+        categoryTabs.forEach((tab) => {
+            tab.addEventListener("click", () => {
+                console.log(
+                    "Category tab clicked:",
+                    (tab as HTMLElement).dataset.category,
+                );
+                categoryTabs.forEach((t) => t.classList.remove("active"));
+                tab.classList.add("active");
+                currentCategory =
+                    (tab as HTMLElement).dataset.category || "All";
+                filterStories();
+            });
+        });
+
+        // Search input
+        const searchInput = document.getElementById(
+            "filter-search-input",
+        ) as HTMLInputElement;
+        console.log("Search input found:", searchInput);
+        console.log("Search input value:", searchInput?.value);
+        console.log("Search input type:", searchInput?.type);
+
+        if (searchInput) {
+            console.log("Attaching input event listener to search input");
+            searchInput.addEventListener("input", (e) => {
+                currentSearch = (
+                    e.target as HTMLInputElement
+                ).value.toLowerCase();
+                console.log("Search input event fired! Value:", currentSearch);
+                filterStories();
+            });
+
+            // Also try 'keyup' event as backup
+            searchInput.addEventListener("keyup", (e) => {
+                console.log("Keyup event fired on search input");
+            });
+        } else {
+            console.error(
+                "Search input NOT found! Cannot attach event listener.",
+            );
+        }
+
+        // Sort select
+        const sortSelect = document.getElementById(
+            "sort-select",
+        ) as HTMLSelectElement;
+        console.log("Sort select found:", sortSelect);
+
+        if (sortSelect) {
+            sortSelect.addEventListener("change", (e) => {
+                currentSort = (e.target as HTMLSelectElement).value;
+                console.log("Sort changed:", currentSort);
+                filterStories();
+            });
+        }
+    });
+</script>

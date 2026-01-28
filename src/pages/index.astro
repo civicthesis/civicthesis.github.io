@@ -4,7 +4,9 @@ import FeaturedStoryCard from "../components/layout/FeaturedStoryCard.astro";
 import StoryCard from "../components/layout/StoryCard.astro";
 import GridCard from "../components/layout/GridCard.astro";
 import StoryCardHorizontal from "../components/layout/StoryCardHorizontal.astro";
+import FeaturedCategories from "../components/layout/FeaturedCategories.astro";
 import { getCollection } from "astro:content";
+import { featuredConfig } from "../config/featured";
 
 // Define simpler types for content collection entries if full types aren't available
 type CollectionEntry = {
@@ -24,27 +26,57 @@ const posts = (await getCollection("blog")).sort(
 		b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 
+// Initial posts to display (for pagination)
+const initialPostsCount = 6;
+const allPosts = posts;
+const initialPosts = posts.slice(0, initialPostsCount);
+
 const stories = (await getCollection("stories")).sort(
 	(a: CollectionEntry, b: CollectionEntry) =>
 		b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 
-// Try to find OG Crew, otherwise default to first story
-const featuredStoryIndex = stories.findIndex((s: CollectionEntry) =>
-	s.slug.includes("og-crew"),
-);
-const featuredStory =
-	featuredStoryIndex >= 0 ? stories[featuredStoryIndex] : stories[0];
+// Featured story selection based on config
+let featuredStory: CollectionEntry | undefined;
 
-// Get next 4 stories for sub-features (excluding the featured one)
+if (featuredConfig.featuredStorySlug) {
+	// Manual selection: find story by slug
+	featuredStory = stories.find(
+		(s: CollectionEntry) => s.slug === featuredConfig.featuredStorySlug,
+	);
+}
+
+if (!featuredStory) {
+	// Auto selection based on strategy
+	if (featuredConfig.selectionStrategy === "random") {
+		const randomIndex = Math.floor(Math.random() * stories.length);
+		featuredStory = stories[randomIndex];
+	} else {
+		// Default to newest
+		featuredStory = stories[0];
+	}
+}
+
+// Get stories for different sections (excluding the featured one)
+const featuredStoryIndex = stories.findIndex(
+	(s: CollectionEntry) => s.slug === featuredStory?.slug,
+);
+
 const allFilteredStories = stories.filter(
-	(_: CollectionEntry, index: number) =>
-		featuredStoryIndex >= 0 ? index !== featuredStoryIndex : index !== 0,
+	(_: CollectionEntry, index: number) => index !== featuredStoryIndex,
 );
 
-const subStories = allFilteredStories.slice(0, 4);
-const secondaryStories = allFilteredStories.slice(4, 7); // Taking next 3 for grid
-const horizontalStories = allFilteredStories.slice(7, 13); // Taking next 6 for horizontal grid
+const subStories = allFilteredStories.slice(0, featuredConfig.subFeaturedCount);
+const secondaryStories = allFilteredStories.slice(
+	featuredConfig.subFeaturedCount,
+	featuredConfig.subFeaturedCount + featuredConfig.secondaryCount,
+);
+const horizontalStories = allFilteredStories.slice(
+	featuredConfig.subFeaturedCount + featuredConfig.secondaryCount,
+	featuredConfig.subFeaturedCount +
+		featuredConfig.secondaryCount +
+		featuredConfig.horizontalCount,
+);
 ---
 
 <Layout
@@ -52,16 +84,6 @@ const horizontalStories = allFilteredStories.slice(7, 13); // Taking next 6 for 
 	description="Exploring data, society, and technology through a modern lens."
 	image="/logo.png"
 >
-	<!-- <section class="hero animate-fade-in">
-		<h1>
-			<span class="civic">CIVIC</span>
-			<span class="thesis">Thesis</span>
-		</h1>
-		<p class="subtitle">
-			Exploring data, society, and technology through a modern lens.
-		</p>
-	</section> -->
-
 	<section class="featured-grid animate-fade-in">
 		<div class="main-feature">
 			{
@@ -72,7 +94,9 @@ const horizontalStories = allFilteredStories.slice(7, 13); // Taking next 6 for 
 						date={featuredStory.data.pubDate}
 						image={featuredStory.data.image}
 						href={`/stories/${featuredStory.slug}`}
-						category={featuredStory.data.category}
+						category={
+							featuredStory.data.category || "Uncategorized"
+						}
 					/>
 				)
 			}
@@ -124,15 +148,27 @@ const horizontalStories = allFilteredStories.slice(7, 13); // Taking next 6 for 
 		}
 	</section>
 
+	<!-- Featured Categories Section -->
+	<div class="container">
+		<FeaturedCategories
+			title="Explore Topics"
+			maxCategories={6}
+			showViewAll={true}
+		/>
+	</div>
+
 	<div class="section-header">
 		<h2 class="section-title">Latest from Blog</h2>
 		<a href="/blog" class="see-all-link">See All →</a>
 	</div>
 
-	<section class="posts-grid">
+	<section class="posts-grid" id="posts-container">
 		{
-			posts.map((post) => (
-				<article class="post-card animate-fade-in">
+			initialPosts.map((post) => (
+				<article
+					class="post-card animate-fade-in"
+					data-post-slug={post.slug}
+				>
 					<a href={`/blog/${post.slug}`}>
 						<div class="post-content">
 							<span class="post-date">
@@ -143,12 +179,6 @@ const horizontalStories = allFilteredStories.slice(7, 13); // Taking next 6 for 
 								})}
 							</span>
 							<h2>{post.data.title}</h2>
-							{/* <p>{post.data.description}</p> */}
-							{/* <div class="post-tags">
-								{post.data.tags.map((tag) => (
-									<span class="tag">#{tag}</span>
-								))}
-							</div> */}
 						</div>
 					</a>
 				</article>
@@ -156,47 +186,29 @@ const horizontalStories = allFilteredStories.slice(7, 13); // Taking next 6 for 
 		}
 	</section>
 
-	<!-- <section class="hero animate-fade-in">
-		<h1>
-			<span class="civic">CIVIC</span>
-			<span class="thesis">Thesis</span>
-		</h1>
-		<p class="subtitle">
-			Exploring data, society, and technology through a modern lens.
-		</p>
-	</section> -->
+	{
+		allPosts.length > initialPostsCount && (
+			<div class="load-more-container">
+				<button id="load-more-btn" class="load-more-btn">
+					Load More Posts
+				</button>
+				<p class="posts-count">
+					Showing <span id="current-count">{initialPostsCount}</span>{" "}
+					of {allPosts.length} posts
+				</p>
+			</div>
+		)
+	}
 </Layout>
 
 <style>
-	/* .hero {
-		text-align: center;
-		padding: var(--spacing-xl) 0;
-		margin-bottom: var(--spacing-xl);
-	}
-
-	.hero h1 {
-		font-size: 4rem;
-		margin-bottom: var(--spacing-sm);
-	}
-
-	.highlight {
-		color: var(--color-primary);
-	}
-
-	.subtitle {
-		font-size: 1.25rem;
-		color: #666;
-		max-width: 600px;
-		margin: 0 auto;
-	} */
-
 	.section-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-end;
 		margin-bottom: var(--spacing-lg);
 		padding-top: var(--spacing-xl);
-		border-top: 1px solid var(--color-border);
+		/* border-top: 1px solid var(--color-border); */
 	}
 
 	.section-title {
@@ -226,7 +238,8 @@ const horizontalStories = allFilteredStories.slice(7, 13); // Taking next 6 for 
 		gap: var(--spacing-lg);
 	}
 
-	.post-card {
+	/* Use :global() to ensure styles apply to dynamically created cards */
+	:global(.post-card) {
 		background: var(--color-bg);
 		border: 1px solid var(--color-border);
 		border-radius: 12px;
@@ -237,13 +250,13 @@ const horizontalStories = allFilteredStories.slice(7, 13); // Taking next 6 for 
 			border-color 0.2s ease;
 	}
 
-	.post-card:hover {
+	:global(.post-card:hover) {
 		transform: translateY(-4px);
 		box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
 		border-color: var(--color-secondary);
 	}
 
-	.post-card a {
+	:global(.post-card a) {
 		display: block;
 		height: 100%;
 		padding: var(--spacing-lg);
@@ -251,24 +264,24 @@ const horizontalStories = allFilteredStories.slice(7, 13); // Taking next 6 for 
 		color: inherit;
 	}
 
-	.post-card a:hover {
+	:global(.post-card a:hover) {
 		color: inherit;
 	}
 
-	.post-date {
+	:global(.post-date) {
 		font-size: 0.875rem;
 		color: #888;
 		display: block;
 		margin-bottom: var(--spacing-sm);
 	}
 
-	.post-card h2 {
+	:global(.post-card h2) {
 		font-size: 1.5rem;
 		margin-bottom: var(--spacing-sm);
 		line-height: 1.3;
 	}
 
-	.post-card p {
+	:global(.post-card p) {
 		color: #666;
 		font-size: 1rem;
 		margin-bottom: var(--spacing-md);
@@ -278,13 +291,13 @@ const horizontalStories = allFilteredStories.slice(7, 13); // Taking next 6 for 
 		overflow: hidden;
 	}
 
-	.post-tags {
+	:global(.post-tags) {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.5rem;
 	}
 
-	.tag {
+	:global(.tag) {
 		font-size: 0.75rem;
 		background-color: var(--color-code-bg);
 		padding: 0.25rem 0.5rem;
@@ -292,12 +305,6 @@ const horizontalStories = allFilteredStories.slice(7, 13); // Taking next 6 for 
 		color: var(--color-text);
 		font-family: var(--font-mono);
 	}
-
-	/* @media (max-width: 768px) {
-		.hero h1 {
-			font-size: 2.5rem;
-		}
-	} */
 
 	.featured-grid {
 		display: grid;
@@ -364,4 +371,201 @@ const horizontalStories = allFilteredStories.slice(7, 13); // Taking next 6 for 
 			grid-template-columns: 1fr;
 		}
 	}
+
+	.load-more-container {
+		text-align: center;
+		margin: var(--spacing-xl) 0;
+		padding: var(--spacing-lg) 0;
+	}
+
+	.load-more-btn {
+		padding: 1rem 2.5rem;
+		background: var(--color-primary);
+		color: white;
+		border: none;
+		border-radius: 8px;
+		font-size: 1rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		box-shadow: 0 4px 12px rgba(27, 42, 65, 0.2);
+	}
+
+	.load-more-btn:hover {
+		background: var(--color-secondary);
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(27, 42, 65, 0.3);
+	}
+
+	.load-more-btn:disabled {
+		background: var(--color-text-muted);
+		cursor: not-allowed;
+		transform: none;
+	}
+
+	.posts-count {
+		margin-top: var(--spacing-sm);
+		color: var(--color-text-muted);
+		font-size: 0.9rem;
+	}
+
+	#current-count {
+		font-weight: 600;
+		color: var(--color-primary);
+	}
+
+	/* Fade-in animation for newly loaded cards */
+	@keyframes fadeInUp {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.post-card.newly-loaded {
+		animation: fadeInUp 0.5s ease-out forwards;
+	}
+
+	/* Loading spinner for button */
+	.load-more-btn.loading {
+		position: relative;
+		color: transparent;
+		pointer-events: none;
+	}
+
+	.load-more-btn.loading::after {
+		content: "";
+		position: absolute;
+		width: 20px;
+		height: 20px;
+		top: 50%;
+		left: 50%;
+		margin-left: -10px;
+		margin-top: -10px;
+		border: 2px solid white;
+		border-radius: 50%;
+		border-top-color: transparent;
+		animation: spin 0.6s linear infinite;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
 </style>
+
+<script define:vars={{ allPosts, initialPostsCount }}>
+	// Load More functionality
+	let currentIndex = initialPostsCount;
+	const postsPerLoad = 6;
+
+	const loadMoreBtn = document.getElementById("load-more-btn");
+	const postsContainer = document.getElementById("posts-container");
+	const currentCountSpan = document.getElementById("current-count");
+
+	if (loadMoreBtn && postsContainer && currentCountSpan) {
+		loadMoreBtn.addEventListener("click", () => {
+			// Add loading state
+			loadMoreBtn.classList.add("loading");
+			loadMoreBtn.disabled = true;
+
+			// Small delay for better UX
+			setTimeout(() => {
+				const nextPosts = allPosts.slice(
+					currentIndex,
+					currentIndex + postsPerLoad,
+				);
+
+				// Create cards with staggered animation
+				nextPosts.forEach((post, index) => {
+					setTimeout(() => {
+						// Create article element
+						const article = document.createElement("article");
+						article.className = "post-card newly-loaded";
+						article.dataset.postSlug = post.slug;
+
+						// Create link
+						const link = document.createElement("a");
+						link.href = `/blog/${post.slug}`;
+
+						// Create content container
+						const content = document.createElement("div");
+						content.className = "post-content";
+
+						// Create date element
+						const date = new Date(post.data.pubDate);
+						const formattedDate = date.toLocaleDateString("en-US", {
+							year: "numeric",
+							month: "long",
+							day: "numeric",
+						});
+
+						const dateSpan = document.createElement("span");
+						dateSpan.className = "post-date";
+						dateSpan.textContent = formattedDate;
+
+						// Create title element
+						const title = document.createElement("h2");
+						title.textContent = post.data.title;
+
+						// Assemble the card
+						content.appendChild(dateSpan);
+						content.appendChild(title);
+						link.appendChild(content);
+						article.appendChild(link);
+
+						// Add to container
+						postsContainer.appendChild(article);
+
+						// Remove newly-loaded class after animation
+						setTimeout(() => {
+							article.classList.remove("newly-loaded");
+							article.classList.add("animate-fade-in");
+						}, 500);
+					}, index * 100); // Stagger by 100ms
+				});
+
+				// Update counter and button state after all cards are added
+				setTimeout(
+					() => {
+						currentIndex += nextPosts.length;
+						currentCountSpan.textContent = currentIndex.toString();
+
+						// Remove loading state
+						loadMoreBtn.classList.remove("loading");
+
+						// Check if all posts are loaded
+						if (currentIndex >= allPosts.length) {
+							loadMoreBtn.disabled = true;
+							loadMoreBtn.textContent = "All Posts Loaded";
+						} else {
+							loadMoreBtn.disabled = false;
+						}
+
+						// Smooth scroll to first new post
+						const allCards =
+							postsContainer.querySelectorAll(".post-card");
+						if (allCards.length > 0) {
+							const firstNewCard =
+								allCards[allCards.length - nextPosts.length];
+							if (firstNewCard) {
+								setTimeout(() => {
+									firstNewCard.scrollIntoView({
+										behavior: "smooth",
+										block: "nearest",
+									});
+								}, 200);
+							}
+						}
+					},
+					nextPosts.length * 100 + 100,
+				);
+			}, 300);
+		});
+	}
+</script>

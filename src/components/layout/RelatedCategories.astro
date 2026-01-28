@@ -1,0 +1,193 @@
+---
+import { getCollection } from "astro:content";
+
+interface Props {
+    currentCategory: string;
+    maxCategories?: number;
+}
+
+const { currentCategory, maxCategories = 4 } = Astro.props;
+
+// Get all stories and their categories
+const stories = await getCollection("stories");
+
+// Count stories per category and calculate tag overlap
+const categoryData = new Map<
+    string,
+    { count: number; sharedTags: Set<string>; sampleImage?: string }
+>();
+
+// Get tags from current category stories
+const currentCategoryStories = stories.filter(
+    (s) => s.data.category === currentCategory,
+);
+const currentTags = new Set(
+    currentCategoryStories.flatMap((s) => s.data.tags || []),
+);
+
+// Calculate related categories based on tag overlap
+stories.forEach((story) => {
+    const category = story.data.category;
+    if (!category || category === currentCategory) return;
+
+    if (!categoryData.has(category)) {
+        categoryData.set(category, {
+            count: 0,
+            sharedTags: new Set(),
+            sampleImage: story.data.image,
+        });
+    }
+
+    const data = categoryData.get(category)!;
+    data.count++;
+
+    // Track shared tags
+    story.data.tags?.forEach((tag) => {
+        if (currentTags.has(tag)) {
+            data.sharedTags.add(tag);
+        }
+    });
+});
+
+// Sort by shared tags count (relevance), then by story count
+const relatedCategories = Array.from(categoryData.entries())
+    .map(([category, data]) => ({
+        category,
+        count: data.count,
+        relevance: data.sharedTags.size,
+        image: data.sampleImage,
+    }))
+    .sort((a, b) => {
+        if (b.relevance !== a.relevance) return b.relevance - a.relevance;
+        return b.count - a.count;
+    })
+    .slice(0, maxCategories);
+---
+
+{
+    relatedCategories.length > 0 && (
+        <section class="related-categories">
+            <h3 class="section-title">Related Topics</h3>
+            <div class="categories-grid">
+                {relatedCategories.map((item) => (
+                    <a href={`/${item.category}`} class="category-card">
+                        {item.image && (
+                            <div class="category-image">
+                                <img
+                                    src={item.image}
+                                    alt={item.category}
+                                    loading="lazy"
+                                />
+                                <div class="image-overlay" />
+                            </div>
+                        )}
+                        <div class="category-info">
+                            <h4 class="category-name">{item.category}</h4>
+                            <p class="category-count">
+                                {item.count}{" "}
+                                {item.count === 1 ? "story" : "stories"}
+                            </p>
+                        </div>
+                    </a>
+                ))}
+            </div>
+        </section>
+    )
+}
+
+<style>
+    .related-categories {
+        margin-top: var(--spacing-xl);
+        padding-top: var(--spacing-xl);
+        border-top: 1px solid var(--color-border);
+    }
+
+    .section-title {
+        font-family: "Playfair Display", serif;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: var(--spacing-lg);
+        color: var(--color-heading);
+    }
+
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: var(--spacing-lg);
+    }
+
+    .category-card {
+        position: relative;
+        display: block;
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        background: var(--color-bg);
+        min-height: 180px;
+    }
+
+    .category-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        border-color: var(--color-primary);
+    }
+
+    .category-image {
+        position: relative;
+        width: 100%;
+        height: 120px;
+        overflow: hidden;
+        background: var(--color-surface);
+    }
+
+    .category-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .category-card:hover .category-image img {
+        transform: scale(1.1);
+    }
+
+    .image-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(0, 0, 0, 0.3) 100%
+        );
+    }
+
+    .category-info {
+        padding: var(--spacing-md);
+    }
+
+    .category-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: var(--color-text);
+        text-transform: capitalize;
+    }
+
+    .category-count {
+        font-size: 0.9rem;
+        color: var(--color-text-muted);
+        margin: 0;
+    }
+
+    @media (max-width: 768px) {
+        .categories-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+        }
+    }
+</style>

@@ -1,0 +1,100 @@
+---
+interface Props {
+    items: Array<{
+        label: string;
+        href: string;
+    }>;
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+    <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+        {
+            items.map((item, index) => (
+                <li
+                    itemprop="itemListElement"
+                    itemscope
+                    itemtype="https://schema.org/ListItem"
+                >
+                    {index < items.length - 1 ? (
+                        <>
+                            <a href={item.href} itemprop="item">
+                                <span itemprop="name">{item.label}</span>
+                            </a>
+                            <meta
+                                itemprop="position"
+                                content={String(index + 1)}
+                            />
+                            <span class="separator" aria-hidden="true">
+                                /
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            <span itemprop="item" aria-current="page">
+                                <span itemprop="name">{item.label}</span>
+                            </span>
+                            <meta
+                                itemprop="position"
+                                content={String(index + 1)}
+                            />
+                        </>
+                    )}
+                </li>
+            ))
+        }
+    </ol>
+</nav>
+
+<style>
+    .breadcrumb {
+        margin-bottom: var(--spacing-lg);
+        padding: var(--spacing-sm) 0;
+    }
+
+    ol {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    a {
+        color: var(--color-text-muted);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    a:hover {
+        color: var(--color-primary);
+        text-decoration: underline;
+    }
+
+    span[aria-current="page"] {
+        color: var(--color-text);
+        font-weight: 600;
+    }
+
+    .separator {
+        color: var(--color-text-muted);
+        user-select: none;
+    }
+
+    @media (max-width: 768px) {
+        ol {
+            font-size: 0.85rem;
+        }
+    }
+</style>

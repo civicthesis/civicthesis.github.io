@@ -1,0 +1,269 @@
+---
+interface Props {
+    categories: string[];
+    activeCategory?: string;
+    searchPlaceholder?: string;
+    showSearch?: boolean;
+    showSort?: boolean;
+}
+
+const {
+    categories,
+    activeCategory = "All",
+    searchPlaceholder = "Search...",
+    showSearch = true,
+    showSort = true,
+} = Astro.props;
+---
+
+<div class="filter-controls">
+    <!-- Category Filter Tabs -->
+    <div class="category-tabs">
+        <button
+            class={`category-tab ${activeCategory === "All" ? "active" : ""}`}
+            data-category="All"
+        >
+            All
+        </button>
+        {
+            categories.map((category) => (
+                <button
+                    class={`category-tab ${activeCategory === category ? "active" : ""}`}
+                    data-category={category}
+                >
+                    {category}
+                </button>
+            ))
+        }
+    </div>
+
+    <!-- Search and Sort Controls -->
+    <div class="controls-row">
+        {
+            showSearch && (
+                <div class="search-box">
+                    <svg
+                        class="search-icon"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                    </svg>
+                    <input
+                        type="text"
+                        id="filter-search-input"
+                        class="search-input"
+                        placeholder={searchPlaceholder}
+                        aria-label="Search"
+                    />
+                </div>
+            )
+        }
+
+        {
+            showSort && (
+                <div class="sort-box">
+                    <label for="sort-select">Sort by:</label>
+                    <select id="sort-select" aria-label="Sort options">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="title-asc">Title A-Z</option>
+                        <option value="title-desc">Title Z-A</option>
+                    </select>
+                </div>
+            )
+        }
+    </div>
+</div>
+
+<style>
+    :global(.filter-controls) {
+        margin-bottom: var(--spacing-xl);
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    :global(.category-tabs) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: var(--spacing-lg);
+        padding-bottom: var(--spacing-lg);
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    :global(.category-tab) {
+        padding: 0.625rem 1.5rem;
+        border: 1.5px solid var(--color-border);
+        border-radius: 99px;
+        background: var(--color-bg);
+        color: var(--color-text);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        letter-spacing: 0.01em;
+    }
+
+    :global(.category-tab:hover) {
+        background: var(--color-bg-offset);
+        border-color: var(--color-primary);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    :global(.category-tab.active) {
+        background: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+        box-shadow: 0 4px 12px rgba(27, 42, 65, 0.2);
+    }
+
+    :global(.controls-row) {
+        display: flex;
+        gap: 1.25rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    :global(.search-box) {
+        position: relative;
+        flex: 1;
+        min-width: 280px;
+    }
+
+    :global(.search-icon) {
+        position: absolute;
+        left: 1.125rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--color-text-muted);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    :global(.search-input),
+    :global(#filter-search-input) {
+        width: 100%;
+        padding: 0.875rem 1.25rem 0.875rem 3rem;
+        border: 1.5px solid var(--color-border);
+        border-radius: 12px;
+        background: var(--color-bg);
+        color: var(--color-text);
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    :global(.search-input:focus),
+    :global(#filter-search-input:focus) {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow:
+            0 0 0 4px rgba(27, 42, 65, 0.08),
+            0 2px 8px rgba(0, 0, 0, 0.08);
+        background: white;
+    }
+
+    :global(.search-input::placeholder),
+    :global(#filter-search-input::placeholder) {
+        color: var(--color-text-muted);
+        opacity: 0.7;
+    }
+
+    :global(.sort-box) {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: var(--color-bg);
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        border: 1.5px solid var(--color-border);
+    }
+
+    :global(.sort-box label) {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--color-text);
+        white-space: nowrap;
+    }
+
+    :global(#sort-select) {
+        padding: 0.5rem 0.75rem;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--color-text);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    :global(#sort-select:focus) {
+        outline: none;
+        background: var(--color-bg-offset);
+    }
+
+    :global(#sort-select:hover) {
+        background: var(--color-bg-offset);
+    }
+
+    /* Hide on mobile - header search is available */
+    @media (max-width: 768px) {
+        :global(.filter-controls) {
+            display: none;
+        }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+        :global(.controls-row) {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        :global(.search-box) {
+            min-width: 100%;
+        }
+
+        :global(.sort-box) {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        :global(#sort-select) {
+            flex: 1;
+        }
+    }
+</style>
+
+<script>
+    // This script will be used by the page to handle filtering/sorting
+    // The actual logic will be implemented in the page that uses this component
+
+    // Store filter state in localStorage
+    const sortSelect = document.getElementById(
+        "sort-select",
+    ) as HTMLSelectElement;
+    if (sortSelect) {
+        // Load saved sort preference
+        const savedSort = localStorage.getItem("storiesSortPreference");
+        if (savedSort) {
+            sortSelect.value = savedSort;
+        }
+
+        // Save sort preference on change
+        sortSelect.addEventListener("change", () => {
+            localStorage.setItem("storiesSortPreference", sortSelect.value);
+        });
+    }
+</script>

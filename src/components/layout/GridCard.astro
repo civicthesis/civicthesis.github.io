@@ -34,19 +34,19 @@ const {
             <span class="category">{category}</span>
         </div>
         <h3 class="title">{title}</h3>
-        <p class="description">{description}</p>
-        <div class="footer">
+        <!-- <p class="description">{description}</p> -->
+        <!-- <div class="footer">
             <span class="author">{author}</span>
             <span class="separator">•</span>
             <time datetime={date.toISOString()}>{formatDate(date)}</time>
-        </div>
+        </div> -->
     </div>
 </article>
 
 <style>
     .grid-card {
         position: relative;
-        background: #141212; /* GitHub dark bg typical */
+        background: #141212; GitHub dark bg typical
         border: 1px solid #30363d;
         border-radius: 8px;
         overflow: hidden;
@@ -112,12 +112,12 @@ const {
     }
 
     .title {
-        font-family: var(--font-sans);
-        font-size: 1.25rem;
-        font-weight: 700;
+        font-family: var(--font-carrois);
         color: #ffffff;
         margin-bottom: 0.75rem;
-        line-height: 1.3;
+                font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1.25;
     }
 
     .description {

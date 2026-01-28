@@ -1,0 +1,360 @@
+---
+import { getCollection } from "astro:content";
+import { featuredConfig } from "../../config/featured";
+
+interface Props {
+    title?: string;
+    maxCategories?: number;
+    showViewAll?: boolean;
+}
+
+const {
+    title = featuredConfig.categories.sectionTitle,
+    maxCategories = featuredConfig.categories.maxDisplay,
+    showViewAll = featuredConfig.categories.showViewAllLink,
+} = Astro.props;
+
+// Get all stories
+const stories = await getCollection("stories");
+
+// Calculate category counts and get sample images
+const categoryData = new Map<
+    string,
+    { count: number; image?: string; latestDate: Date }
+>();
+
+stories.forEach((story) => {
+    const category = story.data.category;
+    if (!category) return;
+
+    // Skip excluded categories
+    if (featuredConfig.categories.exclude.includes(category)) return;
+
+    if (!categoryData.has(category)) {
+        categoryData.set(category, {
+            count: 0,
+            image: story.data.image,
+            latestDate: story.data.pubDate,
+        });
+    }
+
+    const data = categoryData.get(category)!;
+    data.count++;
+
+    // Update image if this story is more recent and has an image
+    if (story.data.pubDate > data.latestDate && story.data.image) {
+        data.image = story.data.image;
+        data.latestDate = story.data.pubDate;
+    }
+});
+
+// Convert to array
+let featuredCategories = Array.from(categoryData.entries()).map(
+    ([category, data]) => ({
+        category,
+        count: data.count,
+        image: data.image,
+        latestDate: data.latestDate,
+    }),
+);
+
+// Check if manual selection is configured
+if (
+    featuredConfig.categories.featured &&
+    featuredConfig.categories.featured.length > 0
+) {
+    // Manual selection: filter and sort by configured order
+    const manualCategories = featuredConfig.categories.featured
+        .map((cat) => featuredCategories.find((fc) => fc.category === cat))
+        .filter(Boolean) as typeof featuredCategories;
+
+    featuredCategories = manualCategories;
+} else {
+    // Auto-selection: sort based on strategy
+    switch (featuredConfig.categories.selectionStrategy) {
+        case "popular":
+            featuredCategories.sort((a, b) => b.count - a.count);
+            break;
+        case "recent":
+            featuredCategories.sort(
+                (a, b) => b.latestDate.getTime() - a.latestDate.getTime(),
+            );
+            break;
+        case "alphabetical":
+            featuredCategories.sort((a, b) =>
+                a.category.localeCompare(b.category),
+            );
+            break;
+    }
+}
+
+// Limit to maxCategories
+featuredCategories = featuredCategories.slice(0, maxCategories);
+---
+
+{
+    featuredCategories.length > 0 && (
+        <section class="featured-categories">
+            <div class="section-header">
+                <h2 class="section-title">{title}</h2>
+                {showViewAll && (
+                    <a href="/categories" class="view-all-link">
+                        View All Categories →
+                    </a>
+                )}
+            </div>
+
+            <div class="categories-grid">
+                {featuredCategories.map((item) => (
+                    <a
+                        href={`/${item.category}`}
+                        class="category-card"
+                    >
+                        <div class="category-image">
+                            {item.image ? (
+                                <>
+                                    <img
+                                        src={item.image}
+                                        alt={item.category}
+                                        loading="lazy"
+                                    />
+                                    <div class="image-overlay" />
+                                </>
+                            ) : (
+                                <div class="placeholder-image">
+                                    <svg
+                                        width="48"
+                                        height="48"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                                    </svg>
+                                </div>
+                            )}
+                        </div>
+                        <div class="category-content">
+                            <h3 class="category-name">{item.category}</h3>
+                            <p class="category-count">
+                                {item.count}{" "}
+                                {item.count === 1 ? "story" : "stories"}
+                            </p>
+                        </div>
+                        <div class="card-arrow">→</div>
+                    </a>
+                ))}
+            </div>
+        </section>
+    )
+}
+
+<style>
+    .featured-categories {
+        padding: var(--spacing-2xl) 0;
+        background: var(--color-surface);
+        /* border-top: 1px solid var(--color-border); */
+        /* border-bottom: 1px solid var(--color-border); */
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .section-title {
+        font-family: var(--font-carrois);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--color-heading);
+        margin: 0;
+    }
+
+    .view-all-link {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--color-primary);
+        text-decoration: none;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+    }
+
+    .view-all-link:hover {
+        color: var(--color-accent);
+        transform: translateX(4px);
+    }
+
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .category-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        background: var(--color-bg);
+        border: 1.5px solid var(--color-border);
+        border-radius: 16px;
+        overflow: hidden;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .category-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+        border-color: var(--color-primary);
+    }
+
+    .category-image {
+        position: relative;
+        width: 100%;
+        height: 160px;
+        background: var(--color-surface);
+        overflow: hidden;
+    }
+
+    .category-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .category-card:hover .category-image img {
+        transform: scale(1.08);
+    }
+
+    .placeholder-image {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+            135deg,
+            var(--color-surface) 0%,
+            var(--color-bg-offset) 100%
+        );
+        color: var(--color-text-muted);
+    }
+
+    .image-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(0, 0, 0, 0.4) 100%
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .category-card:hover .image-overlay {
+        opacity: 1;
+    }
+
+    .category-content {
+        padding: 1.25rem 1.5rem;
+        flex: 1;
+    }
+
+    .category-name {
+        font-size: 1.375rem;
+        font-weight: 700;
+        color: var(--color-text);
+        margin: 0 0 0.5rem 0;
+        text-transform: capitalize;
+        transition: color 0.2s ease;
+    }
+
+    .category-card:hover .category-name {
+        color: var(--color-primary);
+    }
+
+    .category-count {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--color-text-muted);
+        margin: 0;
+        font-family: var(--font-mono);
+        letter-spacing: 0.02em;
+    }
+
+    .card-arrow {
+        position: absolute;
+        bottom: 1.25rem;
+        right: 1.5rem;
+        font-size: 1.5rem;
+        color: var(--color-primary);
+        opacity: 0;
+        transform: translateX(-8px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .category-card:hover .card-arrow {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    @media (max-width: 1024px) {
+        .categories-grid {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.25rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .featured-categories {
+            padding: var(--spacing-xl) 0;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .categories-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .category-image {
+            height: 140px;
+        }
+
+        .category-content {
+            padding: 1rem 1.25rem;
+        }
+
+        .category-name {
+            font-size: 1.125rem;
+        }
+
+        .view-all-link {
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .categories-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+    }
+</style>

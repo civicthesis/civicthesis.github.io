@@ -1,0 +1,155 @@
+---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+    type: "blog" | "stories";
+    count?: number;
+    title?: string;
+}
+
+const { type, count = 3, title } = Astro.props;
+
+// Fetch recent content
+const collection = await getCollection(type);
+const recentItems = collection
+    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+    .slice(0, count);
+
+const sectionTitle = title || `Recent ${type === "blog" ? "Posts" : "Stories"}`;
+const basePath = type === "blog" ? "/blog" : "/stories";
+---
+
+<section class="recent-content">
+    <h3 class="section-title">{sectionTitle}</h3>
+    <div class="content-grid">
+        {
+            recentItems.map((item) => (
+                <a href={`${basePath}/${item.slug}`} class="content-card">
+                    {item.data.image && (
+                        <div class="card-image">
+                            <img
+                                src={item.data.image}
+                                alt={item.data.title}
+                                loading="lazy"
+                            />
+                        </div>
+                    )}
+                    <div class="card-body">
+                        <h4 class="card-title">{item.data.title}</h4>
+                        <time class="card-date">
+                            {item.data.pubDate.toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                            })}
+                        </time>
+                    </div>
+                </a>
+            ))
+        }
+    </div>
+    <a href={basePath === "/blog" ? "/blog" : "/stories"} class="view-all-link">
+        View All {type === "blog" ? "Posts" : "Stories"} →
+    </a>
+</section>
+
+<style>
+    .recent-content {
+        margin: var(--spacing-xl) 0;
+    }
+
+    .section-title {
+        font-family: "Playfair Display", serif;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: var(--spacing-lg);
+        color: var(--color-heading);
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-md);
+    }
+
+    .content-card {
+        display: block;
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        background: var(--color-bg);
+    }
+
+    .content-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        border-color: var(--color-primary);
+    }
+
+    .card-image {
+        width: 100%;
+        height: 160px;
+        overflow: hidden;
+        background: var(--color-surface);
+    }
+
+    .card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .content-card:hover .card-image img {
+        transform: scale(1.05);
+    }
+
+    .card-body {
+        padding: var(--spacing-md);
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--color-text);
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .card-date {
+        font-size: 0.85rem;
+        color: var(--color-text-muted);
+    }
+
+    .view-all-link {
+        display: inline-block;
+        margin-top: var(--spacing-md);
+        color: var(--color-primary);
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .view-all-link:hover {
+        color: var(--color-secondary);
+        transform: translateX(4px);
+    }
+
+    @media (max-width: 768px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+        }
+    }
+</style>

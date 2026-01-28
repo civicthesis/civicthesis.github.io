@@ -1,6 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import StoryCard from "../components/layout/StoryCard.astro";
+import Breadcrumb from "../components/layout/Breadcrumb.astro";
+import RelatedCategories from "../components/layout/RelatedCategories.astro";
 import { getCollection } from "astro:content";
 
 export async function getStaticPaths() {
@@ -24,16 +26,31 @@ const { stories, category } = Astro.props;
 const sortedStories = stories.sort(
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
+
+// Breadcrumb items
+const breadcrumbItems = [
+    { label: "Home", href: "/" },
+    { label: "Stories", href: "/stories" },
+    { label: category, href: `/${category}` },
+];
 ---
 
 <Layout title={`Stories in ${category} | CivicThesis`}>
     <main>
+        
         <section class="hero">
+            <div class="container">
+                <Breadcrumb items={breadcrumbItems} />
+            </div>
             <div class="container">
                 <span class="category-label">TOPIC</span>
                 <h1>{category}</h1>
                 <p class="subtitle">
                     Latest stories and updates in {category}.
+                </p>
+                <p class="story-count">
+                    {sortedStories.length}
+                    {sortedStories.length === 1 ? "story" : "stories"}
                 </p>
             </div>
         </section>
@@ -57,6 +74,10 @@ const sortedStories = stories.sort(
                 </div>
             </div>
         </section>
+
+        <div class="container">
+            <RelatedCategories currentCategory={category} />
+        </div>
     </main>
 </Layout>
 
@@ -106,7 +127,14 @@ const sortedStories = stories.sort(
         font-size: 1.25rem;
         color: var(--color-text-muted);
         max-width: 600px;
-        margin: 0 auto;
+        margin: 0 auto 0.5rem;
+    }
+
+    .story-count {
+        font-size: 1rem;
+        color: var(--color-primary);
+        font-weight: 600;
+        margin: 0;
     }
 
     .stories-grid {
