@@ -36,14 +36,16 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
 
 <header>
   <div class="container header-content">
+    <div class="header-left">
     <a href="/" class="logo">
       <span class="civic">CIVIC</span>
       <span class="thesis">Thesis</span>
     </a>
-
-    <div class="header-actions">
-      <!-- Search is always visible -->
-      <Search />
+  </div>
+  
+  <div class="header-actions">
+    <!-- Search is always visible -->
+    <Search />
 
       <!-- Desktop Navigation -->
       <nav class="desktop-nav">
@@ -194,11 +196,17 @@ const isStoriesActive = pathname === "/stories" || pathname === "/stories/";
       border-color 0.3s ease;
   }
 
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   .header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px; /* Increased from default 800px */
+    max-width: 1250px; /* Increased from default 800px */
   }
 
   .logo {

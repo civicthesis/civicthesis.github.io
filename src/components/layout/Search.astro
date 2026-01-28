@@ -114,6 +114,57 @@
     margin-left: 0.25rem;
   }
 
+  /* Desktop: Always Expanded */
+  @media (min-width: 769px) {
+    .input-container {
+      width: 600px;
+      opacity: 1;
+      margin-left: 0.25rem;
+      transition: width 0.3s ease;
+    }
+
+    .search-bar {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 0.25rem 0.75rem 0.25rem 0.25rem; /* Adjusted padding for icon */
+    }
+
+    #search-trigger {
+      display: flex; /* Show icon on desktop */
+      padding: 0.4rem; /* Reduce padding slightly */
+      cursor: default; /* Not a toggle on desktop */
+    }
+
+    #search-trigger:hover {
+      background: transparent;
+      color: var(--color-text); /* Remove hover effect */
+    }
+
+    .search-wrapper.expanded .input-container {
+      width: 500px !important;
+      margin-left: 0.25rem;
+    }
+
+    /* Hide clear button by default, show on hover or when has input (handled by JS ideally, but hover works for now) */
+    .clear-btn {
+      opacity: 0;
+    }
+    .search-bar:hover .clear-btn,
+    .search-bar:focus-within .clear-btn {
+      opacity: 0.5;
+    }
+    .clear-btn:hover {
+      opacity: 1 !important;
+    }
+
+    /* Adjust dropdown width */
+    .dropdown {
+      width: 100%; /* Match parent wrapper */
+      min-width: 500px;
+    }
+  }
+
   /* Disable transition for mobile */
   @media (max-width: 768px) {
     .input-container {
@@ -125,12 +176,15 @@
   }
 
   /* Global styles to hide other header elements when search is expanded */
-  :global(body.search-active) header .logo,
-  :global(body.search-active) header .desktop-nav,
-  :global(body.search-active) header .mobile-menu-btn {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
+  /* Only apply on mobile where toggle is needed */
+  @media (max-width: 768px) {
+    :global(body.search-active) header .logo,
+    :global(body.search-active) header .desktop-nav,
+    :global(body.search-active) header .mobile-menu-btn {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
   }
 
   #search-input {
@@ -194,6 +248,15 @@
     pointer-events: none;
     visibility: hidden; /* Start hidden */
     transition: all 0.2s ease;
+  }
+
+  @media (min-width: 769px) {
+    /* Adjust dropdown for desktop fixed width */
+    .dropdown {
+      width: 500px; /* Or match input width? Input is 350px. Let's make dropdown wider */
+      right: 0;
+      min-width: 350px;
+    }
   }
 
   .search-wrapper.has-results .dropdown {
@@ -402,14 +465,24 @@
   };
 
   const toggleSearch = async () => {
-    const isExpanded = wrapper?.classList.contains("expanded");
-    if (!isExpanded) {
-      wrapper?.classList.add("expanded");
-      document.body.classList.add("search-active"); // Hide other elements
+    // Only toggle if module screen or explicit triggering needed
+    // Actually, check if we are on desktop
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile) {
+      const isExpanded = wrapper?.classList.contains("expanded");
+      if (!isExpanded) {
+        wrapper?.classList.add("expanded");
+        document.body.classList.add("search-active"); // Hide other elements
+        input?.focus();
+        await fetchPosts();
+      } else {
+        closeSearch();
+      }
+    } else {
+      // Desktop: Focus input
       input?.focus();
       await fetchPosts();
-    } else {
-      closeSearch();
     }
   };
 
@@ -563,17 +636,14 @@
   };
 
   toggleBtn?.addEventListener("click", () => {
-    // Logic from original toggle
-    const isExpanded = wrapper?.classList.contains("expanded");
-    if (!isExpanded) {
-      wrapper?.classList.add("expanded");
-      document.body.classList.add("search-active");
-      input?.focus();
-      fetchPosts();
-      if (input.value.length === 0) renderRecentSearches();
-    } else {
-      closeSearch();
-    }
+    toggleSearch();
+  });
+
+  // Desktop check for enabling search features on mount/resize?
+  // No, just load data on focus
+  input?.addEventListener("focus", () => {
+    fetchPosts();
+    if (input.value.length === 0) renderRecentSearches();
   });
 
   closeBtn?.addEventListener("click", () => {
@@ -601,11 +671,8 @@
     if (e.key === "Escape") closeSearch();
     if ((e.metaKey || e.ctrlKey) && e.key === "k") {
       e.preventDefault();
-      if (!wrapper?.classList.contains("expanded")) {
-        toggleSearch();
-      } else {
-        input.focus();
-      }
+      // If mobile we toggle, if desktop we focus
+      toggleSearch();
     }
   });
 
