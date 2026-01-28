@@ -17,6 +17,10 @@
     --card-accent-saturated: #d97706;
     /* Navy for light mode */
 
+    --color-github-dark-bg: #141212;
+    --color-github-dark-border: #30363d;
+    --color-github-dark-text: #c9d1d9;
+
     /* Typography */
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --font-serif: 'Playfair Display', serif;
