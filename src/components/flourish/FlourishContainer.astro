@@ -1,0 +1,247 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  source?: string;
+  theme?: 'light' | 'dark' | 'auto';
+  allowFullscreen?: boolean;
+  maxWidth?: string;
+  class?: string;
+}
+
+const {
+  title,
+  subtitle,
+  source,
+  theme = 'auto',
+  allowFullscreen = false,
+  maxWidth = '800px',
+  class: className,
+} = Astro.props;
+---
+
+<div
+  class={`flourish-container theme-${theme} ${allowFullscreen ? 'interactive' : ''} ${className || ''}`}
+  data-allow-fullscreen={allowFullscreen}
+  style={`--max-width: ${maxWidth};`}
+>
+  {
+    allowFullscreen && (
+      <button class="fullscreen-btn" aria-label="Toggle Fullscreen">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="maximize-icon"
+        >
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="minimize-icon"
+          style="display: none;"
+        >
+          <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+        </svg>
+      </button>
+    )
+  }
+
+  <div class="flourish-header">
+    <h3 class="flourish-title">{title}</h3>
+    {subtitle && <p class="flourish-subtitle">{subtitle}</p>}
+  </div>
+
+  <div class="flourish-content">
+    <slot />
+  </div>
+
+  {source && <div class="flourish-source">Source: {source}</div>}
+</div>
+
+<script>
+  function setupFullscreen() {
+    const containers = document.querySelectorAll(
+      '.flourish-container[data-allow-fullscreen="true"]'
+    );
+
+    containers.forEach((container) => {
+      if (container.hasAttribute('data-fs-init')) return;
+      container.setAttribute('data-fs-init', 'true');
+
+      const btn = container.querySelector('.fullscreen-btn');
+      const minimizeIcon = btn?.querySelector('.minimize-icon') as HTMLElement;
+      const maximizeIcon = btn?.querySelector('.maximize-icon') as HTMLElement;
+
+      const toggleFullscreen = () => {
+        if (!document.fullscreenElement) {
+          container.requestFullscreen().catch((err) => {
+            console.error(
+              `Error attempting to enable fullscreen: ${err.message}`
+            );
+          });
+        } else {
+          document.exitFullscreen();
+        }
+      };
+
+      btn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleFullscreen();
+      });
+
+      container.addEventListener('dblclick', () => {
+        toggleFullscreen();
+      });
+
+      document.addEventListener('fullscreenchange', () => {
+        if (document.fullscreenElement === container) {
+            container.classList.add('is-fullscreen');
+            if (maximizeIcon) maximizeIcon.style.display = 'none';
+            if (minimizeIcon) minimizeIcon.style.display = 'block';
+        } else {
+            container.classList.remove('is-fullscreen');
+            if (maximizeIcon) maximizeIcon.style.display = 'block';
+            if (minimizeIcon) minimizeIcon.style.display = 'none';
+        }
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', setupFullscreen);
+  setupFullscreen();
+</script>
+
+<style>
+  .flourish-container {
+    width: 100%;
+    max-width: var(--max-width);
+    margin: 2rem auto;
+    padding: 2rem;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    position: relative;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background-color: var(--fc-bg, #ffffff);
+    color: var(--fc-text, #333333);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  /* Themes */
+  .theme-light {
+    --fc-bg: #ffffff;
+    --fc-text: #333333;
+    --fc-border: #e5e5e5;
+    --fc-sub: #666666;
+  }
+
+  .theme-dark {
+    --fc-bg: #1a1a1a;
+    --fc-text: #f5f5f5;
+    --fc-border: #333333;
+    --fc-sub: #a0a0a0;
+  }
+  
+  /* Auto theme support */
+  @media (prefers-color-scheme: dark) {
+    .theme-auto {
+      --fc-bg: #1a1a1a;
+      --fc-text: #f5f5f5;
+      --fc-border: #333333;
+      --fc-sub: #a0a0a0;
+    }
+  }
+
+  .flourish-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .flourish-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+  }
+
+  .flourish-subtitle {
+    font-size: 1rem;
+    color: var(--fc-sub, #666);
+    margin: 0;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .flourish-source {
+    font-size: 0.75rem;
+    color: var(--fc-sub, #999);
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--fc-border, #eee);
+    padding-top: 0.75rem;
+    text-align: right;
+  }
+
+  /* Fullscreen */
+  .flourish-container.is-fullscreen {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    margin: 0;
+    border-radius: 0;
+    overflow-y: auto;
+    z-index: 9999;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .flourish-container.is-fullscreen .flourish-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+  }
+  
+  .flourish-container.is-fullscreen :global(svg) {
+      max-height: 80vh;
+      width: 100%;
+  }
+
+  .fullscreen-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    color: var(--fc-sub);
+    opacity: 0;
+    transition: opacity 0.2s ease, background-color 0.2s;
+  }
+
+  .flourish-container:hover .fullscreen-btn,
+  .flourish-container.is-fullscreen .fullscreen-btn {
+    opacity: 1;
+  }
+
+  .fullscreen-btn:hover {
+    background-color: rgba(0,0,0,0.05);
+    color: var(--fc-text);
+  }
+</style>

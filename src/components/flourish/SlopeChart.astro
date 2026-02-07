@@ -1,0 +1,158 @@
+---
+import FlourishContainer from './FlourishContainer.astro';
+
+interface Props {
+  data: {
+    label: string;
+    start: number;
+    end: number;
+    color?: string;
+  }[];
+  title: string;
+  subtitle?: string;
+  source?: string;
+  startLabel?: string;
+  endLabel?: string;
+  theme?: 'light' | 'dark' | 'auto';
+  height?: number;
+}
+
+const {
+  data,
+  title,
+  subtitle,
+  source,
+  startLabel = "Start",
+  endLabel = "End",
+  theme = 'auto',
+  height = 500
+} = Astro.props;
+
+// Calculate scales
+const allValues = data.flatMap(d => [d.start, d.end]);
+const minVal = Math.min(...allValues);
+const maxVal = Math.max(...allValues);
+const range = maxVal - minVal;
+const padding = range * 0.1; // 10% padding
+const scaleMin = minVal - padding;
+const scaleMax = maxVal + padding;
+
+const getY = (val: number) => {
+  // SVG coordinates: 0 is top, height is bottom
+  const normalized = (val - scaleMin) / (scaleMax - scaleMin);
+  return height - (normalized * height);
+};
+
+// Default colors
+const defaultColors = [
+    "#3B82F6", "#EC4899", "#10B981", "#F59E0B", "#6366F1", "#9CA3AF"
+];
+---
+
+<FlourishContainer {title} {subtitle} {source} {theme}>
+  <div class="slope-chart-wrapper">
+    <svg viewBox={`0 0 600 ${height}`} preserveAspectRatio="xMidYMid meet" class="slope-svg">
+      
+      <!-- Axis Labels -->
+      <text x="50" y="20" class="col-label" text-anchor="middle">{startLabel}</text>
+      <text x="550" y="20" class="col-label" text-anchor="middle">{endLabel}</text>
+      
+      <!-- Vertical Axes Lines -->
+      <line x1="50" y1="30" x2="50" y2={height} stroke="currentColor" stroke-opacity="0.1" stroke-dasharray="4 4"/>
+      <line x1="550" y1="30" x2="550" y2={height} stroke="currentColor" stroke-opacity="0.1" stroke-dasharray="4 4"/>
+
+      <!-- Lines -->
+      {data.map((d, i) => {
+        const y1 = getY(d.start);
+        const y2 = getY(d.end);
+        const color = d.color || defaultColors[i % defaultColors.length];
+        const isUp = d.end > d.start;
+
+        return (
+          <g class="slope-group" tabindex="0">
+             <!-- Thick hover target line -->
+            <line x1="50" y1={y1} x2="550" y2={y2} stroke="transparent" stroke-width="20" class="hover-target" />
+            
+            <!-- Visible Line -->
+            <line 
+              x1="50" y1={y1} x2="550" y2={y2} 
+              stroke={color} 
+              stroke-width="3" 
+              class="slope-line"
+              opacity="0.7"
+            />
+            
+            <!-- Start Dot & Label -->
+            <circle cx="50" cy={y1} r="4" fill={color} />
+            <text x="40" y={y1 + 4} text-anchor="end" class="val-label">
+                {d.label} ({d.start})
+            </text>
+            
+            <!-- End Dot & Label -->
+            <circle cx="550" cy={y2} r="4" fill={color} />
+             <text x="560" y={y2 + 4} text-anchor="start" class="val-label">
+                {d.label} ({d.end})
+            </text>
+          </g>
+        );
+      })}
+
+    </svg>
+  </div>
+</FlourishContainer>
+
+<style>
+  .slope-chart-wrapper {
+    width: 100%;
+    overflow: visible;
+  }
+
+  .slope-svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .col-label {
+    font-weight: bold;
+    font-size: 14px;
+    fill: var(--fc-text);
+  }
+
+  .val-label {
+    font-size: 12px;
+    fill: var(--fc-sub);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  
+  .slope-group {
+      cursor: pointer;
+      outline: none;
+  }
+
+  .slope-line {
+      transition: all 0.3s ease;
+  }
+
+  /* Interaction */
+  .slope-group:hover .slope-line,
+  .slope-group:focus .slope-line {
+      opacity: 1;
+      stroke-width: 5;
+      z-index: 10;
+  }
+
+  .slope-group:hover .val-label,
+  .slope-group:focus .val-label {
+      opacity: 1;
+      fill: var(--fc-text);
+      font-weight: bold;
+  }
+
+  /* Fade out others on hover */
+  .slope-svg:has(.slope-group:hover) .slope-group:not(:hover) {
+      opacity: 0.2;
+  }
+</style>

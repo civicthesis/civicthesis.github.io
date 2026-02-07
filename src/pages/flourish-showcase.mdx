@@ -1,0 +1,117 @@
+---
+layout: ../layouts/Layout.astro
+title: "Data Storytelling with Flourish-Style Charts"
+description: "A showcase of new interactive data visualization components inspired by Flourish."
+pubDate: "2024-05-20"
+---
+import BarChartRace from '../components/flourish/BarChartRace.astro';
+import SlopeChart from '../components/flourish/SlopeChart.astro';
+
+# Data Storytelling with Flourish-Style Charts
+
+Data visualization is not just about showing numbers; it's about telling a story. Standard bar and line charts are useful, but sometimes you need more dynamic or comparative tools to highlight changes over time or drastic shifts between two states.
+
+We've implemented a new set of "Flourish-style" components for CivicThesis to help users create compelling data narratives.
+
+## 1. The Bar Chart Race: Visualizing Trends Over Time
+
+Bar chart races are excellent for showing how rankings evolove. They capture the dynamism of competition and change.
+
+### Example: The Rise of Tech Giants (Market Cap 2000-2023)
+
+This chart visualizes the approximate market capitalization (in Billions USD) of top tech companies, showing the rapid ascent of Apple and Microsoft, and the explosive growth of NVIDIA.
+
+*(Note: Data is illustrative for demonstration)*
+
+<BarChartRace 
+  title="Tech Giants Market Cap (Billions USD)"
+  subtitle="The battle for the world's most valuable company (2000 - 2024)"
+  source="Yahoo Finance / Macrotrends"
+  duration={1500}
+  topN={8}
+  data={[
+    // 2000
+    { step: 2000, label: "Microsoft", value: 586, color: "#F25022" },
+    { step: 2000, label: "Cisco", value: 366, color: "#049FD9" },
+    { step: 2000, label: "Intel", value: 277, color: "#0071C5" },
+    { step: 2000, label: "Oracle", value: 160, color: "#F80000" },
+    { step: 2000, label: "IBM", value: 193, color: "#0530ad" },
+    { step: 2000, label: "Nokia", value: 200, color: "#124191" },
+    { step: 2000, label: "Apple", value: 16, color: "#A2AAAD" },
+    { step: 2000, label: "Amazon", value: 17, color: "#FF9900" },
+    
+    // 2005
+    { step: 2005, label: "Microsoft", value: 270, color: "#F25022" },
+    { step: 2005, label: "Cisco", value: 110, color: "#049FD9" },
+    { step: 2005, label: "Intel", value: 150, color: "#0071C5" },
+    { step: 2005, label: "IBM", value: 128, color: "#0530ad" },
+    { step: 2005, label: "Apple", value: 58, color: "#A2AAAD" },
+    { step: 2005, label: "Google", value: 120, color: "#4285F4" },
+    { step: 2005, label: "Amazon", value: 20, color: "#FF9900" },
+    
+    // 2010
+    { step: 2010, label: "Apple", value: 297, color: "#A2AAAD" },
+    { step: 2010, label: "Microsoft", value: 238, color: "#F25022" },
+    { step: 2010, label: "Google", value: 190, color: "#4285F4" },
+    { step: 2010, label: "IBM", value: 180, color: "#0530ad" },
+    { step: 2010, label: "Amazon", value: 80, color: "#FF9900" },
+    { step: 2010, label: "Oracle", value: 150, color: "#F80000" },
+    
+    // 2015
+    { step: 2015, label: "Apple", value: 586, color: "#A2AAAD" },
+    { step: 2015, label: "Google", value: 510, color: "#4285F4" },
+    { step: 2015, label: "Microsoft", value: 440, color: "#F25022" },
+    { step: 2015, label: "Amazon", value: 315, color: "#FF9900" },
+    { step: 2015, label: "Facebook", value: 300, color: "#1877F2" },
+    
+    // 2020
+    { step: 2020, label: "Apple", value: 2200, color: "#A2AAAD" },
+    { step: 2020, label: "Microsoft", value: 1600, color: "#F25022" },
+    { step: 2020, label: "Amazon", value: 1600, color: "#FF9900" },
+    { step: 2020, label: "Google", value: 1200, color: "#4285F4" },
+    { step: 2020, label: "Facebook", value: 770, color: "#1877F2" },
+    { step: 2020, label: "Tesla", value: 650, color: "#E31937" },
+    { step: 2020, label: "NVIDIA", value: 320, color: "#76B900" },
+
+    // 2024
+    { step: 2024, label: "Microsoft", value: 3100, color: "#F25022" },
+    { step: 2024, label: "Apple", value: 2800, color: "#A2AAAD" },
+    { step: 2024, label: "NVIDIA", value: 2200, color: "#76B900" },
+    { step: 2024, label: "Google", value: 1700, color: "#4285F4" },
+    { step: 2024, label: "Amazon", value: 1800, color: "#FF9900" },
+    { step: 2024, label: "Meta", value: 1200, color: "#1877F2" },
+  ]}
+/>
+
+---
+
+## 2. Slope Charts: Analyzing Change
+
+Slope charts are simple yet powerful. By connecting two points, they immediately show:
+1.  **Direction:** Did it go up or down?
+2.  **Magnitude:** How steep was the change?
+3.  **Ranking:** Did the order of categories change?
+
+### Example: Life Expectancy (1960 vs 2020)
+
+This chart compares life expectancy at birth for selected countries, highlighting significant improvements in developing nations compared to steadier growth in developed ones.
+
+<SlopeChart 
+  title="Gain in Life Expectancy (1960 vs 2020)"
+  subtitle="Years of life expectancy at birth. Notice the dramatic rise in China and India."
+  source="World Bank"
+  startLabel="1960"
+  endLabel="2020"
+  height={600}
+  data={[
+    { label: "Japan", start: 67.7, end: 84.6, color: "#ff6b6b" },
+    { label: "USA", start: 69.8, end: 77.3, color: "#888" },
+    { label: "China", start: 43.7, end: 78.1, color: "#1dd1a1" },
+    { label: "India", start: 41.1, end: 70.1, color: "#feca57" },
+    { label: "UK", start: 71.1, end: 80.9, color: "#54a0ff" },
+    { label: "Nigeria", start: 36.6, end: 55.4, color: "#5f27cd" },
+    { label: "Brazil", start: 54.2, end: 76.1, color: "#48dbfb" },
+    { label: "Germany", start: 69.3, end: 81.1, color: "#ff9ff3" },
+    { label: "South Korea", start: 53.0, end: 83.5, color: "#ff9f43" }
+  ]}
+/>

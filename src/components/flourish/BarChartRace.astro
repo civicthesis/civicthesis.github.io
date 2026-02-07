@@ -1,0 +1,434 @@
+---
+import FlourishContainer from "./FlourishContainer.astro";
+
+interface Props {
+    data: {
+        step: string | number;
+        label: string;
+        value: number;
+        color?: string;
+        image?: string;
+    }[];
+    title: string;
+    subtitle?: string;
+    source?: string;
+    duration?: number; // ms per step
+    topN?: number; // Number of bars to show
+    theme?: "light" | "dark" | "auto";
+}
+
+const {
+    data,
+    title,
+    subtitle,
+    source,
+    duration = 1000,
+    topN = 10,
+    theme = "auto",
+} = Astro.props;
+
+// Group data by step
+const steps = [...new Set(data.map((d) => d.step))].sort();
+const initialStep = steps[0];
+
+// Get unique categories and assign colors if not provided
+const categories = [...new Set(data.map((d) => d.label))];
+const colorPalette = [
+    "#264653",
+    "#2a9d8f",
+    "#e9c46a",
+    "#f4a261",
+    "#e76f51",
+    "#e63946",
+    "#f1faee",
+    "#a8dadc",
+    "#457b9d",
+    "#1d3557",
+];
+
+// Serialize data for client-side use
+const chartData = {
+    data,
+    steps,
+    duration,
+    topN,
+};
+---
+
+<FlourishContainer {title} {subtitle} {source} {theme}>
+    <div class="bar-race-wrapper" data-chart-config={JSON.stringify(chartData)}>
+        <div class="controls">
+            <button class="play-btn" aria-label="Play/Pause">
+                <span class="icon play">▶</span>
+                <span class="icon pause" style="display:none;">⏸</span>
+            </button>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <span class="current-step">{initialStep}</span>
+        </div>
+
+        <div class="chart-area">
+            <!-- Bars will be injected here by JS -->
+        </div>
+    </div>
+</FlourishContainer>
+
+<script>
+    // Type Declarations
+    interface ChartData {
+        label: string;
+        value: number;
+        step: string | number;
+        color?: string;
+    }
+
+    interface ChartConfig {
+        data: ChartData[];
+        steps: (string | number)[];
+        duration: number;
+        topN: number;
+    }
+
+    class BarChartRace {
+        el: HTMLElement;
+        config: ChartConfig;
+        isPlaying: boolean;
+        currentIndex: number;
+        timer: any;
+        chartArea: HTMLElement;
+        stepLabel: HTMLElement;
+        playBtn: HTMLElement;
+        progressBar: HTMLElement;
+        playIcon: HTMLElement;
+        pauseIcon: HTMLElement;
+        colorMap: Map<string, string>;
+
+        constructor(el: HTMLElement) {
+            this.el = el;
+            this.config = JSON.parse(el.dataset.chartConfig!);
+            this.isPlaying = false;
+            this.currentIndex = 0;
+            this.timer = null;
+            this.colorMap = new Map();
+
+            this.chartArea = el.querySelector(".chart-area") as HTMLElement;
+            this.stepLabel = el.querySelector(".current-step") as HTMLElement;
+            this.playBtn = el.querySelector(".play-btn") as HTMLElement;
+            this.progressBar = el.querySelector(
+                ".progress-fill",
+            ) as HTMLElement;
+
+            this.playIcon = this.playBtn.querySelector(".play") as HTMLElement;
+            this.pauseIcon = this.playBtn.querySelector(
+                ".pause",
+            ) as HTMLElement;
+
+            this.init();
+        }
+
+        init() {
+            // Auto-assign colors map first
+            const palette = [
+                "#3B82F6",
+                "#EF4444",
+                "#10B981",
+                "#F59E0B",
+                "#6366F1",
+                "#EC4899",
+                "#8B5CF6",
+                "#14B8A6",
+                "#F97316",
+                "#06B6D4",
+            ];
+
+            const uniqueLabels = [
+                ...new Set(this.config.data.map((d) => d.label)),
+            ];
+            uniqueLabels.forEach((label, i) => {
+                // Find if data has explicit color first
+                const item = this.config.data.find(
+                    (d) => d.label === label && d.color,
+                );
+                this.colorMap.set(
+                    label,
+                    item ? item.color! : palette[i % palette.length],
+                );
+            });
+
+            this.playBtn.addEventListener("click", () => this.togglePlay());
+            this.renderStep(0);
+        }
+
+        getDataForStep(stepIndex: number) {
+            const step = this.config.steps[stepIndex];
+            return this.config.data
+                .filter((d) => d.step === step)
+                .sort((a, b) => b.value - a.value)
+                .slice(0, this.config.topN); // Keep top N
+        }
+
+        renderStep(index: number) {
+            const stepData = this.getDataForStep(index);
+            // Robust Max Value Calculation: Filter out non-numbers
+            const validValues = stepData
+                .map((d) => Number(d.value))
+                .filter((v) => !isNaN(v));
+            const maxValue =
+                validValues.length > 0 ? Math.max(...validValues) : 0;
+
+            // Update Step Label
+            this.stepLabel.textContent = String(this.config.steps[index]);
+            // Update Progress Bar
+            const progress = ((index + 1) / this.config.steps.length) * 100;
+            this.progressBar.style.width = `${progress}%`;
+
+            // 1. Mark all existing bars as "to remove"
+            const existingBars = new Map<string, HTMLElement>();
+            this.chartArea.querySelectorAll(".race-bar-group").forEach((el) => {
+                const element = el as HTMLElement;
+                if (element.dataset.label) {
+                    existingBars.set(element.dataset.label, element);
+                    element.dataset.status = "exiting";
+                }
+            });
+
+            // 2. Update or Create Bars
+            stepData.forEach((d, rank) => {
+                let barGroup = existingBars.get(d.label);
+
+                // Safe Percentage
+                let percentage = 0;
+                const val = Number(d.value);
+                if (!isNaN(val) && maxValue > 0) {
+                    percentage = (val / maxValue) * 100;
+                }
+
+                const translateY = rank * 44; // 40px height + 4px gap
+                const color = this.colorMap.get(d.label) || "#999";
+
+                if (!barGroup) {
+                    // Create new bar
+                    barGroup = document.createElement("div");
+                    barGroup.className = "race-bar-group";
+                    barGroup.dataset.label = d.label;
+                    barGroup.dataset.status = "entering";
+
+                    // Initial styles for enter animation (spawn from bottom or off-screen?)
+                    // Spawning at their rank position looks best, or from bottom
+                    barGroup.style.transform = `translateY(${translateY + 20}px)`;
+                    barGroup.style.opacity = "0";
+
+                    barGroup.innerHTML = `
+            <div class="race-label">${d.label}</div>
+            <div class="race-bar-container">
+              <div class="race-bar" style="background-color: ${color}; width: ${percentage}%"></div>
+              <span class="race-value">${val.toLocaleString()}</span>
+            </div>
+          `;
+                    this.chartArea.appendChild(barGroup);
+                } else {
+                    // Keep existing bar
+                    existingBars.delete(d.label);
+                    barGroup.dataset.status = "updating";
+
+                    // Update color if needed
+                    const bar = barGroup.querySelector(
+                        ".race-bar",
+                    ) as HTMLElement;
+                    if (bar) bar.style.backgroundColor = color;
+                }
+
+                // Apply Styles
+                // We use a small timeout to ensure DOM insertion happened for new bars
+                // allowing the transition to trigger
+                setTimeout(() => {
+                    if (barGroup) {
+                        barGroup.style.opacity = "1";
+                        barGroup.style.transform = `translateY(${translateY}px)`;
+
+                        const bar = barGroup.querySelector(
+                            ".race-bar",
+                        ) as HTMLElement;
+                        if (bar) bar.style.width = `${percentage}%`;
+
+                        const valLabel = barGroup.querySelector(".race-value");
+                        if (valLabel)
+                            valLabel.textContent = val.toLocaleString();
+                    }
+                }, 20);
+            });
+
+            // 3. Remove bars that dropped out of top N
+            existingBars.forEach((el) => {
+                el.style.opacity = "0";
+                el.style.transform = `translateY(${this.chartArea.clientHeight}px)`; // Drop down to bottom
+                setTimeout(() => el.remove(), 500); // Remove after transition
+            });
+        }
+
+        togglePlay() {
+            this.isPlaying = !this.isPlaying;
+            this.playIcon.style.display = this.isPlaying ? "none" : "block";
+            this.pauseIcon.style.display = this.isPlaying ? "block" : "none";
+
+            if (this.isPlaying) {
+                this.loop();
+            } else {
+                clearTimeout(this.timer);
+            }
+        }
+
+        loop() {
+            if (!this.isPlaying) return;
+
+            if (this.currentIndex >= this.config.steps.length - 1) {
+                this.isPlaying = false;
+                this.playIcon.style.display = "block";
+                this.pauseIcon.style.display = "none";
+                clearTimeout(this.timer);
+                return;
+            }
+
+            this.currentIndex++;
+            this.renderStep(this.currentIndex);
+
+            this.timer = setTimeout(() => {
+                this.loop();
+            }, this.config.duration);
+        }
+    }
+
+    // Init all instances
+    document.addEventListener("astro:page-load", () => {
+        document
+            .querySelectorAll(".bar-race-wrapper")
+            .forEach((el) => new BarChartRace(el as HTMLElement));
+    });
+
+    // Also init on first load if not using View Transitions
+    document
+        .querySelectorAll(".bar-race-wrapper")
+        .forEach((el) => new BarChartRace(el as HTMLElement));
+</script>
+
+<style>
+    .bar-race-wrapper {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    /* Controls */
+    .controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--fc-border, #eee);
+    }
+
+    .play-btn {
+        background: var(--fc-text, #333);
+        color: var(--fc-bg, #fff);
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        transition: transform 0.2s;
+    }
+
+    .play-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .progress-bar {
+        flex: 1;
+        height: 4px;
+        background: var(--fc-border, #eee);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: var(--fc-text, #333);
+        width: 0%;
+        transition: width 0.3s linear;
+    }
+
+    .current-step {
+        font-size: 2rem;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        color: var(--fc-sub, #999);
+    }
+
+    /* Chart Area */
+    .chart-area {
+        position: relative;
+        width: 100%;
+        height: 500px; /* Customizable? */
+        overflow: hidden;
+    }
+
+    .chart-area :global(.race-bar-group) {
+        position: absolute;
+        top: 0; /* Always 0, we use transform for Y position */
+        left: 0;
+        width: 100%;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        transition:
+            transform 0.5s ease-out,
+            opacity 0.3s ease;
+        will-change: transform, opacity;
+    }
+
+    .chart-area :global(.race-label) {
+        width: 120px;
+        text-align: right;
+        padding-right: 12px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--fc-text);
+    }
+
+    .chart-area :global(.race-bar-container) {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        position: relative;
+        height: 100%;
+    }
+
+    .chart-area :global(.race-bar) {
+        height: 100%;
+        /* background set inline */
+        transition: width 1s linear;
+        border-radius: 2px;
+        opacity: 0.9;
+    }
+
+    .chart-area :global(.race-value) {
+        margin-left: 8px;
+        font-size: 0.85rem;
+        font-variant-numeric: tabular-nums;
+        font-weight: bold;
+        color: var(--fc-text);
+    }
+
+    .chart-area :global(.race-bar-group[data-status="exiting"]) {
+        opacity: 0;
+    }
+</style>
