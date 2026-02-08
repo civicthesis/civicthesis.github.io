@@ -10,6 +10,8 @@ import Treemap from "../components/flourish/Treemap.astro";
 import Sunburst from "../components/flourish/Sunburst.astro";
 import Sankey from "../components/flourish/Sankey.astro";
 import Parliament from "../components/flourish/Parliament.astro";
+import ChoroplethMap from "../components/flourish/ChoroplethMap.astro";
+import ProjectionMap from "../components/flourish/ProjectionMap.astro";
 
 # Data Storytelling with Flourish-Style Charts
 
@@ -223,4 +225,67 @@ export const parliamentData = {
   data={parliamentData}
   height={400}
   source="European Parliament"
+/>
+
+---
+
+## 7. Choropleth Map: Geospatial Data
+
+Choropleth maps color geographic regions based on a data variable.
+
+export const populationData = [
+  { code: "CHN", value: 1444216107, name: "China" },
+  { code: "IND", value: 1393409038, name: "India" },
+  { code: "USA", value: 332915073, name: "United States" },
+  { code: "IDN", value: 276361783, name: "Indonesia" },
+  { code: "PAK", value: 225199937, name: "Pakistan" },
+  { code: "BRA", value: 213993437, name: "Brazil" },
+  { code: "NGA", value: 211400708, name: "Nigeria" },
+  { code: "BGD", value: 166303498, name: "Bangladesh" },
+  { code: "RUS", value: 145912025, name: "Russia" },
+  { code: "MEX", value: 130262216, name: "Mexico" },
+  { code: "JPN", value: 126050804, name: "Japan" },
+  { code: "DEU", value: 83900473, name: "Germany" },
+  { code: "FRA", value: 67422000, name: "France" },
+  { code: "GBR", value: 67281039, name: "United Kingdom" },
+  { code: "ITA", value: 60367477, name: "Italy" },
+  { code: "ZAF", value: 59308690, name: "South Africa" },
+  { code: "KOR", value: 51780579, name: "South Korea" },
+  { code: "COL", value: 51265844, name: "Colombia" },
+  { code: "ESP", value: 47326687, name: "Spain" },
+  { code: "ARG", value: 45605826, name: "Argentina" },
+];
+
+<ChoroplethMap
+  title="World Population (Selected Countries)"
+  subtitle="Countries colored by total population (2021)"
+  data={populationData}
+  height={600}
+  source="World Bank"
+/>
+
+---
+
+## 8. Projection Map: Interactive Globe
+
+A 3D orthographic projection of the world with drag-to-rotate interaction.
+
+export const cityData = [
+  { name: "New York", lat: 40.7128, lon: -74.0060 },
+  { name: "London", lat: 51.5074, lon: -0.1278 },
+  { name: "Tokyo", lat: 35.6762, lon: 139.6503 },
+  { name: "Sydney", lat: -33.8688, lon: 151.2093 },
+  { name: "São Paulo", lat: -23.5505, lon: -46.6333 },
+  { name: "Cairo", lat: 30.0444, lon: 31.2357 },
+  { name: "Mumbai", lat: 19.0760, lon: 72.8777 },
+  { name: "Moscow", lat: 55.7558, lon: 37.6173 },
+  { name: "Los Angeles", lat: 34.0522, lon: -118.2437 },
+  { name: "Dubai", lat: 25.2048, lon: 55.2708 },
+];
+
+<ProjectionMap
+  title="Global Connections"
+  subtitle="Major cities across the globe (Drag to rotate)"
+  data={cityData}
+  height={500}
 />

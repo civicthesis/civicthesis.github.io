@@ -1,0 +1,367 @@
+---
+import FlourishContainer from "./FlourishContainer.astro";
+
+interface Props {
+    data: { lat: number; lon: number; name: string; value?: number }[];
+    title?: string;
+    subtitle?: string;
+    source?: string;
+    height?: number;
+    theme?: "light" | "dark" | "auto";
+}
+
+const {
+    data,
+    title = "3D Projection Map",
+    subtitle = "Interactive Globe",
+    source,
+    height = 500,
+    theme = "auto",
+} = Astro.props;
+
+const uniqueId = `globe-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<FlourishContainer
+    title={title}
+    subtitle={subtitle}
+    source={source}
+    theme={theme}
+    allowFullscreen={true}
+>
+    <div
+        id={uniqueId}
+        class="globe-container"
+        style={`height: ${height}px;`}
+        data-chart-config={JSON.stringify({ data, theme })}
+    >
+        <!-- Tooltip -->
+        <div class="globe-tooltip"></div>
+        <!-- Canvas/SVG Area -->
+        <div class="chart-area"></div>
+        <div class="loading-overlay">Loading Globe Data...</div>
+    </div>
+</FlourishContainer>
+
+<style>
+    .globe-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        user-select: none;
+        background: #000; /* Space */
+        cursor: grab;
+    }
+
+    .globe-container:active {
+        cursor: grabbing;
+    }
+
+    :global(.light) .globe-container {
+        background: #f0f4f8; /* Sky/Sea */
+    }
+
+    .chart-area {
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+
+    /* Tooltip */
+    .globe-tooltip {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.85);
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        pointer-events: none;
+        opacity: 0;
+        transform: translate(-50%, -100%);
+        transition:
+            opacity 0.2s,
+            transform 0.2s;
+        z-index: 10;
+        white-space: nowrap;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .globe-tooltip::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+    }
+
+    .loading-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        pointer-events: none;
+    }
+
+    :global(.light) .loading-overlay {
+        color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* Globe Styling */
+    .globe-container :global(path.land) {
+        fill: #4caf50;
+        stroke: #2e7d32;
+        stroke-width: 0.5px;
+    }
+
+    .globe-container :global(path.water) {
+        fill: #2196f3;
+    }
+
+    .globe-container :global(path.graticule) {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.2);
+        stroke-width: 0.5px;
+    }
+
+    :global(.light) .globe-container :global(path.land) {
+        fill: #e0e0e0;
+        stroke: #999;
+    }
+
+    :global(.light) .globe-container :global(path.graticule) {
+        stroke: rgba(0, 0, 0, 0.1);
+    }
+
+    /* Point Styling */
+    .globe-container :global(circle.point) {
+        fill: #ff5722;
+        stroke: #fff;
+        stroke-width: 1.5px;
+        transition: r 0.3s;
+    }
+
+    .globe-container :global(circle.point:hover) {
+        fill: #ff9800;
+        r: 8px;
+    }
+</style>
+
+<script>
+    // @ts-nocheck
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    class ProjectionMap {
+        el;
+        config;
+        chartArea;
+        tooltip;
+        loadingOverlay;
+        resizeTimer;
+
+        static geoData = null;
+
+        constructor(el) {
+            this.el = el;
+            this.config = JSON.parse(el.dataset.chartConfig || "{}");
+            this.chartArea = el.querySelector(".chart-area");
+            this.tooltip = el.querySelector(".globe-tooltip");
+            this.loadingOverlay = el.querySelector(".loading-overlay");
+            this.init();
+        }
+
+        async init() {
+            if (!ProjectionMap.geoData) {
+                try {
+                    const response = await fetch(
+                        "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson",
+                    );
+                    ProjectionMap.geoData = await response.json();
+                } catch (e) {
+                    console.error("Failed to load map data", e);
+                    this.loadingOverlay.innerText = "Error loading map.";
+                    return;
+                }
+            }
+
+            this.loadingOverlay.style.display = "none";
+            this.render(this.config.data);
+
+            window.addEventListener("resize", () => {
+                clearTimeout(this.resizeTimer);
+                this.resizeTimer = setTimeout(
+                    () => this.render(this.config.data),
+                    200,
+                );
+            });
+        }
+
+        render(dataPoints) {
+            this.chartArea.innerHTML = "";
+            let { width, height } = this.el.getBoundingClientRect();
+            if (!width || width === 0)
+                width = this.el.offsetWidth || this.el.clientWidth || 800;
+            if (!height || height === 0)
+                height = this.el.offsetHeight || this.el.clientHeight || 500;
+
+            const svg = d3
+                .select(this.chartArea)
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .attr("viewBox", `0 0 ${width} ${height}`);
+
+            // Orthographic Projection (Globe)
+            const projection = d3
+                .geoOrthographic()
+                .scale(height / 2.2)
+                .translate([width / 2, height / 2])
+                .clipAngle(90);
+
+            const path = d3.geoPath().projection(projection);
+
+            // Draw Water (Sphere)
+            svg.append("path")
+                .datum({ type: "Sphere" })
+                .attr("class", "water")
+                .attr("d", path)
+                .attr("fill", "#1a237e") // Fallback
+                .attr("opacity", 0.5);
+
+            // Draw Graticule
+            const graticule = d3.geoGraticule();
+            svg.append("path")
+                .datum(graticule())
+                .attr("class", "graticule")
+                .attr("d", path);
+
+            // Draw Land
+            const land = svg.append("g");
+            land.selectAll("path")
+                .data(ProjectionMap.geoData.features)
+                .join("path")
+                .attr("class", "land")
+                .attr("d", path);
+
+            // Draw Points
+            const pointsGroup = svg.append("g");
+
+            const updatePoints = () => {
+                pointsGroup
+                    .selectAll("circle")
+                    .data(dataPoints)
+                    .join("circle")
+                    .attr("class", "point")
+                    .attr("cx", (d) => {
+                        const coords = projection([d.lon, d.lat]);
+                        return coords ? coords[0] : null;
+                    })
+                    .attr("cy", (d) => {
+                        const coords = projection([d.lon, d.lat]);
+                        return coords ? coords[1] : null;
+                    })
+                    .attr("r", 5)
+                    .attr("display", (d) => {
+                        // Hide points on back side
+                        const coords = projection([d.lon, d.lat]);
+                        // Simple check: if projection returns null, it's clipped?
+                        // geoOrthographic returns null if clipped? No, usually not for points unless configured.
+                        // But we want to check visibility.
+                        // d3.geoPath handles clipping for features, but for raw points we need logic.
+                        // Common way: measure distance from center relative to clip angle.
+                        // Or easier: use d3.geoCircle to check?
+                        // Easiest: Let D3 project it, but complex logic needed for exact horizon.
+                        // Quick hack: check dot product or use standard clipping logic.
+                        // Actually, projection([lon, lat]) might return coordinates even if on back, but we verify circle visibility.
+                        // With `.clipAngle(90)`, points on back might be tricky.
+
+                        // Reliable way:
+                        const p = d3
+                            .geoCircle()
+                            .center([d.lon, d.lat])
+                            .radius(0.1)();
+                        // If path(p) is empty string, it's hidden.
+                        return path(p) ? "block" : "none";
+                    })
+                    .on("mouseenter", (event, d) => {
+                        const content = `
+                            <div style="font-weight:600;">${d.name}</div>
+                            ${d.value ? `<div>${d.value}</div>` : ""}
+                        `;
+                        this.tooltip.style.opacity = "1";
+                        this.tooltip.innerHTML = content;
+
+                        // Stop rotation on hover
+                        if (this.timer) this.timer.stop();
+                    })
+                    .on("mousemove", (event) => {
+                        const chartRect = this.el.getBoundingClientRect();
+                        this.tooltip.style.left = `${event.clientX - chartRect.left}px`;
+                        this.tooltip.style.top = `${event.clientY - chartRect.top - 10}px`;
+                    })
+                    .on("mouseleave", () => {
+                        this.tooltip.style.opacity = "0";
+                        // Resume rotation?
+                        // this.startRotation(); // Optional
+                    });
+            };
+
+            updatePoints();
+
+            // Drag Behavior
+            const drag = d3
+                .drag()
+                .on("start", () => {
+                    if (this.timer) this.timer.stop();
+                })
+                .on("drag", (event) => {
+                    const rotate = projection.rotate();
+                    const k = 75 / projection.scale();
+                    projection.rotate([
+                        rotate[0] + event.dx * k,
+                        rotate[1] - event.dy * k,
+                    ]);
+                    svg.selectAll("path").attr("d", path);
+                    updatePoints();
+                });
+
+            svg.call(drag);
+
+            // Auto Rotation
+            this.startRotation = () => {
+                this.timer = d3.timer((elapsed) => {
+                    const rotate = projection.rotate();
+                    const k = 0.2; // Speed
+                    projection.rotate([rotate[0] + k, rotate[1]]);
+                    svg.selectAll("path").attr("d", path);
+                    updatePoints();
+                });
+            };
+
+            // Determine if interaction occurred, else rotate
+            // For now, auto-rotate start
+            if (this.config.theme !== "static") {
+                this.startRotation();
+            }
+        }
+    }
+
+    function initGlobe() {
+        document.querySelectorAll(".globe-container").forEach((el) => {
+            const element = el;
+            if (!element.dataset.initialized) {
+                new ProjectionMap(element);
+                element.dataset.initialized = "true";
+            }
+        });
+    }
+
+    initGlobe();
+    document.addEventListener("astro:page-load", initGlobe);
+</script>
