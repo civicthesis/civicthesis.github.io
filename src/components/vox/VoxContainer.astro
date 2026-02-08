@@ -6,6 +6,8 @@ interface Props {
     theme?: "light" | "dark";
     allowFullscreen?: boolean;
     class?: string;
+    titleFontSize?: string;
+    subtitleFontSize?: string;
 }
 
 const {
@@ -15,6 +17,8 @@ const {
     theme = "light",
     allowFullscreen = false,
     class: className,
+    titleFontSize,
+    subtitleFontSize,
 } = Astro.props;
 ---
 
@@ -59,8 +63,24 @@ const {
     }
 
     <div class="vox-header">
-        <h3 class="vox-title">{title}</h3>
-        {subtitle && <p class="vox-subtitle">{subtitle}</p>}
+        <h3
+            class="vox-title"
+            style={titleFontSize ? `font-size: ${titleFontSize}` : ""}
+        >
+            {title}
+        </h3>
+        {
+            subtitle && (
+                <p
+                    class="vox-subtitle"
+                    style={
+                        subtitleFontSize ? `font-size: ${subtitleFontSize}` : ""
+                    }
+                >
+                    {subtitle}
+                </p>
+            )
+        }
     </div>
 
     <div class="vox-content">
@@ -152,10 +172,18 @@ const {
         width: 100%;
         max-width: 800px;
         margin: 2rem auto;
-        padding: 2rem;
-        font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+        padding: 0rem;
+        font-family:
+            "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
         position: relative;
         transition: all 0.3s ease;
+    }
+
+    @media (max-width: 600px) {
+        .vox-container {
+            padding: 0rem;
+            margin: 1rem auto;
+        }
     }
 
     .vox-container.interactive {
@@ -221,22 +249,23 @@ const {
 
     /* Header */
     .vox-title {
-        font-size: 1.5rem;
+        font-size: 2rem; /* Increased from 1.5rem */
         font-weight: 700;
         margin: 0 0 0.5rem 0;
         letter-spacing: -0.02em;
-        line-height: 1.2;
+        line-height: 1.1;
     }
 
     .vox-container.is-fullscreen .vox-title {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
 
     .vox-subtitle {
-        font-size: 1rem;
+        font-size: 1.25rem; /* Increased from 1rem */
         color: #777;
         margin: 0 0 1.5rem 0;
         font-weight: 400;
+        line-height: 1.5;
     }
 
     .vox-container.is-fullscreen .vox-subtitle {

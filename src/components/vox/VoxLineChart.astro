@@ -22,6 +22,9 @@ interface Props {
     trigger?: "visible" | "load";
     class?: string;
     colors?: string[]; // Allow overriding colors prop
+    axisLabelFontSize?: number;
+    seriesLabelFontSize?: number;
+    showLegend?: boolean;
 }
 
 const {
@@ -35,6 +38,9 @@ const {
     trigger = "visible",
     class: className,
     colors: overrideColors,
+    axisLabelFontSize = 14, // Increased default
+    seriesLabelFontSize = 18, // Increased default
+    showLegend = true, // Added legend prop, default true for new request
 } = Astro.props;
 
 // 1. Normalize Series Data
@@ -115,7 +121,11 @@ const defaultColors = [
 const uniqueId = Math.random().toString(36).substr(2, 9);
 ---
 
-<div class={`vox-line-chart ${className || ""}`} data-trigger={trigger}>
+<div
+    class={`vox-line-chart ${trigger === "visible" ? "trigger-visible" : ""} ${className || ""}`}
+    data-trigger={trigger}
+    style={`--axis-font-size: ${axisLabelFontSize}px; --series-font-size: ${seriesLabelFontSize}px;`}
+>
     <svg
         viewBox={`0 0 ${chartWidth} ${chartHeight}`}
         preserveAspectRatio="xMidYMid meet"
@@ -231,92 +241,133 @@ const uniqueId = Math.random().toString(36).substr(2, 9);
             })
         }
     </svg>
+
+    {
+        showLegend && (
+            <div class="legend">
+                {normalizedSeries.map((s, i) => (
+                    <div class="legend-item">
+                        <span
+                            class="legend-color"
+                            style={`background-color: ${s.color || defaultColors[i % defaultColors.length]}`}
+                        />
+                        <span class="legend-text">{s.name}</span>
+                    </div>
+                ))}
+            </div>
+        )
+    }
+
+    <script>
+        const setup = () => {
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("in-view");
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                },
+                { threshold: 0.3 }, // Wait until 30% visible
+            );
+
+            document
+                .querySelectorAll('.vox-line-chart[data-trigger="visible"]')
+                .forEach((el) => observer.observe(el));
+
+            document
+                .querySelectorAll('.vox-line-chart[data-trigger="load"]')
+                .forEach((el) => el.classList.add("in-view"));
+        };
+
+        document.addEventListener("astro:page-load", setup);
+        setup();
+    </script>
+
+    <style>
+        .vox-line-chart {
+            width: 100%;
+            height: auto;
+            overflow: visible;
+            --bg-color: #fff;
+        }
+
+        /* ... */
+
+        .axis-label {
+            font-size: var(--axis-font-size, 14px);
+            fill: #777;
+            font-family: inherit;
+        }
+
+        .series-label {
+            font-size: var(--series-font-size, 16px);
+            font-family: inherit;
+        }
+
+        /* Animation: Draw Line */
+        .line-path {
+            stroke-dasharray: 2000;
+            stroke-dashoffset: 2000;
+            transition: stroke-dashoffset 2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .vox-line-chart.in-view .line-path {
+            stroke-dashoffset: 0;
+        }
+
+        /* Animation: Points Fade In */
+        .data-point {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            transition-delay: calc(
+                1s + var(--delay)
+            ); /* Start appearing after line half drawn */
+        }
+
+        .vox-line-chart.in-view .data-point {
+            opacity: 1;
+        }
+
+        /* Animation: Label Slide In */
+        .series-label {
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.5s ease;
+            transition-delay: 2s; /* After line finishes */
+        }
+
+        .vox-line-chart.in-view .series-label {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-family: inherit;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            margin-right: 6px;
+            border-radius: 2px;
+        }
+
+        .legend-text {
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
 </div>
-
-<script>
-    const setup = () => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("in-view");
-                        observer.unobserve(entry.target);
-                    }
-                });
-            },
-            { threshold: 0.3 }, // Wait until 30% visible
-        );
-
-        document
-            .querySelectorAll('.vox-line-chart[data-trigger="visible"]')
-            .forEach((el) => observer.observe(el));
-
-        document
-            .querySelectorAll('.vox-line-chart[data-trigger="load"]')
-            .forEach((el) => el.classList.add("in-view"));
-    };
-
-    document.addEventListener("astro:page-load", setup);
-    setup();
-</script>
-
-<style>
-    .vox-line-chart {
-        width: 100%;
-        height: auto;
-        overflow: visible;
-        --bg-color: #fff; /* Should match container bg */
-    }
-
-    :global(.theme-dark) .vox-line-chart {
-        --bg-color: #222;
-    }
-
-    .axis-label {
-        font-size: 12px;
-        fill: #777;
-        font-family: inherit;
-    }
-
-    .series-label {
-        font-size: 14px;
-        font-family: inherit;
-    }
-
-    /* Animation: Draw Line */
-    .line-path {
-        stroke-dasharray: 2000;
-        stroke-dashoffset: 2000;
-        transition: stroke-dashoffset 2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .vox-line-chart.in-view .line-path {
-        stroke-dashoffset: 0;
-    }
-
-    /* Animation: Points Fade In */
-    .data-point {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        transition-delay: calc(
-            1s + var(--delay)
-        ); /* Start appearing after line half drawn */
-    }
-
-    .vox-line-chart.in-view .data-point {
-        opacity: 1;
-    }
-
-    /* Animation: Label Slide In */
-    .series-label {
-        opacity: 0;
-        transform: translateX(-10px);
-        transition: all 0.5s ease;
-        transition-delay: 2s; /* After line finishes */
-    }
-
-    .vox-line-chart.in-view .series-label {
-        opacity: 1;
-        transform: translateX(0);
-    }
-</style>

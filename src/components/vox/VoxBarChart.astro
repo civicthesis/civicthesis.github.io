@@ -24,6 +24,10 @@ interface Props {
     showGrid?: boolean;
     trigger?: "visible" | "load";
     class?: string;
+    axisLabelFontSize?: number;
+    valueLabelFontSize?: number;
+    showLegend?: boolean;
+    legendFontSize?: number;
 }
 
 const {
@@ -36,6 +40,10 @@ const {
     showGrid = true,
     trigger = "visible",
     class: className,
+    axisLabelFontSize = 16, // Increased default
+    valueLabelFontSize = 16, // Increased default
+    showLegend = true, // Added default true
+    legendFontSize = 14,
 } = Astro.props;
 
 // Determine Mode
@@ -86,6 +94,7 @@ const uniqueId = Math.random().toString(36).substr(2, 9);
 <div
     class={`vox-bar-chart ${orientation} ${className || ""}`}
     data-trigger={trigger}
+    style={`--axis-font-size: ${axisLabelFontSize}px; --value-font-size: ${valueLabelFontSize}px; --legend-font-size: ${legendFontSize}px;`}
 >
     <svg
         viewBox={`0 0 ${chartWidth} ${chartHeight}`}
@@ -299,17 +308,27 @@ const uniqueId = Math.random().toString(36).substr(2, 9);
     </svg>
 
     {
-        isStacked && (
+        showLegend && (
             <div class="legend">
-                {keys.map((key, i) => (
-                    <div class="legend-item">
-                        <span
-                            class="legend-color"
-                            style={`background-color: ${colors[i % colors.length]}`}
-                        />
-                        <span class="legend-text">{key}</span>
-                    </div>
-                ))}
+                {isStacked
+                    ? keys.map((key, i) => (
+                          <div class="legend-item">
+                              <span
+                                  class="legend-color"
+                                  style={`background-color: ${colors[i % colors.length]}`}
+                              />
+                              <span class="legend-text">{key}</span>
+                          </div>
+                      ))
+                    : items.map((item: any, i) => (
+                          <div class="legend-item">
+                              <span
+                                  class="legend-color"
+                                  style={`background-color: ${item.color || colors[0]}`}
+                              />
+                              <span class="legend-text">{item.label}</span>
+                          </div>
+                      ))}
             </div>
         )
     }
@@ -349,7 +368,8 @@ const uniqueId = Math.random().toString(36).substr(2, 9);
 
     .axis-label {
         /* font-size: 12px; */
-        font-size: 15px;
+        font-size: var(--axis-font-size, 15px);
+        font-weight: bold;
         /* fill: #555; */
         fill: var(--color-primary);
     }
@@ -361,7 +381,7 @@ const uniqueId = Math.random().toString(36).substr(2, 9);
 
     .value-label {
         /* font-size: 12px; */
-        font-size: 14px;
+        font-size: var(--value-font-size, 14px);
         font-weight: bold;
         /* fill: #333; */
         fill: var(--color-primary);
@@ -417,13 +437,17 @@ const uniqueId = Math.random().toString(36).substr(2, 9);
         justify-content: center;
         gap: 1rem;
         margin-top: 1rem;
-        font-size: 14px;
+        font-size: var(--legend-font-size, 14px);
         font-family: inherit;
     }
 
     .legend-item {
         display: flex;
         align-items: center;
+    }
+
+    .legend-text {
+        font-weight: bold;
     }
 
     .legend-color {
