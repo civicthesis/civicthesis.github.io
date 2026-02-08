@@ -32,9 +32,15 @@ const {
     <div class="image-container">
         {
             image ? (
-                <img src={image} alt={title} loading="lazy" />
+                <img 
+                    src={image} 
+                    alt={title} 
+                    loading="lazy" 
+                    data-category={category}
+                    data-tags={tags.join(',')}
+                />
             ) : (
-                <DynamicPlaceholder title={title} category={category} />
+                <DynamicPlaceholder title={title} category={category} tags={tags} />
             )
         }
     </div>

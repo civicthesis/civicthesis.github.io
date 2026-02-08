@@ -18,7 +18,12 @@ const { title, description, date, image, href, category } = Astro.props;
     <div class="image-container">
         {
             image ? (
-                <img src={image} alt={title} loading="eager" />
+                <img 
+                    src={image} 
+                    alt={title} 
+                    loading="eager" 
+                    data-category={category}
+                />
             ) : (
                 <DynamicPlaceholder title={title} category={category} />
             )
