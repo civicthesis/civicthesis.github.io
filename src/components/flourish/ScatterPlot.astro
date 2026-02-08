@@ -1,0 +1,546 @@
+---
+import FlourishContainer from "./FlourishContainer.astro";
+
+interface Props {
+    data: {
+        year: number;
+        items: {
+            name: string;
+            x: number;
+            y: number;
+            size?: number; // Bubble size
+            color?: string;
+            category?: string;
+        }[];
+    }[];
+    title?: string;
+    subtitle?: string;
+    source?: string;
+    height?: number;
+    xAxisLabel?: string;
+    yAxisLabel?: string;
+    theme?: "light" | "dark" | "auto";
+    autoPlay?: boolean;
+}
+
+const {
+    data,
+    title = "Scatter Plot Analysis",
+    subtitle = "Correlation and distribution over time",
+    source,
+    height = 500,
+    xAxisLabel = "X Axis",
+    yAxisLabel = "Y Axis",
+    theme = "auto",
+    autoPlay = true,
+} = Astro.props;
+
+const uniqueId = `scatter-${Math.random().toString(36).substr(2, 9)}`;
+
+// Sort data by year
+const sortedData = [...data].sort((a, b) => a.year - b.year);
+const startYear = sortedData[0]?.year;
+const endYear = sortedData[sortedData.length - 1]?.year;
+---
+
+<FlourishContainer
+    title={title}
+    subtitle={subtitle}
+    source={source}
+    theme={theme}
+    allowFullscreen={true}
+>
+    <div
+        id={uniqueId}
+        class="scatter-container"
+        style={`height: ${height}px;`}
+        data-chart-config={JSON.stringify({
+            data: sortedData,
+            theme,
+            autoPlay,
+        })}
+    >
+        <!-- Tooltip -->
+        <div class="scatter-tooltip"></div>
+
+        <!-- Controls -->
+        <div class="scatter-controls">
+            <button class="play-btn">
+                <svg viewBox="0 0 24 24" class="icon-play"
+                    ><path fill="currentColor" d="M8 5v14l11-7z"></path></svg
+                >
+                <svg
+                    viewBox="0 0 24 24"
+                    class="icon-pause"
+                    style="display:none;"
+                    ><path
+                        fill="currentColor"
+                        d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg
+                >
+            </button>
+            <input
+                type="range"
+                class="year-slider"
+                min="0"
+                max={sortedData.length - 1}
+                value="0"
+                step="1"
+            />
+            <div class="current-year">{startYear}</div>
+        </div>
+
+        <!-- Canvas/SVG Area -->
+        <div class="chart-area"></div>
+
+        <!-- Large Background Year -->
+        <div class="bg-year">{startYear}</div>
+    </div>
+</FlourishContainer>
+
+<style>
+    .scatter-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        user-select: none;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chart-area {
+        width: 100%;
+        flex-grow: 1;
+        position: relative;
+    }
+
+    /* Tooltip */
+    .scatter-tooltip {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.85);
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        pointer-events: none;
+        opacity: 0;
+        transform: translate(-50%, -100%);
+        transition:
+            opacity 0.2s,
+            transform 0.2s;
+        z-index: 20;
+        white-space: nowrap;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .scatter-tooltip::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+    }
+
+    /* Controls */
+    .scatter-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.5rem 1rem;
+        background: rgba(0, 0, 0, 0.03);
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        z-index: 10;
+    }
+
+    :global(.dark) .scatter-controls {
+        background: rgba(255, 255, 255, 0.05);
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .play-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: inherit;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.2s;
+    }
+
+    .play-btn:hover {
+        background: rgba(0, 0, 0, 0.1);
+    }
+    :global(.dark) .play-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .play-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .year-slider {
+        flex-grow: 1;
+        cursor: pointer;
+    }
+
+    .current-year {
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+    }
+
+    .bg-year {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 15rem;
+        font-weight: 800;
+        color: rgba(0, 0, 0, 0.03);
+        pointer-events: none;
+        z-index: 0;
+    }
+    :global(.dark) .bg-year {
+        color: rgba(255, 255, 255, 0.03);
+    }
+
+    /* Dot Styling */
+    .scatter-container :global(circle.dot) {
+        transition:
+            cx 0.5s ease-out,
+            cy 0.5s ease-out,
+            r 0.5s ease-out,
+            fill 0.3s;
+        cursor: pointer;
+        opacity: 0.8;
+    }
+
+    .scatter-container :global(circle.dot:hover) {
+        stroke: #fff;
+        stroke-width: 2px;
+        opacity: 1;
+    }
+
+    .scatter-container :global(line.grid) {
+        stroke: rgba(0, 0, 0, 0.1);
+        stroke-dasharray: 4;
+    }
+    :global(.dark) .scatter-container :global(line.grid) {
+        stroke: rgba(255, 255, 255, 0.15);
+    }
+
+    .scatter-container :global(text.axis-label) {
+        font-size: 0.75rem;
+        fill: #666;
+    }
+    :global(.dark) .scatter-container :global(text.axis-label) {
+        fill: #cbd5e1;
+    }
+</style>
+
+<script>
+    // @ts-nocheck
+    class ScatterChart {
+        el;
+        config;
+        chartArea;
+        tooltip;
+        playBtn;
+        slider;
+        yearDisplay;
+        bgYear;
+
+        isPlaying = false;
+        timer;
+        currentIndex = 0;
+
+        // Scales
+        xMin;
+        xMax;
+        yMin;
+        yMax;
+
+        constructor(el) {
+            this.el = el;
+            this.config = JSON.parse(el.dataset.chartConfig || "{}");
+            this.chartArea = el.querySelector(".chart-area");
+            this.tooltip = el.querySelector(".scatter-tooltip");
+            this.playBtn = el.querySelector(".play-btn");
+            this.slider = el.querySelector(".year-slider");
+            this.yearDisplay = el.querySelector(".current-year");
+            this.bgYear = el.querySelector(".bg-year");
+
+            this.init();
+        }
+
+        init() {
+            if (!this.config.data || this.config.data.length === 0) return;
+
+            // Calculate Global Scales
+            const allItems = this.config.data.flatMap((d) => d.items);
+            this.xMin = Math.min(...allItems.map((i) => i.x));
+            this.xMax = Math.max(...allItems.map((i) => i.x));
+            this.yMin = Math.min(...allItems.map((i) => i.y));
+            this.yMax = Math.max(...allItems.map((i) => i.y));
+
+            // Padding
+            const xPad = (this.xMax - this.xMin) * 0.1;
+            const yPad = (this.yMax - this.yMin) * 0.1;
+            this.xMin -= xPad;
+            this.xMax += xPad;
+            this.yMin -= yPad;
+            this.yMax += yPad;
+
+            // Setup SVG
+            this.setupSVG();
+            this.renderFrame(0);
+
+            // Controls
+            this.playBtn.addEventListener("click", () => this.togglePlay());
+            this.slider.addEventListener("input", (e) => {
+                this.pause();
+                this.currentIndex = +e.target.value;
+                this.renderFrame(this.currentIndex);
+            });
+
+            // AutoPlay
+            if (this.config.autoPlay) {
+                setTimeout(() => this.play(), 1000);
+            }
+
+            window.addEventListener("resize", () => {
+                this.setupSVG();
+                this.renderFrame(this.currentIndex);
+            });
+        }
+
+        setupSVG() {
+            this.chartArea.innerHTML = "";
+            let { width, height } = this.chartArea.getBoundingClientRect();
+            if (!width) width = 800;
+            if (!height) height = 400; // flexible
+
+            this.width = width;
+            this.height = height;
+            this.padding = { top: 20, right: 20, bottom: 40, left: 50 };
+
+            const svg = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "svg",
+            );
+            svg.setAttribute("width", "100%");
+            svg.setAttribute("height", "100%");
+            svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+            this.chartArea.appendChild(svg);
+            this.svg = svg;
+
+            // Draw Grid/Axes
+            this.drawAxes();
+        }
+
+        drawAxes() {
+            // Simple Grid
+            const steps = 5;
+            for (let i = 0; i <= steps; i++) {
+                // X Grid (Vertical lines)
+                const x = this.mapX(
+                    this.xMin + (this.xMax - this.xMin) * (i / steps),
+                );
+                this.createLine(
+                    x,
+                    this.padding.top,
+                    x,
+                    this.height - this.padding.bottom,
+                    "grid",
+                );
+
+                // Y Grid (Horizontal lines)
+                const y = this.mapY(
+                    this.yMin + (this.yMax - this.yMin) * (i / steps),
+                );
+                this.createLine(
+                    this.padding.left,
+                    y,
+                    this.width - this.padding.right,
+                    y,
+                    "grid",
+                );
+            }
+
+            // Labels (Simplified)
+            // Ideally use d3-axis but keeping vanilla for light-weight
+        }
+
+        createLine(x1, y1, x2, y2, className) {
+            const line = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "line",
+            );
+            line.setAttribute("x1", x1);
+            line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2);
+            line.setAttribute("y2", y2);
+            line.setAttribute("class", className);
+            this.svg.appendChild(line);
+        }
+
+        mapX(val) {
+            const range = this.xMax - this.xMin;
+            const pxRange = this.width - this.padding.left - this.padding.right;
+            return this.padding.left + ((val - this.xMin) / range) * pxRange;
+        }
+
+        mapY(val) {
+            const range = this.yMax - this.yMin;
+            const pxRange =
+                this.height - this.padding.top - this.padding.bottom;
+            return (
+                this.height -
+                this.padding.bottom -
+                ((val - this.yMin) / range) * pxRange
+            );
+        }
+
+        mapSize(val) {
+            // Sqrt scale for area
+            // Increased multiplier for larger bubbles
+            return Math.sqrt(val || 10) * 1.5;
+        }
+
+        renderFrame(index) {
+            const frame = this.config.data[index];
+            if (!frame) return;
+
+            // Update UI
+            this.yearDisplay.innerText = frame.year;
+            this.bgYear.innerText = frame.year;
+            this.slider.value = index;
+
+            // Nodes
+            // We use sorting by key (name) to ensure transitions work
+
+            const nodes = frame.items;
+
+            // Check if we need to create groups first
+            let dotGroup = this.svg.querySelector(".dots");
+            if (!dotGroup) {
+                dotGroup = document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "g",
+                );
+                dotGroup.setAttribute("class", "dots");
+                this.svg.appendChild(dotGroup);
+            }
+
+            // Update patterns
+            nodes.forEach((item) => {
+                let dot = dotGroup.querySelector(
+                    `.dot[data-name="${item.name}"]`,
+                );
+                if (!dot) {
+                    dot = document.createElementNS(
+                        "http://www.w3.org/2000/svg",
+                        "circle",
+                    );
+                    dot.setAttribute("class", "dot");
+                    dot.setAttribute("data-name", item.name);
+                    dot.setAttribute("fill", item.color || "#3b82f6");
+
+                    // Events
+                    dot.addEventListener("mouseenter", (e) => {
+                        const content = `
+                            <div style="font-weight:600;">${item.name}</div>
+                            <div>X: ${item.x.toLocaleString()}</div>
+                            <div>Y: ${item.y.toLocaleString()}</div>
+                         `;
+                        this.tooltip.style.opacity = "1";
+                        this.tooltip.innerHTML = content;
+                    });
+                    dot.addEventListener("mousemove", (e) => {
+                        const chartRect = this.el.getBoundingClientRect();
+                        this.tooltip.style.left = `${e.clientX - chartRect.left}px`;
+                        this.tooltip.style.top = `${e.clientY - chartRect.top - 10}px`;
+                    });
+                    dot.addEventListener("mouseleave", () => {
+                        this.tooltip.style.opacity = "0";
+                    });
+
+                    dotGroup.appendChild(dot);
+                }
+
+                // Animate to new position
+                dot.style.cx = `${this.mapX(item.x)}px`; // Using CSS transition
+                dot.style.cy = `${this.mapY(item.y)}px`;
+                dot.style.r = `${this.mapSize(item.size)}px`;
+
+                // For immediate update if transition not desired for first render
+                dot.setAttribute("cx", this.mapX(item.x));
+                dot.setAttribute("cy", this.mapY(item.y));
+                dot.setAttribute("r", this.mapSize(item.size));
+            });
+        }
+
+        play() {
+            if (this.isPlaying) return;
+            this.isPlaying = true;
+            this.updatePlayBtn();
+
+            if (this.currentIndex >= this.config.data.length - 1) {
+                this.currentIndex = 0;
+            }
+
+            this.timer = setInterval(() => {
+                this.currentIndex++;
+                if (this.currentIndex >= this.config.data.length) {
+                    this.pause();
+                } else {
+                    this.renderFrame(this.currentIndex);
+                }
+            }, 800); // Speed
+        }
+
+        pause() {
+            this.isPlaying = false;
+            clearInterval(this.timer);
+            this.updatePlayBtn();
+        }
+
+        togglePlay() {
+            if (this.isPlaying) this.pause();
+            else this.play();
+        }
+
+        updatePlayBtn() {
+            const playIcon = this.playBtn.querySelector(".icon-play");
+            const pauseIcon = this.playBtn.querySelector(".icon-pause");
+            if (this.isPlaying) {
+                playIcon.style.display = "none";
+                pauseIcon.style.display = "block";
+            } else {
+                playIcon.style.display = "block";
+                pauseIcon.style.display = "none";
+            }
+        }
+    }
+
+    function initScatter() {
+        document.querySelectorAll(".scatter-container").forEach((el) => {
+            const element = el;
+            if (!element.dataset.initialized) {
+                new ScatterChart(element);
+                element.dataset.initialized = "true";
+            }
+        });
+    }
+
+    initScatter();
+    document.addEventListener("astro:page-load", initScatter);
+</script>

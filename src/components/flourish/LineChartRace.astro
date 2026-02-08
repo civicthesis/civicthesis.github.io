@@ -1,0 +1,429 @@
+---
+import FlourishContainer from "./FlourishContainer.astro";
+
+interface Props {
+    data: {
+        name: string;
+        values: { year: number; value: number }[];
+        color?: string;
+    }[];
+    title?: string;
+    subtitle?: string;
+    source?: string;
+    height?: number;
+    xAxisLabel?: string;
+    yAxisLabel?: string;
+    theme?: "light" | "dark" | "auto";
+    autoPlay?: boolean;
+}
+
+const {
+    data,
+    title = "Line Chart Race",
+    subtitle = "Trends over time",
+    source,
+    height = 500,
+    xAxisLabel = "Year",
+    yAxisLabel = "Value",
+    theme = "auto",
+    autoPlay = true,
+} = Astro.props;
+
+const uniqueId = `line-race-${Math.random().toString(36).substr(2, 9)}`;
+
+// Get years range from all data
+const allYears = new Set<number>();
+data.forEach((d) => d.values.forEach((v) => allYears.add(v.year)));
+const years = Array.from(allYears).sort((a, b) => a - b);
+const startYear = years[0];
+const endYear = years[years.length - 1];
+---
+
+<FlourishContainer
+    title={title}
+    subtitle={subtitle}
+    source={source}
+    theme={theme}
+    allowFullscreen={true}
+>
+    <div
+        id={uniqueId}
+        class="line-race-container"
+        style={`height: ${height}px;`}
+        data-chart-config={JSON.stringify({ data, years, theme, autoPlay })}
+    >
+        <div class="chart-area"></div>
+
+        <!-- Controls (Replay) -->
+        <button class="replay-btn">Replay Animation</button>
+    </div>
+</FlourishContainer>
+
+<style>
+    .line-race-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        user-select: none;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chart-area {
+        flex-grow: 1;
+        position: relative;
+    }
+
+    .line-race-container :global(path.line) {
+        fill: none;
+        stroke-width: 3px;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: stroke-width 0.2s;
+        cursor: pointer;
+    }
+
+    .line-race-container :global(path.line:hover) {
+        stroke-width: 5px;
+        z-index: 10;
+        /* SVG z-index is order based, but we can't change order easily without re-appending. 
+         Just stroke width is usually enough. */
+    }
+
+    .line-race-container :global(circle.point) {
+        stroke: #fff;
+        stroke-width: 2px;
+        fill: inherit;
+    }
+
+    .line-race-container :global(text.label) {
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    :global(.dark) .line-race-container :global(text.label) {
+        fill: #ffffff; /* Pure white */
+        font-weight: 700;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    }
+    :global(.dark) .line-race-container :global(text.label) {
+        fill: #ffffff;
+        font-weight: 700;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    }
+    
+    /* Specific axis label styling to ensure they are white */
+    .line-race-container :global(text.axis-label) {
+        font-size: 0.75rem;
+        fill: #666;
+    }
+    :global(.dark) .line-race-container :global(text.axis-label) {
+        fill: #ffffff;
+    }
+
+    .line-race-container :global(line.grid) {
+        stroke: rgba(0, 0, 0, 0.1);
+        stroke-dasharray: 4;
+    }
+    :global(.dark) .line-race-container :global(line.grid) {
+        stroke: rgba(255, 255, 255, 0.2);
+    }
+
+    .replay-btn {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        padding: 8px 16px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+    }
+
+    .replay-btn.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* Tooltip logic simplified: browser native title or overlapping HTML tooltip? 
+     Let's use simple SVG `title` for now or custom if needed. 
+     Custom is better. */
+
+    .tooltip-box {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.85);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+</style>
+
+<script>
+    // @ts-nocheck
+    class LineRaceChart {
+        el;
+        config;
+        chartArea;
+        svg;
+        replayBtn;
+
+        width;
+        height;
+        padding = { top: 20, right: 100, bottom: 40, left: 50 };
+
+        xScale;
+        yScale;
+
+        constructor(el) {
+            this.el = el;
+            this.config = JSON.parse(el.dataset.chartConfig || "{}");
+            this.chartArea = el.querySelector(".chart-area");
+            this.replayBtn = el.querySelector(".replay-btn");
+
+            this.replayBtn.addEventListener("click", () => this.animate());
+
+            this.init();
+        }
+
+        init() {
+            this.render();
+            window.addEventListener("resize", () => this.render());
+
+            if (this.config.autoPlay) {
+                // Ensure intersection observer starts it when visible
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            this.animate();
+                            observer.disconnect();
+                        }
+                    });
+                });
+                observer.observe(this.el);
+            }
+        }
+
+        setupScales(width, height) {
+            const { data, years } = this.config;
+            const xMin = years[0];
+            const xMax = years[years.length - 1];
+
+            // Convert year to x
+            this.xScale = (year) => {
+                return (
+                    this.padding.left +
+                    ((year - xMin) / (xMax - xMin)) *
+                        (width - this.padding.left - this.padding.right)
+                );
+            };
+
+            // Find y max
+            const allValues = data.flatMap((d) => d.values.map((v) => v.value));
+            const yMax = Math.max(...allValues) * 1.1; // 10% padding
+
+            this.yScale = (val) => {
+                return (
+                    height -
+                    this.padding.bottom -
+                    (val / yMax) *
+                        (height - this.padding.top - this.padding.bottom)
+                );
+            };
+        }
+
+        render() {
+            this.chartArea.innerHTML = "";
+            let { width, height } = this.chartArea.getBoundingClientRect();
+            if (!width) width = 800;
+            if (!height) height = 500;
+
+            this.width = width;
+            this.height = height;
+
+            this.setupScales(width, height);
+
+            const svg = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "svg",
+            );
+            svg.setAttribute("width", "100%");
+            svg.setAttribute("height", "100%");
+            svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+            this.chartArea.appendChild(svg);
+            this.svg = svg;
+
+            this.drawAxes();
+            this.drawLines();
+        }
+
+        drawAxes() {
+            // Simple axes
+            const bottomY = this.height - this.padding.bottom;
+
+            // X Axis line
+            this.createLine(
+                this.padding.left,
+                bottomY,
+                this.width - this.padding.right,
+                bottomY,
+                "grid",
+                "#999",
+            );
+
+            // Y Axis Grid
+            const steps = 5;
+            for (let i = 1; i <= steps; i++) {
+                const y =
+                    this.height -
+                    this.padding.bottom -
+                    (i / steps) *
+                        (this.height - this.padding.top - this.padding.bottom);
+                this.createLine(
+                    this.padding.left,
+                    y,
+                    this.width - this.padding.right,
+                    y,
+                    "grid",
+                );
+            }
+
+            // X Labels (Years)
+            const { years } = this.config;
+            const stepYear = Math.ceil(years.length / 6);
+            for (let i = 0; i < years.length; i += stepYear) {
+                const year = years[i];
+                const x = this.xScale(year);
+                const text = document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "text",
+                );
+                text.setAttribute("x", x);
+                text.setAttribute("y", this.height - 10);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("class", "label axis-label");
+                text.textContent = year;
+                this.svg.appendChild(text);
+            }
+        }
+
+        createLine(x1, y1, x2, y2, className, stroke) {
+            const line = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "line",
+            );
+            line.setAttribute("x1", x1);
+            line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2);
+            line.setAttribute("y2", y2);
+            line.setAttribute("class", className);
+            if (stroke) line.setAttribute("stroke", stroke);
+            this.svg.appendChild(line);
+        }
+
+        drawLines() {
+            const { data } = this.config;
+
+            data.forEach((series, i) => {
+                const color = series.color || `hsl(${i * 50}, 70%, 50%)`;
+
+                // Construct path
+                let d = "";
+                series.values.forEach((pt, idx) => {
+                    const x = this.xScale(pt.year);
+                    const y = this.yScale(pt.value);
+                    if (idx === 0) d += `M ${x} ${y}`;
+                    else d += ` L ${x} ${y}`;
+                });
+
+                const path = document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "path",
+                );
+                path.setAttribute("d", d);
+                path.setAttribute("class", "line");
+                path.setAttribute("stroke", color);
+                path.setAttribute("fill", "none");
+                path.setAttribute("id", `path-${i}`);
+
+                this.svg.appendChild(path);
+
+                // Label at end
+                const lastPt = series.values[series.values.length - 1];
+                const text = document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "text",
+                );
+                text.setAttribute("x", this.xScale(lastPt.year) + 5);
+                text.setAttribute("y", this.yScale(lastPt.value));
+                text.setAttribute("fill", color);
+                text.setAttribute("class", "label");
+                text.setAttribute("alignment-baseline", "middle");
+                text.textContent = series.name;
+                text.setAttribute("opacity", "0"); // hidden initially
+                text.setAttribute("id", `label-${i}`);
+                this.svg.appendChild(text);
+            });
+        }
+
+        animate() {
+            this.replayBtn.classList.remove("visible");
+            const duration = 2000; // 3s
+            const start = performance.now();
+
+            const paths = Array.from(this.svg.querySelectorAll("path.line"));
+            const labels = Array.from(
+                this.svg.querySelectorAll("text.label[id^='label-']"),
+            );
+
+            // Prepare paths: stroke-dasharray
+            paths.forEach((path) => {
+                const len = path.getTotalLength();
+                path.style.strokeDasharray = len;
+                path.style.strokeDashoffset = len;
+            });
+            labels.forEach((l) => l.setAttribute("opacity", "0"));
+
+            const step = (timestamp) => {
+                const elapsed = timestamp - start;
+                const progress = Math.min(elapsed / duration, 1);
+
+                paths.forEach((path) => {
+                    const len = path.getTotalLength();
+                    path.style.strokeDashoffset = len * (1 - progress);
+                });
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    this.replayBtn.classList.add("visible");
+                    labels.forEach((l) => {
+                        l.style.transition = "opacity 0.5s";
+                        l.setAttribute("opacity", "1");
+                    });
+                }
+            };
+
+            requestAnimationFrame(step);
+        }
+    }
+
+    function initLineRace() {
+        document.querySelectorAll(".line-race-container").forEach((el) => {
+            const element = el;
+            if (!element.dataset.initialized) {
+                new LineRaceChart(element);
+                element.dataset.initialized = "true";
+            }
+        });
+    }
+
+    initLineRace();
+    document.addEventListener("astro:page-load", initLineRace);
+</script>

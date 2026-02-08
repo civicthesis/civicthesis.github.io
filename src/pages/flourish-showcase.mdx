@@ -13,6 +13,8 @@ import Parliament from "../components/flourish/Parliament.astro";
 import ChoroplethMap from "../components/flourish/ChoroplethMap.astro";
 import ProjectionMap from "../components/flourish/ProjectionMap.astro";
 import ScrollyDemo from "../components/flourish/ScrollyDemo.astro";
+import ScatterPlot from "../components/flourish/ScatterPlot.astro";
+import LineChartRace from "../components/flourish/LineChartRace.astro";
 
 # Data Storytelling with Flourish-Style Charts
 
@@ -298,3 +300,105 @@ export const cityData = [
 ScrollyTelling combines scrolling text with dynamic visuals. As the user scrolls through the narrative, the chart updates automatically.
 
 <ScrollyDemo />
+
+---
+
+## 10. Scatter Plot: Correlation & Time
+
+A motion chart (Gapminder style) showing changes over time.
+
+export const scatterData = [
+  {
+    year: 1950,
+    items: [
+      { name: "Country A", x: 1000, y: 45, size: 10, color: "#e63946" },
+      { name: "Country B", x: 5000, y: 60, size: 15, color: "#457b9d" },
+      { name: "Country C", x: 300, y: 40, size: 20, color: "#a8dadc" },
+    ]
+  },
+  {
+    year: 1980,
+    items: [
+      { name: "Country A", x: 3000, y: 55, size: 12, color: "#e63946" },
+      { name: "Country B", x: 12000, y: 70, size: 18, color: "#457b9d" },
+      { name: "Country C", x: 1500, y: 50, size: 25, color: "#a8dadc" },
+    ]
+  },
+  {
+    year: 2010,
+    items: [
+      { name: "Country A", x: 8000, y: 72, size: 14, color: "#e63946" },
+      { name: "Country B", x: 25000, y: 80, size: 18, color: "#457b9d" },
+      { name: "Country C", x: 5000, y: 65, size: 30, color: "#a8dadc" },
+    ]
+  },
+  {
+      year: 2020,
+      items: [
+        { name: "Country A", x: 12000, y: 75, size: 15, color: "#e63946" },
+        { name: "Country B", x: 35000, y: 82, size: 18, color: "#457b9d" },
+        { name: "Country C", x: 8000, y: 68, size: 32, color: "#a8dadc" },
+      ]
+    }
+];
+
+<ScatterPlot
+  title="Wealth & Health of Nations"
+  subtitle="GDP per Capita vs Life Expectancy (1950-2020)"
+  data={scatterData}
+  height={500}
+  xAxisLabel="GDP per Capita"
+  yAxisLabel="Life Expectancy"
+/>
+
+---
+
+## 11. Line Chart Race: Trends
+
+Animated line charts that reveal data trends progressively.
+
+export const lineRaceData = [
+  {
+    name: "Tech Sector",
+    values: [
+      { year: 2015, value: 100 },
+      { year: 2016, value: 120 },
+      { year: 2017, value: 180 },
+      { year: 2018, value: 250 },
+      { year: 2019, value: 300 },
+      { year: 2020, value: 450 },
+    ],
+    color: "#8884d8"
+  },
+  {
+    name: "Retail",
+    values: [
+      { year: 2015, value: 200 },
+      { year: 2016, value: 210 },
+      { year: 2017, value: 220 },
+      { year: 2018, value: 230 },
+      { year: 2019, value: 240 },
+      { year: 2020, value: 250 },
+    ],
+    color: "#82ca9d"
+  },
+   {
+      name: "Energy",
+      values: [
+        { year: 2015, value: 300 },
+        { year: 2016, value: 290 },
+        { year: 2017, value: 270 },
+        { year: 2018, value: 260 },
+        { year: 2019, value: 280 },
+        { year: 2020, value: 320 },
+      ],
+      color: "#ffc658"
+    }
+];
+
+<LineChartRace
+  title="Industry Growth Trends"
+  subtitle="Sector performance (2015-2020)"
+  data={lineRaceData}
+  height={400}
+/>
