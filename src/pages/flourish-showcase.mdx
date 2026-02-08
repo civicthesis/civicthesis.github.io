@@ -8,6 +8,8 @@ import BarChartRace from '../components/flourish/BarChartRace.astro';
 import SlopeChart from '../components/flourish/SlopeChart.astro';
 import Treemap from "../components/flourish/Treemap.astro";
 import Sunburst from "../components/flourish/Sunburst.astro";
+import Sankey from "../components/flourish/Sankey.astro";
+import Parliament from "../components/flourish/Parliament.astro";
 
 # Data Storytelling with Flourish-Style Charts
 
@@ -162,4 +164,63 @@ Sunburst charts are like treemaps but use a radial layout. They are effective fo
   data={debtData}
   height={500}
   source="IMF / World Bank"
+/>
+
+---
+
+## 5. Sankey: Flow Visualization
+
+Sankey diagrams visualize the flow of resources or data. The width of each link is proportional to the flow quantity.
+
+export const energyData = {
+  nodes: [
+    { name: "Solar" }, { name: "Wind" }, { name: "Fossil Fuels" }, 
+    { name: "Electricity Grid" }, { name: "Losses" },
+    { name: "Residential" }, { name: "Industry" }, { name: "Transport" }
+  ],
+  links: [
+    { source: "Solar", target: "Electricity Grid", value: 30 },
+    { source: "Wind", target: "Electricity Grid", value: 20 },
+    { source: "Fossil Fuels", target: "Electricity Grid", value: 50 },
+    { source: "Fossil Fuels", target: "Transport", value: 40 },
+    { source: "Electricity Grid", target: "Residential", value: 30 },
+    { source: "Electricity Grid", target: "Industry", value: 50 },
+    { source: "Electricity Grid", target: "Losses", value: 20 },
+    { source: "Transport", target: "Losses", value: 25 },
+    { source: "Transport", target: "Industry", value: 15 }
+  ]
+};
+
+<Sankey
+  title="Energy Flow Analysis"
+  subtitle="Simplified model of energy generation to consumption"
+  data={energyData}
+  height={500}
+/>
+
+---
+
+## 6. Parliament: Seat Distribution
+
+Parliament charts use a semi-circular dot layout to visualize legislative composition.
+
+export const parliamentData = {
+  parties: [
+    { name: "Left Group", seats: 45, color: "#B71C1C" },
+    { name: "Social Democrats", seats: 140, color: "#F44336" },
+    { name: "Greens", seats: 68, color: "#4CAF50" },
+    { name: "Liberals", seats: 98, color: "#FFEB3B" },
+    { name: "Christian Democrats", seats: 178, color: "#2196F3" },
+    { name: "Conservatives", seats: 60, color: "#0D47A1" },
+    { name: "Right Group", seats: 55, color: "#607D8B" },
+    { name: "Non-Inscrits", seats: 40, color: "#9E9E9E" }
+  ]
+};
+
+<Parliament
+  title="European Parliament Composition"
+  subtitle="Projection of seats by political group"
+  data={parliamentData}
+  height={400}
+  source="European Parliament"
 />

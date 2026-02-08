@@ -1,0 +1,408 @@
+---
+import FlourishContainer from "./FlourishContainer.astro";
+
+interface Props {
+    data: {
+        parties: { name: string; seats: number; color: string }[];
+    };
+    title?: string;
+    subtitle?: string;
+    source?: string;
+    height?: number;
+    theme?: "light" | "dark" | "auto";
+}
+
+const {
+    data,
+    title = "Parliament Composition",
+    subtitle = "Seat distribution",
+    source,
+    height = 400,
+    theme = "auto",
+} = Astro.props;
+
+const uniqueId = `parliament-${Math.random().toString(36).substr(2, 9)}`;
+
+// Calculate total seats
+const totalSeats = data.parties.reduce((acc, p) => acc + p.seats, 0);
+---
+
+<FlourishContainer
+    title={title}
+    subtitle={`${subtitle} (${totalSeats} Seats)`}
+    source={source}
+    theme={theme}
+    allowFullscreen={true}
+>
+    <div
+        id={uniqueId}
+        class="parliament-container"
+        style={`height: ${height}px;`}
+        data-chart-config={JSON.stringify({ data, theme })}
+    >
+        <!-- Tooltip -->
+        <div class="parliament-tooltip"></div>
+        <!-- Canvas/SVG Area -->
+        <div class="chart-area"></div>
+        <div class="center-label">
+            <div class="center-total"></div>
+            <div class="center-desc">Total Seats</div>
+        </div>
+    </div>
+</FlourishContainer>
+
+<style>
+    .parliament-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        user-select: none;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end; /* Align bottom */
+        padding-bottom: 20px;
+    }
+
+    .chart-area {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+    }
+
+    /* Tooltip */
+    .parliament-tooltip {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.85);
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        pointer-events: none;
+        opacity: 0;
+        transform: translate(-50%, -100%);
+        transition:
+            opacity 0.2s,
+            transform 0.2s;
+        z-index: 10;
+        white-space: nowrap;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .parliament-tooltip::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+    }
+
+    .center-label {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        margin-bottom: 10px;
+        pointer-events: none;
+    }
+
+    .center-total {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .center-desc {
+        font-size: 0.8rem;
+        opacity: 0.7;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .parliament-container :global(circle) {
+        transition:
+            opacity 0.3s,
+            r 0.3s;
+        cursor: pointer;
+    }
+
+    .parliament-container :global(circle:hover) {
+        opacity: 0.8;
+        stroke: #fff;
+        stroke-width: 2px;
+    }
+</style>
+
+<script>
+    // @ts-nocheck
+    class ParliamentChart {
+        el;
+        config;
+        chartArea;
+        tooltip;
+        centerLabel;
+        resizeTimer;
+
+        constructor(el) {
+            this.el = el;
+            this.config = JSON.parse(el.dataset.chartConfig || "{}");
+            this.chartArea = el.querySelector(".chart-area");
+            this.tooltip = el.querySelector(".parliament-tooltip");
+            this.centerLabel = el.querySelector(".center-total");
+            this.init();
+        }
+
+        init() {
+            if (!this.config.data) return;
+            this.render(this.config.data);
+            window.addEventListener("resize", () => {
+                clearTimeout(this.resizeTimer);
+                this.resizeTimer = setTimeout(
+                    () => this.render(this.config.data),
+                    200,
+                );
+            });
+        }
+
+        render(data) {
+            this.chartArea.innerHTML = "";
+            let { width, height } = this.el.getBoundingClientRect();
+            if (!width || width === 0)
+                width = this.el.offsetWidth || this.el.clientWidth || 800;
+            if (!height || height === 0)
+                height = this.el.offsetHeight || this.el.clientHeight || 400;
+
+            const svg = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "svg",
+            );
+            svg.setAttribute("width", "100%");
+            svg.setAttribute("height", "100%");
+            svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+            this.chartArea.appendChild(svg);
+
+            // Algorithm for hemicycle
+            // Based on d3-parliament logic (simplified)
+            // We want semi-circles.
+
+            const outerRadius = Math.min(width / 2, height);
+            const innerRadius = outerRadius * 0.4; // 40% hole
+
+            const parties = data.parties;
+            const totalSeats = parties.reduce((acc, p) => acc + p.seats, 0);
+            this.centerLabel.innerText = totalSeats.toLocaleString();
+
+            let seatPoints = [];
+
+            // Calculate optimal number of rows
+            // Area = (pi * R^2)/2 - (pi * r^2)/2
+            // Area per seat ~ circle area
+
+            // Heuristic: iterate rows from inner to outer
+            // Circumference of row i: pi * r_i
+            // Number of seats fitting in row i: (pi * r_i) / (seat_radius * 2 + gap)
+
+            // Let's assume uniform seat size
+            // We need to solve for seat radius `r_seat` such that sum of seats fits.
+            // But usually we fix rows.
+
+            const gap = 5;
+            // Let's maximize dot size.
+            // Approximate area available?
+
+            // Simplified approach: Custom seat generation
+            // Iterate rows
+            const numRows = Math.max(5, Math.ceil(Math.sqrt(totalSeats) / 2));
+            // Example: 500 seats -> sqrt(500) = 22 -> 11 rows.
+
+            let r_nav = (outerRadius - innerRadius) / (numRows - 1);
+
+            // Better algorithm:
+            // https://github.com/geoffreybr/d3-parliament/blob/master/d3-parliament.js
+
+            let seats = [];
+            let currentSeatIndex = 0;
+
+            // Flatten parties into seats array
+            parties.forEach((party) => {
+                for (let i = 0; i < party.seats; i++) {
+                    seats.push({
+                        party: party.name,
+                        color: party.color,
+                        index: currentSeatIndex++,
+                    });
+                }
+            });
+
+            // Coordinate Calculation
+            let n_rows = 0;
+            let max_seats_in_row = 0;
+
+            // Try to find a good seat radius
+            // We can iterate on seat radius size
+
+            const rows = [];
+            const seatRadius = width / 50; // initial guess
+
+            // Simple concentric rows
+            // Row 1 (inner): radius R1. Arc length = PI * R1. Capacity = floor( (PI * R1) / (2*r + gap) )
+
+            /* 
+               We will pre-calculate row capacities relative to radius.
+               r_seat is unknown.
+               Total Seats = Sum( floor( PI * (inner + i*d) / (2*r + gap) ) )
+               Assume d = 2.5 * r (packing)
+            */
+
+            // Quick & Dirty Layout:
+            // use `d3-parliament` logic port
+
+            const calculatePoints = () => {
+                const points = [];
+                // Start with a seat radius
+                const r = 5; // relative unit
+                let fit = false;
+
+                // We need real pixel coordinates.
+                // Let's fix row count?
+                // Let's try to fit roughly.
+
+                const arcWidth = outerRadius - innerRadius;
+                const rowsCount = Math.ceil(arcWidth / (r * 2.5));
+                // ... this is hard to derive analytically for perfect fit.
+
+                // Let's just create grid and map to polar?
+                // Or spiral?
+                // The standard is concentric arcs.
+
+                // Row 1 has N seats. Row 2 has M seats.
+                // R2/R1 = M/N approx.
+
+                // Let's use flexible row count loop for visual balance.
+                let currentRowRadius = innerRadius;
+                let remainingSeats = totalSeats;
+                let assignedSeats = 0;
+                let rowPoints = [];
+
+                // We need to check expected seat size vs available size.
+                // Let's iterate:
+                // 1. Determine ideal seat size `s`
+                // 2. Generate points
+
+                // Calculate seat size based on area approximately
+                const area =
+                    (Math.PI * outerRadius * outerRadius) / 2 -
+                    (Math.PI * innerRadius * innerRadius) / 2;
+                const areaPerSeat = area / totalSeats;
+                const idealRadius = Math.sqrt(areaPerSeat) * 0.4; // Packing factor
+
+                let currentR = innerRadius + idealRadius;
+                let finalPoints = [];
+
+                while (currentR < outerRadius - idealRadius) {
+                    const circumference = Math.PI * currentR;
+                    const count = Math.round(
+                        circumference / (idealRadius * 2.5),
+                    ); // 2.5 is spacing
+
+                    // Distribute `count` points from PI to 0 (or 180 to 0 degrees)
+                    // Angle step = PI / (count - 1)? No, for semicirlce: PI / (count + margin)
+
+                    for (let i = 0; i < count; i++) {
+                        const angle = Math.PI - (Math.PI * (i + 0.5)) / count; // Center points in segments
+                        finalPoints.push({
+                            x: width / 2 + currentR * Math.cos(angle),
+                            y: height - currentR * Math.sin(angle), // Bottom aligned
+                            r: idealRadius,
+                            angle: angle,
+                        });
+                    }
+                    currentR += idealRadius * 2.5;
+                }
+
+                // Now we have `finalPoints` slots. We map `seats` to them.
+                // We might have more slots than seats or fewer.
+                // We truncate or fill.
+                // Sort finalPoints by angle (from left to right) then by radius?
+                // Typically parliament fills vertical slices (by party).
+                // Or fills rows? Usually rows for concentric coloring?
+                // Actually, parliaments are usually slices (pie-like) but mapped to dots.
+
+                // Sort by angle first!
+                finalPoints.sort((a, b) => b.angle - a.angle); // Left to right (PI to 0)
+
+                return finalPoints;
+            };
+
+            const slots = calculatePoints();
+            // Map seats to slots
+            seats.forEach((seat, i) => {
+                if (i < slots.length) {
+                    const slot = slots[i];
+
+                    const circle = document.createElementNS(
+                        "http://www.w3.org/2000/svg",
+                        "circle",
+                    );
+                    circle.setAttribute("cx", slot.x);
+                    circle.setAttribute("cy", slot.y);
+                    circle.setAttribute("r", slot.r);
+                    circle.setAttribute("fill", seat.color);
+
+                    // Tooltip
+                    const tooltipContent = `
+                        <div style="font-weight:600; margin-bottom:4px;">${seat.party}</div>
+                   `;
+
+                    circle.addEventListener("mouseenter", () => {
+                        this.tooltip.style.opacity = "1";
+                        this.tooltip.innerHTML = tooltipContent;
+                        this.resizeTimer = setTimeout(() => {
+                            circle.setAttribute("r", slot.r * 1.5);
+                        }, 0);
+                    });
+                    circle.addEventListener("mousemove", (e) => {
+                        const chartRect = this.el.getBoundingClientRect();
+                        this.tooltip.style.left = `${e.clientX - chartRect.left}px`;
+                        this.tooltip.style.top = `${e.clientY - chartRect.top - 10}px`;
+                    });
+                    circle.addEventListener("mouseleave", () => {
+                        this.tooltip.style.opacity = "0";
+                        circle.setAttribute("r", slot.r);
+                    });
+
+                    svg.appendChild(circle);
+
+                    // Animate
+                    circle.setAttribute("r", 0);
+                    setTimeout(() => {
+                        circle.style.transition =
+                            "r 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+                        circle.setAttribute("r", slot.r);
+                    }, i * 2); // Fast stagger
+                }
+            });
+        }
+    }
+
+    function initParliament() {
+        document.querySelectorAll(".parliament-container").forEach((el) => {
+            const element = el;
+            if (!element.dataset.initialized) {
+                new ParliamentChart(element);
+                element.dataset.initialized = "true";
+            }
+        });
+    }
+
+    initParliament();
+    document.addEventListener("astro:page-load", initParliament);
+</script>
