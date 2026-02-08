@@ -1,0 +1,473 @@
+---
+import FlourishContainer from "./FlourishContainer.astro";
+
+interface Props {
+    data: {
+        name: string;
+        value?: number;
+        children?: any[];
+        color?: string;
+    };
+    title?: string;
+    subtitle?: string;
+    source?: string;
+    height?: number;
+    theme?: "light" | "dark" | "auto";
+}
+
+const {
+    data,
+    title = "Treemap Analysis",
+    subtitle = "Hierarchical data visualization",
+    source,
+    height = 500,
+    theme = "auto",
+} = Astro.props;
+
+const uniqueId = `treemap-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<FlourishContainer
+    title={title}
+    subtitle={subtitle}
+    source={source}
+    theme={theme}
+    allowFullscreen={true}
+>
+    <div
+        id={uniqueId}
+        class="treemap-container"
+        style={`height: ${height}px;`}
+        data-chart-config={JSON.stringify({ data, theme })}
+    >
+        <!-- Tooltip -->
+        <div class="treemap-tooltip"></div>
+        <!-- Canvas/SVG Area -->
+        <div class="chart-area"></div>
+    </div>
+</FlourishContainer>
+
+<style>
+    .treemap-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        user-select: none;
+    }
+
+    .chart-area {
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+
+    /* Tooltip */
+    .treemap-tooltip {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.85);
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        pointer-events: none;
+        opacity: 0;
+        transform: translate(-50%, -100%);
+        transition:
+            opacity 0.2s,
+            transform 0.2s;
+        z-index: 10;
+        white-space: nowrap;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .treemap-tooltip::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+    }
+
+    /* Node Styling */
+    .treemap-container :global(.node) {
+        position: absolute;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        /* transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); */
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 500;
+        padding: 4px;
+        box-sizing: border-box;
+    }
+
+    .treemap-container :global(.node:hover) {
+        z-index: 2;
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+    }
+
+    .treemap-container :global(.node-label) {
+        pointer-events: none;
+        line-height: 1.2;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .treemap-container :global(.node-value) {
+        font-size: 0.75rem;
+        opacity: 0.8;
+        margin-top: 2px;
+    }
+</style>
+
+<script>
+    // @ts-nocheck
+    class TreemapChart {
+        /** @type {HTMLElement} */
+        el;
+        /** @type {any} */
+        config;
+        /** @type {HTMLElement} */
+        chartArea;
+        /** @type {HTMLElement} */
+        tooltip;
+        /** @type {any} */
+        resizeTimer;
+
+        /**
+         * @param {HTMLElement} el
+         */
+        constructor(el) {
+            this.el = el;
+            this.config = JSON.parse(el.dataset.chartConfig || "{}");
+            this.chartArea = el.querySelector(".chart-area");
+            this.tooltip = el.querySelector(".treemap-tooltip");
+            this.init();
+        }
+
+        init() {
+            if (!this.config.data) {
+                console.error("Treemap: Missing data in config");
+                return;
+            }
+            this.render(this.config.data);
+            window.addEventListener("resize", () => {
+                // Debounce resize
+                clearTimeout(this.resizeTimer);
+                this.resizeTimer = setTimeout(
+                    () => this.render(this.config.data),
+                    200,
+                );
+            });
+        }
+
+        // Squarified Treemap Algorithm
+        /**
+         * @param {any} data
+         * @param {number} x
+         * @param {number} y
+         * @param {number} width
+         * @param {number} height
+         */
+        layout(data, x, y, width, height) {
+            if (!data.children || data.children.length === 0) {
+                console.warn("Treemap: No children to layout");
+                return [];
+            }
+            if (width <= 0 || height <= 0) {
+                return [];
+            }
+
+            /** @type {any[]} */
+            let nodes = [];
+
+            // 1. Sort children by value descending
+            const children = [...data.children].sort(
+                (a, b) => (b.value || 0) - (a.value || 0),
+            );
+            const totalValue = children.reduce(
+                (acc, c) => acc + (c.value || 0),
+                0,
+            );
+
+            // Normalize values to area
+            const totalArea = width * height;
+            const items = children.map((c) => ({
+                ...c,
+                area: (c.value / totalValue) * totalArea,
+                value: c.value, // Make sure value is preserved
+            }));
+
+            /** @type {any[]} */
+            let currentRow = [];
+            let remainingItems = [...items];
+            let containerX = x;
+            let containerY = y;
+            let containerW = width;
+            let containerH = height;
+
+            // Helper: Calculate worst aspect ratio of a row
+            /**
+             * @param {any[]} row
+             * @param {number} sideLength
+             */
+            const worst = (row, sideLength) => {
+                if (row.length === 0 || sideLength === 0) return Infinity;
+                const totalArea = row.reduce((sum, item) => sum + item.area, 0);
+                const rowSide = totalArea / sideLength; // width of the row
+
+                let maxRatio = 0;
+                for (const item of row) {
+                    const itemLength = item.area / rowSide; // length of item along row
+                    const ratio = Math.max(
+                        rowSide / itemLength,
+                        itemLength / rowSide,
+                    );
+                    if (ratio > maxRatio) maxRatio = ratio;
+                }
+                return maxRatio;
+            };
+
+            const layoutRow = (
+                row,
+                startX,
+                startY,
+                sideLength,
+                isHorizontal,
+            ) => {
+                const rowArea = row.reduce((sum, item) => sum + item.area, 0);
+                const rowWidth = rowArea / sideLength;
+
+                let currentPos = 0;
+                row.forEach((item) => {
+                    const itemLength = item.area / rowWidth;
+                    if (isHorizontal) {
+                        // Row is vertical stack, moving horizontally
+                        nodes.push({
+                            ...item,
+                            x: startX,
+                            y: startY + currentPos,
+                            width: rowWidth,
+                            height: itemLength,
+                        });
+                        currentPos += itemLength;
+                    } else {
+                        // Working on short side = width, we build a row
+                        nodes.push({
+                            ...item,
+                            x: startX + currentPos,
+                            y: startY,
+                            width: itemLength,
+                            height: rowWidth,
+                        });
+                        currentPos += itemLength;
+                    }
+                });
+            };
+
+            while (remainingItems.length > 0) {
+                const sideLength = Math.min(containerW, containerH);
+                const isHorizontal = containerW >= containerH;
+                const item = remainingItems[0];
+
+                if (currentRow.length === 0) {
+                    currentRow.push(item);
+                    remainingItems.shift();
+                } else {
+                    const currentWorst = worst(currentRow, sideLength);
+                    const newRow = [...currentRow, item];
+                    const newWorst = worst(newRow, sideLength);
+
+                    if (newWorst <= currentWorst) {
+                        currentRow.push(item);
+                        remainingItems.shift();
+                    } else {
+                        layoutRow(
+                            currentRow,
+                            containerX,
+                            containerY,
+                            sideLength,
+                            isHorizontal,
+                        );
+
+                        const rowArea = currentRow.reduce(
+                            (sum, i) => sum + i.area,
+                            0,
+                        );
+                        const rowWidth = rowArea / sideLength;
+
+                        if (!isHorizontal) {
+                            containerY += rowWidth;
+                            containerH -= rowWidth;
+                        } else {
+                            containerX += rowWidth;
+                            containerW -= rowWidth;
+                        }
+                        currentRow = [];
+                    }
+                }
+            }
+
+            if (currentRow.length > 0) {
+                const sideLength = Math.min(containerW, containerH);
+                const isHorizontal = containerW >= containerH;
+                layoutRow(
+                    currentRow,
+                    containerX,
+                    containerY,
+                    sideLength,
+                    isHorizontal,
+                );
+            }
+
+            // Assign Colors
+            const colorPalette = [
+                "#3B82F6",
+                "#EF4444",
+                "#10B981",
+                "#F59E0B",
+                "#6366F1",
+                "#EC4899",
+                "#8B5CF6",
+                "#14B8A6",
+                "#F97316",
+                "#06B6D4",
+            ];
+
+            return nodes.map((node, i) => ({
+                ...node,
+                color: node.color || colorPalette[i % colorPalette.length],
+            }));
+        }
+
+        /**
+         * @param {any} data
+         */
+        render(data) {
+            this.chartArea.innerHTML = "";
+            let { width, height } = this.el.getBoundingClientRect();
+
+            // Fallback for hidden container or initial load issues
+            if (!width || width === 0)
+                width = this.el.offsetWidth || this.el.clientWidth || 800;
+            if (!height || height === 0)
+                height = this.el.offsetHeight || this.el.clientHeight || 500;
+
+            // Calculate layout
+            const nodes = this.layout(data, 0, 0, width, height);
+
+            if (nodes.length === 0) {
+                this.chartArea.innerHTML =
+                    "<div style='display:flex;justify-content:center;align-items:center;height:100%;color:rgba(255,255,255,0.5);font-size:0.9rem;'>No data available to display</div>";
+                return;
+            }
+
+            nodes.forEach((node, i) => {
+                const el = document.createElement("div");
+                el.className = "node";
+                el.style.left = `${node.x}px`;
+                el.style.top = `${node.y}px`;
+                el.style.width = `${Math.max(0, node.width - 2)}px`; // Gap
+                el.style.height = `${Math.max(0, node.height - 2)}px`; // Gap
+                el.style.backgroundColor = node.color;
+
+                const isSmall = node.width < 50 || node.height < 30;
+
+                el.innerHTML = `
+                    <div class="node-content">
+                    <div class="node-label" style="font-size: ${Math.min(14, node.width / 6)}px">${node.name}</div>
+                    ${!isSmall ? `<div class="node-value">${Math.round(node.value).toLocaleString()}</div>` : ""}
+                    </div>
+                `;
+
+                // Interactive events
+                const tooltipContent = `
+                    <div style="font-weight:600; margin-bottom:4px;">${node.name}</div>
+                    <div style="display:flex; justify-content:space-between; gap:1rem;">
+                        <span>Value:</span>
+                        <span style="font-weight:600;">${node.value.toLocaleString()}</span>
+                    </div>
+                    <div style="font-size:0.8em; opacity:0.8; margin-top:4px;">${((node.value / data.children.reduce((a, b) => a + (b.value || 0), 0)) * 100).toFixed(1)}% of total</div>
+                `;
+
+                el.addEventListener("mouseenter", (e) =>
+                    this.showTooltip(e, tooltipContent),
+                );
+                el.addEventListener("mousemove", (e) => this.moveTooltip(e));
+                el.addEventListener("mouseleave", () => this.hideTooltip());
+
+                this.chartArea.appendChild(el);
+
+                // Animate entry
+                el.animate(
+                    [
+                        { transform: "scale(0.95)", opacity: 0 },
+                        { transform: "scale(1)", opacity: 1 },
+                    ],
+                    {
+                        duration: 500,
+                        delay: i * 30, // Stagger
+                        easing: "cubic-bezier(0.25, 1, 0.5, 1)",
+                        fill: "forwards",
+                    },
+                );
+            });
+        }
+
+        /**
+         * @param {MouseEvent} e
+         * @param {string} content
+         */
+        showTooltip(e, content) {
+            this.tooltip.style.opacity = "1";
+            this.tooltip.innerHTML = content;
+        }
+
+        /**
+         * @param {MouseEvent} e
+         */
+        moveTooltip(e) {
+            // simple logic to keep tooltip near mouse but within bounds
+            const chartRect = this.el.getBoundingClientRect();
+            const x = e.clientX - chartRect.left;
+            const y = e.clientY - chartRect.top;
+
+            this.tooltip.style.left = `${x}px`;
+            this.tooltip.style.top = `${y - 10}px`;
+        }
+
+        hideTooltip() {
+            this.tooltip.style.opacity = "0";
+        }
+    }
+
+    // Init logic
+    function initTreemaps() {
+        document.querySelectorAll(".treemap-container").forEach((el) => {
+            const element = el;
+            if (!element.dataset.initialized) {
+                new TreemapChart(element);
+                element.dataset.initialized = "true";
+            }
+        });
+    }
+
+    // Run immediately (for MPA)
+    initTreemaps();
+
+    // Run on Astro page navigation (for SPA/View Transitions)
+    document.addEventListener("astro:page-load", initTreemaps);
+</script>
