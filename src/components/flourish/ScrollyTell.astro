@@ -1,0 +1,160 @@
+---
+interface Props {
+    steps: {
+        id: string | number;
+        content: string;
+        data?: any; // Data to pass to the chart when this step is active
+    }[];
+    threshold?: number; // 0 to 1, when to trigger (e.g., 0.5 = middle of screen)
+}
+
+const { steps, threshold = 0.5 } = Astro.props;
+---
+
+<div class="scrolly-container">
+    <div class="scrolly-visual">
+        <div class="sticky-content">
+            <slot name="visual" />
+        </div>
+    </div>
+
+    <div class="scrolly-text">
+        {
+            steps.map((step, index) => (
+                <div
+                    class="step"
+                    data-step-id={step.id}
+                    data-step-index={index}
+                    data-step-data={JSON.stringify(step.data)}
+                >
+                    <div class="step-content" set:html={step.content} />
+                </div>
+            ))
+        }
+    </div>
+</div>
+
+<style>
+    .scrolly-container {
+        display: flex;
+        flex-direction: column-reverse; /* Mobile: text first? usually chart top/sticky */
+        position: relative;
+    }
+
+    /* Desktop Layout */
+    @media (min-width: 768px) {
+        .scrolly-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+    }
+
+    .scrolly-visual {
+        position: relative;
+        height: 100%;
+        min-height: 50vh;
+    }
+
+    .sticky-content {
+        position: sticky;
+        top: 2rem; /* Stick to top with some padding */
+        height: auto;
+        min-height: 50vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* transition: transform 0.3s ease; */
+    }
+
+    .scrolly-text {
+        position: relative;
+        padding-bottom: 50vh; /* Extra space at bottom */
+    }
+
+    .step {
+        min-height: 80vh; /* Each step takes up space to scroll */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.3;
+        transition: opacity 0.5s;
+        margin-bottom: 2rem;
+    }
+
+    .step.active {
+        opacity: 1;
+    }
+
+    .step-content {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        border: 1px solid #eee;
+        color: #1e293b; /* Ensure text is dark on light bg */
+    }
+
+    :global(.dark) .step-content {
+        background: rgba(30, 41, 59, 0.9);
+        border-color: #334155;
+        color: #fff;
+    }
+</style>
+
+<script>
+    // @ts-nocheck
+    function initScrolly() {
+        const containers = document.querySelectorAll(".scrolly-container");
+
+        containers.forEach((container) => {
+            if (container.dataset.initialized) return;
+            container.dataset.initialized = "true";
+
+            const steps = container.querySelectorAll(".step");
+            const visual = container.querySelector(".sticky-content");
+
+            // Intersection Observer
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            // Remove active from all
+                            steps.forEach((s) => s.classList.remove("active"));
+                            // Add active to current
+                            entry.target.classList.add("active");
+
+                            // Dispatch Event with data
+                            const stepId = entry.target.dataset.stepId;
+                            const stepIndex = entry.target.dataset.stepIndex;
+                            const stepData = JSON.parse(
+                                entry.target.dataset.stepData || "{}",
+                            );
+
+                            const event = new CustomEvent("scrolly:step", {
+                                detail: {
+                                    id: stepId,
+                                    index: +stepIndex,
+                                    data: stepData,
+                                    container: container,
+                                },
+                                bubbles: true,
+                            });
+                            container.dispatchEvent(event);
+                        }
+                    });
+                },
+                {
+                    threshold: 0.5, // 50% visibility triggers change
+                    rootMargin: "-10% 0px -40% 0px", // Adjust trigger zone (centerish)
+                },
+            );
+
+            steps.forEach((step) => observer.observe(step));
+        });
+    }
+
+    initScrolly();
+    document.addEventListener("astro:page-load", initScrolly);
+</script>

@@ -1,0 +1,139 @@
+---
+import ScrollyTell from "./ScrollyTell.astro";
+import FlourishContainer from "./FlourishContainer.astro";
+
+const steps = [
+    {
+        id: 1,
+        content:
+            "<h3>The Industrial Revolution</h3><p>In <strong>1850</strong>, global CO2 emissions were relatively low, dominated by coal usage in early industrial hubs.</p>",
+        data: { year: 1850, val: 0.2, color: "#aaa" },
+    },
+    {
+        id: 2,
+        content:
+            "<h3>The Rise of Oil</h3><p>By <strong>1950</strong>, emissions had climbed significantly as oil became a primary energy source for transportation and industry.</p>",
+        data: { year: 1950, val: 6, color: "#f59e0b" },
+    },
+    {
+        id: 3,
+        content:
+            "<h3>Modern Era</h3><p>In <strong>2020</strong>, emissions skyrocketed to over 35 billion tonnes, driven by rapid global development and population growth.</p>",
+        data: { year: 2020, val: 35, color: "#ef4444" },
+    },
+];
+---
+
+<FlourishContainer
+    title="ScrollyTelling Demo"
+    subtitle="Scroll down to see the story unfold"
+>
+    <div id="scrolly-demo-wrapper">
+        <ScrollyTell steps={steps}>
+            <div slot="visual" class="demo-visual">
+                <div class="chart-container">
+                    <div class="bar-label">Global CO2 Emissions (Gt)</div>
+                    <div class="bar-wrapper">
+                        <div class="bar" style="height: 0%;"></div>
+                    </div>
+                    <div class="year-display">1850</div>
+                </div>
+            </div>
+        </ScrollyTell>
+    </div>
+</FlourishContainer>
+
+<style>
+    .demo-visual {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 2rem;
+        width: 100%;
+        height: 400px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    :global(.dark) .demo-visual {
+        background: #0f172a;
+        border-color: #1e293b;
+    }
+
+    .chart-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 200px;
+        height: 300px;
+    }
+
+    .bar-wrapper {
+        flex-grow: 1;
+        width: 60px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        display: flex;
+        align-items: flex-end;
+        margin: 1rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+    :global(.dark) .bar-wrapper {
+        background: #334155;
+    }
+
+    .bar {
+        width: 100%;
+        background: #3b82f6;
+        transition:
+            height 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+            background-color 0.5s;
+    }
+
+    .year-display {
+        font-size: 2rem;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        color: #334155;
+    }
+    :global(.dark) .year-display {
+        color: #e2e8f0;
+    }
+
+    .bar-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #64748b;
+    }
+</style>
+
+<script>
+    // @ts-nocheck
+    function initDemo() {
+        const wrapper = document.getElementById("scrolly-demo-wrapper");
+        if (wrapper) {
+            if (wrapper.dataset.demoInitialized === "true") return;
+            wrapper.dataset.demoInitialized = "true";
+
+            const container = wrapper.querySelector(".scrolly-container");
+            container.addEventListener("scrolly:step", (e) => {
+                const { id, data } = e.detail;
+                const bar = wrapper.querySelector(".bar");
+                const year = wrapper.querySelector(".year-display");
+
+                if (data && bar && year) {
+                    bar.style.height = `${(data.val / 40) * 100}%`;
+                    bar.style.backgroundColor = data.color;
+                    year.innerText = data.year;
+                }
+            });
+        }
+    }
+
+    initDemo();
+    document.addEventListener("astro:page-load", initDemo);
+</script>
