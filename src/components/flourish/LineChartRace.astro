@@ -15,6 +15,9 @@ interface Props {
     yAxisLabel?: string;
     theme?: "light" | "dark" | "auto";
     autoPlay?: boolean;
+    showGrid?: boolean;
+    showLegend?: boolean;
+    showInlineLabels?: boolean;
 }
 
 const {
@@ -27,6 +30,9 @@ const {
     yAxisLabel = "Value",
     theme = "auto",
     autoPlay = true,
+    showGrid = true,
+    showLegend = false,
+    showInlineLabels = true, // Default to true, or user can disable
 } = Astro.props;
 
 const uniqueId = `line-race-${Math.random().toString(36).substr(2, 9)}`;
@@ -50,8 +56,32 @@ const endYear = years[years.length - 1];
         id={uniqueId}
         class="line-race-container"
         style={`height: ${height}px;`}
-        data-chart-config={JSON.stringify({ data, years, theme, autoPlay })}
+        data-chart-config={JSON.stringify({
+            data,
+            years,
+            theme,
+            autoPlay,
+            showGrid,
+            showLegend,
+            showInlineLabels,
+        })}
     >
+        {
+            showLegend && (
+                <div class="legend-container">
+                    {data.map((d, i) => (
+                        <div class="legend-item">
+                            <span
+                                class="legend-color"
+                                style={`background-color: ${d.color || `hsl(${i * 50}, 70%, 50%)`}`}
+                            />
+                            <span class="legend-label">{d.name}</span>
+                        </div>
+                    ))}
+                </div>
+            )
+        }
+
         <div class="chart-area"></div>
 
         <!-- Controls (Replay) -->
@@ -105,19 +135,14 @@ const endYear = years[years.length - 1];
         font-weight: 700;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
     }
-    :global(.dark) .line-race-container :global(text.label) {
-        fill: #ffffff;
-        font-weight: 700;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-    }
-    
+
     /* Specific axis label styling to ensure they are white */
     .line-race-container :global(text.axis-label) {
         font-size: 0.75rem;
         fill: #666;
     }
     :global(.dark) .line-race-container :global(text.axis-label) {
-        fill: #ffffff;
+        fill: #ffffff !important; /* Force white */
     }
 
     .line-race-container :global(line.grid) {
@@ -125,12 +150,12 @@ const endYear = years[years.length - 1];
         stroke-dasharray: 4;
     }
     :global(.dark) .line-race-container :global(line.grid) {
-        stroke: rgba(255, 255, 255, 0.2);
+        stroke: rgba(255, 255, 255, 0.35); /* Increased for better visibility */
     }
 
     .replay-btn {
         position: absolute;
-        bottom: 20px;
+        top: 20px; /* moved to top */
         right: 20px;
         padding: 8px 16px;
         background: rgba(0, 0, 0, 0.8);
@@ -141,6 +166,7 @@ const endYear = years[years.length - 1];
         opacity: 0;
         transition: opacity 0.3s;
         pointer-events: none;
+        max-height: 40px;
     }
 
     .replay-btn.visible {
@@ -151,6 +177,33 @@ const endYear = years[years.length - 1];
     /* Tooltip logic simplified: browser native title or overlapping HTML tooltip? 
      Let's use simple SVG `title` for now or custom if needed. 
      Custom is better. */
+
+    .legend-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 0.5rem;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    :global(.dark) .legend-item {
+        color: #f1f5f9;
+    }
+
+    .legend-color {
+        display: block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
 
     .tooltip-box {
         position: absolute;
@@ -277,21 +330,25 @@ const endYear = years[years.length - 1];
                 "#999",
             );
 
-            // Y Axis Grid
-            const steps = 5;
-            for (let i = 1; i <= steps; i++) {
-                const y =
-                    this.height -
-                    this.padding.bottom -
-                    (i / steps) *
-                        (this.height - this.padding.top - this.padding.bottom);
-                this.createLine(
-                    this.padding.left,
-                    y,
-                    this.width - this.padding.right,
-                    y,
-                    "grid",
-                );
+            if (this.config.showGrid) {
+                // Y Axis Grid
+                const steps = 5;
+                for (let i = 1; i <= steps; i++) {
+                    const y =
+                        this.height -
+                        this.padding.bottom -
+                        (i / steps) *
+                            (this.height -
+                                this.padding.top -
+                                this.padding.bottom);
+                    this.createLine(
+                        this.padding.left,
+                        y,
+                        this.width - this.padding.right,
+                        y,
+                        "grid",
+                    );
+                }
             }
 
             // X Labels (Years)
@@ -356,19 +413,21 @@ const endYear = years[years.length - 1];
 
                 // Label at end
                 const lastPt = series.values[series.values.length - 1];
-                const text = document.createElementNS(
-                    "http://www.w3.org/2000/svg",
-                    "text",
-                );
-                text.setAttribute("x", this.xScale(lastPt.year) + 5);
-                text.setAttribute("y", this.yScale(lastPt.value));
-                text.setAttribute("fill", color);
-                text.setAttribute("class", "label");
-                text.setAttribute("alignment-baseline", "middle");
-                text.textContent = series.name;
-                text.setAttribute("opacity", "0"); // hidden initially
-                text.setAttribute("id", `label-${i}`);
-                this.svg.appendChild(text);
+                if (this.config.showInlineLabels) {
+                    const text = document.createElementNS(
+                        "http://www.w3.org/2000/svg",
+                        "text",
+                    );
+                    text.setAttribute("x", this.xScale(lastPt.year) + 5);
+                    text.setAttribute("y", this.yScale(lastPt.value));
+                    text.setAttribute("fill", color);
+                    text.setAttribute("class", "label");
+                    text.setAttribute("alignment-baseline", "middle");
+                    text.textContent = series.name;
+                    text.setAttribute("opacity", "0"); // hidden initially
+                    text.setAttribute("id", `label-${i}`);
+                    this.svg.appendChild(text);
+                }
             });
         }
 

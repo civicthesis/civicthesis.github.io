@@ -396,9 +396,21 @@ export const lineRaceData = [
     }
 ];
 
+
 <LineChartRace
   title="Industry Growth Trends"
   subtitle="Sector performance (2015-2020)"
   data={lineRaceData}
   height={400}
+/>
+
+### Configuration: Grid & Legend Enabled
+
+<LineChartRace
+  title="Industry Trends (Detailed View)"
+  subtitle="Same data with grid lines and legend enabled"
+  data={lineRaceData}
+  height={400}
+  showGrid={true}
+  showLegend={true}
 />
