@@ -149,11 +149,13 @@ const socialImageURL = new URL(image, Astro.url);
 				});
 		</script>
 		<script>
+			import { initImageFallback } from "../scripts/imageFallback";
 			if ("serviceWorker" in navigator) {
 				window.addEventListener("load", () => {
 					navigator.serviceWorker.register("/sw.js");
 				});
 			}
+			initImageFallback();
 		</script>
 	</head>
 	<body>

@@ -141,8 +141,8 @@ const slices = data.map((d, index) => {
         --bg-color: #fff;
     }
 
-    :global(.theme-dark) .vox-pie-chart {
-        --bg-color: #222;
+    :global([data-theme="dark"]) .vox-pie-chart {
+        --bg-color: #1f2023;
     }
 
     @media (min-width: 600px) {
@@ -209,5 +209,10 @@ const slices = data.map((d, index) => {
         font-size: var(--legend-font-size, 0.9rem);
         font-weight: bold; /* Added bold */
         color: #777;
+        transition: color 0.3s ease;
+    }
+
+    :global([data-theme="dark"]) .vox-pie-chart .legend-value {
+        color: #aaa;
     }
 </style>

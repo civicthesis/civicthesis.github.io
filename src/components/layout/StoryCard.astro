@@ -1,5 +1,6 @@
 ---
 import { formatDate } from "../../utils";
+import DynamicPlaceholder from "../ui/DynamicPlaceholder.astro";
 
 interface Props {
     title: string;
@@ -33,41 +34,7 @@ const {
             image ? (
                 <img src={image} alt={title} loading="lazy" />
             ) : (
-                <div class="pattern-fallback" aria-hidden="true">
-                    <svg
-                        width="100%"
-                        height="100%"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <defs>
-                            <pattern
-                                id={`pattern-${title.replace(/\s+/g, "-").toLowerCase()}`}
-                                x="0"
-                                y="0"
-                                width="20"
-                                height="20"
-                                patternUnits="userSpaceOnUse"
-                            >
-                                <circle
-                                    cx="2"
-                                    cy="2"
-                                    r="1"
-                                    class="pattern-dot"
-                                />
-                            </pattern>
-                        </defs>
-                        <rect
-                            width="100%"
-                            height="100%"
-                            fill={`url(#pattern-${title.replace(/\s+/g, "-").toLowerCase()})`}
-                        />
-                    </svg>
-                    <div class="logo-fallback">
-                        CIVIC
-                        <br />
-                        Thesis
-                    </div>
-                </div>
+                <DynamicPlaceholder title={title} category={category} />
             )
         }
         <div class="overlay"></div>
@@ -155,49 +122,6 @@ const {
 
     .story-card:hover .image-container img {
         transform: scale(1.05);
-    }
-
-    .pattern-fallback {
-        width: 100%;
-        height: 100%;
-        background-color: var(--color-surface-offset, #f3f4f6);
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-    }
-
-    /* Light mode dot color */
-    .pattern-dot {
-        fill: var(--color-border);
-        opacity: 0.6;
-    }
-
-    /* Dark mode adjustments would typically be handled by the var(--color-border) if set correctly, 
-       but we can enforce opacity or specific colors if needed. */
-
-    .logo-fallback {
-        position: absolute;
-        font-family: var(
-            --font-heading
-        ); /* Assuming a heading font exists, or Serif */
-        font-weight: 900;
-        font-size: 1.5rem;
-        line-height: 1;
-        text-align: center;
-        color: var(--color-text-muted);
-        opacity: 0.2;
-        transform: rotate(-10deg);
-        z-index: 1;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        pointer-events: none;
-        user-select: none;
-    }
-
-    :global(.dark) .pattern-fallback {
-        background-color: #1a1a1a; /* Darker bg for pattern in dark mode */
     }
 
     .overlay {

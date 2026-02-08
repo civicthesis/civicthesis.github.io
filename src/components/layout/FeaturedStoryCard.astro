@@ -1,5 +1,6 @@
 ---
 import { formatDate } from "../../utils";
+import DynamicPlaceholder from "../ui/DynamicPlaceholder.astro";
 
 interface Props {
     title: string;
@@ -15,7 +16,13 @@ const { title, description, date, image, href, category } = Astro.props;
 
 <article class="featured-card group">
     <div class="image-container">
-        {image && <img src={image} alt={title} loading="eager" />}
+        {
+            image ? (
+                <img src={image} alt={title} loading="eager" />
+            ) : (
+                <DynamicPlaceholder title={title} category={category} />
+            )
+        }
         <div class="overlay"></div>
     </div>
 

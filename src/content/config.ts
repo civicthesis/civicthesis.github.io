@@ -21,6 +21,12 @@ const storiesCollection = defineCollection({
         image: z.string().optional(),
         tags: z.array(z.string()).default([]),
         category: z.string().default('General'),
+        // Series support
+        series: z.object({
+            id: z.string(), // e.g., 'iit-madras-stats-2'
+            order: z.number(), // 1, 2, 3...
+            title: z.string().optional(), // Series Title override
+        }).optional(),
     }),
 });
 

@@ -1,0 +1,264 @@
+---
+import { getCollection } from "astro:content";
+import DynamicPlaceholder from "../ui/DynamicPlaceholder.astro";
+
+interface Props {
+    seriesId: string;
+    currentOrder: number;
+    class?: string;
+}
+
+const { seriesId, currentOrder, class: className } = Astro.props;
+
+// Fetch all stories in this series
+const allStories = await getCollection("stories", ({ data }) => {
+    return data.series?.id === seriesId;
+});
+
+// Sort by order
+const seriesStories = allStories.sort(
+    (a, b) => (a.data.series?.order || 0) - (b.data.series?.order || 0),
+);
+
+// Get the actual series title from the first story or a specific prop
+const seriesTitle =
+    seriesStories[0]?.data.series?.title ||
+    seriesStories[0]?.data.series?.id.replace(/-/g, " ") ||
+    "Series";
+
+const totalParts = seriesStories.length;
+const currentIndex = seriesStories.findIndex(
+    (s) => s.data.series?.order === currentOrder,
+);
+
+const prevStory = currentIndex > 0 ? seriesStories[currentIndex - 1] : null;
+const nextStory =
+    currentIndex < totalParts - 1 ? seriesStories[currentIndex + 1] : null;
+---
+
+{
+    totalParts > 1 && (
+        <div class={`series-nav ${className || ""}`}>
+            <div class="series-info">
+                <div class="series-header-info">
+                    <span class="series-label">Series: {seriesTitle}</span>
+                    <span class="part-indicator">
+                        Part {currentOrder} of {totalParts}
+                    </span>
+                </div>
+                <div class="progress-bar">
+                    <div
+                        class="progress-fill"
+                        style={`width: ${(currentOrder / totalParts) * 100}%`}
+                    />
+                </div>
+            </div>
+
+            <div class="nav-grid">
+                {prevStory ? (
+                    <a
+                        href={`/stories/${prevStory.slug}`}
+                        class="nav-card prev"
+                    >
+                        <div class="nav-card-inner">
+                            <span class="nav-direction">Previous</span>
+                            <div class="nav-content">
+                                {
+                                    prevStory.data.image ? (
+                                        <img
+                                            src={prevStory.data.image}
+                                            alt=""
+                                            class="nav-thumb"
+                                        />
+                                    ) : (
+                                        <DynamicPlaceholder title={prevStory.data.title} class="nav-thumb" />
+                                    )
+                                }
+                                <span class="nav-title">
+                                    {prevStory.data.title}
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                ) : (
+                    <div class="nav-empty" />
+                )}
+
+                {nextStory ? (
+                    <a
+                        href={`/stories/${nextStory.slug}`}
+                        class="nav-card next"
+                    >
+                        <div class="nav-card-inner">
+                            <span class="nav-direction">Next Up</span>
+                            <div class="nav-content">
+                                <span class="nav-title">
+                                    {nextStory.data.title}
+                                </span>
+                                {
+                                    nextStory.data.image ? (
+                                        <img
+                                            src={nextStory.data.image}
+                                            alt=""
+                                            class="nav-thumb"
+                                        />
+                                    ) : (
+                                        <DynamicPlaceholder title={nextStory.data.title} class="nav-thumb" />
+                                    )
+                                }
+                            </div>
+                        </div>
+                    </a>
+                ) : (
+                    <div class="nav-empty" />
+                )}
+            </div>
+        </div>
+    )
+}
+
+<style>
+    .series-nav {
+        margin: 5rem 0;
+        padding: 2.5rem;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 20px;
+        font-family: var(--font-sans);
+        box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+    }
+
+    .series-info {
+        margin-bottom: 2.5rem;
+    }
+
+    .series-header-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 0.75rem;
+    }
+
+    .series-label {
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        color: var(--color-primary);
+    }
+
+    .part-indicator {
+        font-size: 0.85rem;
+        color: var(--color-text-muted);
+        font-weight: 700;
+    }
+
+    .progress-bar {
+        height: 6px;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    :global([data-theme="dark"]) .series-nav .progress-bar {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            var(--color-primary),
+            var(--color-secondary)
+        );
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .nav-card {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .nav-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .nav-card-inner {
+        height: 100%;
+        padding: 1.5rem;
+        background: var(--color-bg);
+        border: 1px solid var(--color-border);
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .nav-card:hover .nav-card-inner {
+        border-color: var(--color-primary);
+        box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-direction {
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: var(--color-text-muted);
+        letter-spacing: 0.05em;
+    }
+
+    .nav-content {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+    }
+
+    .nav-thumb {
+        width: 80px;
+        height: 60px;
+        border-radius: 8px;
+        object-fit: cover;
+        background: var(--color-surface);
+    }
+
+    .nav-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        line-height: 1.3;
+        flex: 1;
+    }
+
+    .next .nav-content {
+        text-align: right;
+    }
+
+    .next .nav-direction {
+        text-align: right;
+    }
+
+    @media (max-width: 768px) {
+        .nav-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .series-nav {
+            padding: 1.5rem;
+        }
+
+        .nav-thumb {
+            width: 60px;
+            height: 45px;
+        }
+    }
+</style>

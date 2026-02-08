@@ -120,10 +120,13 @@ const uniqueId = Math.random().toString(36).substr(2, 9);
                                         x2={chartWidth - padding.right}
                                         y2={y}
                                         stroke="currentColor"
-                                        stroke-opacity="0.1"
+                                        stroke-opacity={
+                                            tick === 0 ? "0.2" : "0.1"
+                                        }
                                         stroke-dasharray={
                                             tick === 0 ? "" : "4 4"
                                         }
+                                        class="grid-line"
                                     />
                                     <text
                                         x={padding.left - 10}
@@ -146,10 +149,13 @@ const uniqueId = Math.random().toString(36).substr(2, 9);
                                         x2={x}
                                         y2={chartHeight - padding.bottom}
                                         stroke="currentColor"
-                                        stroke-opacity="0.1"
+                                        stroke-opacity={
+                                            tick === 0 ? "0.2" : "0.1"
+                                        }
                                         stroke-dasharray={
                                             tick === 0 ? "" : "4 4"
                                         }
+                                        class="grid-line"
                                     />
                                     <text
                                         x={x}
@@ -372,6 +378,7 @@ const uniqueId = Math.random().toString(36).substr(2, 9);
         font-weight: bold;
         /* fill: #555; */
         fill: var(--color-primary);
+        transition: fill 0.3s ease;
     }
 
     /* Force dark text for axis labels when inside a light theme container, even in dark mode */

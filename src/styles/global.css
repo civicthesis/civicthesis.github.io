@@ -12,6 +12,7 @@
     /* Gold */
     --color-accent: #c79f62;
     --color-border: #e0e0e0;
+    --color-surface: #f9f9f9;
     --color-code-bg: #f5f5f5;
     --color-logo-text: #1B2A41;
     --card-accent-saturated: #d97706;
@@ -48,6 +49,7 @@
     /* Gold remains same */
     --color-accent: #93C5FD;
     --color-border: #333333;
+    --color-surface: #26272b;
     --color-code-bg: #2a2b2e;
     /* --color-heading: #ffffff; */
     --color-logo-text: #ffffff;

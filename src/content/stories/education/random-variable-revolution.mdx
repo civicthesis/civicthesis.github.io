@@ -1,0 +1,61 @@
+---
+title: "The Random Variable Revolution"
+description: "Understanding Discrete Random Variables and Probability Mass Functions (PMF) through the lens of the IIT Madras Stats 2 curriculum."
+pubDate: 2026-02-08
+category: "Education"
+tags: ["Statistics", "IIT Madras", "Data Science"]
+series:
+  id: "iit-madras-stats-2"
+  order: 1
+  title: "Ep 1: The Random Variable Revolution"
+image: "/images/stats-rv.jpg"
+---
+
+import VoxContainer from "../../../components/vox/VoxContainer.astro";
+import VoxBarChart from "../../../components/vox/VoxBarChart.astro";
+
+Welcome to the first part of our deep dive into the **IIT Madras BS Degree Foundation Statistics 2** course. 
+
+In Stats 1, we dealt with datasets. We looked at past events, calculated means, and plotted histograms. But in Stats 2, we move from the *past* to the *possible*. We enter the world of **Random Variables (RVs)**.
+
+## What is a Random Variable?
+
+Think of a Random Variable not as a "value," but as a **function**. It maps the outcomes of a random experiment (like tossing a coin or rolling a die) to real numbers.
+
+> [!NOTE]
+> A Discrete Random Variable is one that can take only a countable number of values.
+
+### The Probability Mass Function (PMF)
+
+For discrete RVs, we use a PMF to describe the probability of each outcome. The PMF $P(X = x)$ must satisfy two conditions:
+1. $P(x) \geq 0$ for all $x$.
+2. $\sum P(x) = 1$.
+
+Let's visualize a simple discrete distribution: a weighted coin toss experiment where we count the number of heads in 3 tosses.
+
+<VoxContainer 
+    title="PMF of a Binomial Experiment" 
+    subtitle="Probability of 'x' heads in 3 fair coin tosses"
+    source="CivicThesis Stats Engine"
+>
+    <VoxBarChart 
+        data={[
+            { label: "0 Heads", value: 0.125, color: "#3B82F6" },
+            { label: "1 Head", value: 0.375, color: "#3B82F6" },
+            { label: "2 Heads", value: 0.375, color: "#3B82F6" },
+            { label: "3 Heads", value: 0.125, color: "#3B82F6" }
+        ]}
+        height={300}
+        axisLabelFontSize={14}
+        valueLabelFontSize={14}
+    />
+</VoxContainer>
+
+## Why does this matter?
+
+Understanding the distribution is the foundation for everything that follows: Normal distributions, Sampling, and Hypothesis testing. If you can't define your RV, you can't do the math.
+
+In the next part, we will look at **Continuous Random Variables** and the mysterious "Bell Curve."
+
+---
+*This series is designed for students of the IIT Madras BS in Data Science and Applications program.*

@@ -1,0 +1,73 @@
+---
+title: "The Gaussian Glimpse"
+description: "Moving from discrete to continuous probability. An introduction to the Bell Curve and the Normal Distribution."
+pubDate: 2026-02-09
+category: "Education"
+tags: ["Statistics", "IIT Madras", "Normal Distribution"]
+series:
+  id: "iit-madras-stats-2"
+  order: 2
+  title: "Ep 2: The Gaussian Glimpse"
+image: "/images/stats-gaussian.jpg"
+---
+
+import VoxContainer from "../../../components/vox/VoxContainer.astro";
+import VoxLineChart from "../../../components/vox/VoxLineChart.astro";
+
+In the last episode, we looked at counting heads in a coin toss—a discrete experiment. But what happens when we measure things like height, temperature, or the time between two bus arrivals?
+
+These are **Continuous Random Variables**.
+
+## The Probability Density Function (PDF)
+
+For continuous RVs, we can't assign probability to a single point (it's always zero!). Instead, we assign probability to **intervals**. This is described by the PDF, $f(x)$.
+
+> [!TIP]
+> The area under the entire PDF curve must always equal 1.
+
+### The Normal Distribution
+
+Perhaps the most famous distribution of all is the Normal (or Gaussian) distribution. It is symmetric, bell-shaped, and defined by its mean ($\mu$) and standard deviation ($\sigma$).
+
+<VoxContainer 
+    title="The Standard Normal Curve" 
+    subtitle="μ = 0, σ = 1"
+    source="CivicThesis Stats Engine"
+>
+    <VoxLineChart 
+        series={[
+            {
+                name: "Standard Normal",
+                data: [
+                    { label: -3, value: 0.004 },
+                    { label: -2.5, value: 0.017 },
+                    { label: -2, value: 0.054 },
+                    { label: -1.5, value: 0.129 },
+                    { label: -1, value: 0.242 },
+                    { label: -0.5, value: 0.352 },
+                    { label: 0, value: 0.398 },
+                    { label: 0.5, value: 0.352 },
+                    { label: 1, value: 0.242 },
+                    { label: 1.5, value: 0.129 },
+                    { label: 2, value: 0.054 },
+                    { label: 2.5, value: 0.017 },
+                    { label: 3, value: 0.004 }
+                ],
+                color: "#EC4899"
+            }
+        ]}
+        height={300}
+        showPoints={false}
+        axisLabelFontSize={14}
+        seriesLabelFontSize={18}
+    />
+</VoxContainer>
+
+## Why is it so "Normal"?
+
+The **Central Limit Theorem (CLT)** tells us that if we sum up enough independent random variables, the result will be Normal, regardless of the original distribution!
+
+In the next part, we'll explore **Sampling** and see the CLT in action.
+
+---
+*This series is designed for students of the IIT Madras BS in Data Science and Applications program.*
