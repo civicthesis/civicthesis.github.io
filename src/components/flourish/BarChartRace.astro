@@ -103,6 +103,7 @@ const chartData = {
         playIcon: HTMLElement;
         pauseIcon: HTMLElement;
         colorMap: Map<string, string>;
+        prevValues: Map<string, number>;
 
         constructor(el: HTMLElement) {
             this.el = el;
@@ -111,8 +112,15 @@ const chartData = {
             this.currentIndex = 0;
             this.timer = null;
             this.colorMap = new Map();
+            this.prevValues = new Map();
 
             this.chartArea = el.querySelector(".chart-area") as HTMLElement;
+            // Set dynamic duration variable
+            this.chartArea.style.setProperty(
+                "--duration",
+                `${this.config.duration}ms`,
+            );
+
             this.stepLabel = el.querySelector(".current-step") as HTMLElement;
             this.playBtn = el.querySelector(".play-btn") as HTMLElement;
             this.progressBar = el.querySelector(
@@ -168,6 +176,32 @@ const chartData = {
                 .slice(0, this.config.topN); // Keep top N
         }
 
+        animateValue(
+            obj: Element,
+            start: number,
+            end: number,
+            duration: number,
+        ) {
+            let startTimestamp: number | null = null;
+            const step = (timestamp: number) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min(
+                    (timestamp - startTimestamp) / duration,
+                    1,
+                );
+                // Ease out quart
+                const ease = 1 - Math.pow(1 - progress, 4);
+
+                const current = Math.floor(ease * (end - start) + start);
+                obj.textContent = current.toLocaleString();
+
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
         renderStep(index: number) {
             const stepData = this.getDataForStep(index);
             // Robust Max Value Calculation: Filter out non-numbers
@@ -207,6 +241,10 @@ const chartData = {
                 const translateY = rank * 44; // 40px height + 4px gap
                 const color = this.colorMap.get(d.label) || "#999";
 
+                // Value Animation
+                const prevVal = this.prevValues.get(d.label) || 0;
+                this.prevValues.set(d.label, val);
+
                 if (!barGroup) {
                     // Create new bar
                     barGroup = document.createElement("div");
@@ -237,6 +275,22 @@ const chartData = {
                         ".race-bar",
                     ) as HTMLElement;
                     if (bar) bar.style.backgroundColor = color;
+
+                    // Animate Value
+                    const valLabel = barGroup.querySelector(".race-value");
+                    if (valLabel) {
+                        // Only animate if value changed significantly
+                        if (prevVal !== val) {
+                            this.animateValue(
+                                valLabel,
+                                prevVal,
+                                val,
+                                this.config.duration,
+                            );
+                        } else {
+                            valLabel.textContent = val.toLocaleString();
+                        }
+                    }
                 }
 
                 // Apply Styles
@@ -251,10 +305,6 @@ const chartData = {
                             ".race-bar",
                         ) as HTMLElement;
                         if (bar) bar.style.width = `${percentage}%`;
-
-                        const valLabel = barGroup.querySelector(".race-value");
-                        if (valLabel)
-                            valLabel.textContent = val.toLocaleString();
                     }
                 }, 20);
             });
@@ -268,9 +318,19 @@ const chartData = {
         }
 
         togglePlay() {
+            // Check if we reached the end, if so, restart
+            if (
+                !this.isPlaying &&
+                this.currentIndex >= this.config.steps.length - 1
+            ) {
+                this.currentIndex = -1; // loop() will increment to 0
+                // Reset bars for clean start (optional, but looks better)
+                this.chartArea.innerHTML = "";
+                this.prevValues.clear();
+            }
+
             this.isPlaying = !this.isPlaying;
-            this.playIcon.style.display = this.isPlaying ? "none" : "block";
-            this.pauseIcon.style.display = this.isPlaying ? "block" : "none";
+            this.updateControls();
 
             if (this.isPlaying) {
                 this.loop();
@@ -279,13 +339,33 @@ const chartData = {
             }
         }
 
+        updateControls() {
+            const isEnded = this.currentIndex >= this.config.steps.length - 1;
+
+            if (this.isPlaying) {
+                this.playIcon.style.display = "none";
+                this.pauseIcon.style.display = "block";
+                // Replay icon could be separate, but for now Play/Pause is fine
+                this.playIcon.textContent = "▶";
+            } else {
+                this.playIcon.style.display = "block";
+                this.pauseIcon.style.display = "none";
+
+                // Show Replay icon if ended
+                if (isEnded) {
+                    this.playIcon.textContent = "↺"; // Replay symbol
+                } else {
+                    this.playIcon.textContent = "▶";
+                }
+            }
+        }
+
         loop() {
             if (!this.isPlaying) return;
 
             if (this.currentIndex >= this.config.steps.length - 1) {
                 this.isPlaying = false;
-                this.playIcon.style.display = "block";
-                this.pauseIcon.style.display = "none";
+                this.updateControls();
                 clearTimeout(this.timer);
                 return;
             }
@@ -376,6 +456,8 @@ const chartData = {
         width: 100%;
         height: 500px; /* Customizable? */
         overflow: hidden;
+        /* Dynamic duration with fallback */
+        --duration: 1000ms;
     }
 
     .chart-area :global(.race-bar-group) {
@@ -387,7 +469,7 @@ const chartData = {
         display: flex;
         align-items: center;
         transition:
-            transform 0.5s ease-out,
+            transform var(--duration) cubic-bezier(0.25, 1, 0.5, 1),
             opacity 0.3s ease;
         will-change: transform, opacity;
     }
@@ -415,7 +497,7 @@ const chartData = {
     .chart-area :global(.race-bar) {
         height: 100%;
         /* background set inline */
-        transition: width 1s linear;
+        transition: width var(--duration) cubic-bezier(0.25, 1, 0.5, 1);
         border-radius: 2px;
         opacity: 0.9;
     }

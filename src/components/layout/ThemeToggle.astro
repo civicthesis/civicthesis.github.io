@@ -2,12 +2,12 @@
 
 ---
 
-<button class="theme-toggle" aria-label="Toggle Dark Mode">
+<button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">
   <svg
     class="sun-icon"
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="20"
+    height="20"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -28,8 +28,8 @@
   <svg
     class="moon-icon"
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="20"
+    height="20"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -38,6 +38,22 @@
     stroke-linejoin="round"
   >
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+  <svg
+    class="monitor-icon"
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+    <line x1="8" y1="21" x2="16" y2="21"></line>
+    <line x1="12" y1="17" x2="12" y2="21"></line>
   </svg>
 </button>
 
@@ -53,6 +69,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    width: 36px;
+    height: 36px;
   }
 
   button:hover {
@@ -60,54 +79,94 @@
   }
 
   svg {
+    position: absolute;
     transition:
       transform 0.5s cubic-bezier(0.25, 1, 0.5, 1),
       opacity 0.3s ease;
   }
 
-  /* Light mode default: Show sun, hide moon */
-  .sun-icon {
-    display: block;
-    transform: rotate(0deg);
-  }
-  .moon-icon {
-    display: none;
-    transform: rotate(90deg);
+  /* Default state (hidden) */
+  .sun-icon,
+  .moon-icon,
+  .monitor-icon {
     opacity: 0;
+    transform: rotate(90deg) scale(0.5);
   }
 
-  /* Dark mode: Show moon, hide sun */
-  :global([data-theme="dark"]) .sun-icon {
-    display: none;
-    opacity: 0;
-    transform: rotate(-90deg);
-  }
-  :global([data-theme="dark"]) .moon-icon {
-    display: block;
+  /* Active states based on parent class */
+  :global(.theme-toggle[data-state="light"]) .sun-icon {
     opacity: 1;
-    transform: rotate(0deg);
+    transform: rotate(0deg) scale(1);
+  }
+
+  :global(.theme-toggle[data-state="dark"]) .moon-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+
+  :global(.theme-toggle[data-state="auto"]) .monitor-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
   }
 </style>
 
 <script>
-  const handleToggleClick = () => {
-    const element = document.documentElement;
-    element.classList.add("theme-transition");
+  // Declare globals
+  declare global {
+    interface Window {
+      getTheme: () => string;
+      applyTheme: (theme: string) => void;
+    }
+  }
 
-    const currentTheme = element.getAttribute("data-theme");
-    const targetTheme = currentTheme === "dark" ? "light" : "dark";
+  // Simple state machine
+  const states = ["light", "dark", "auto"];
 
-    element.setAttribute("data-theme", targetTheme);
-    localStorage.setItem("theme", targetTheme);
+  const updateToggleUI = (theme: string) => {
+    document.querySelectorAll(".theme-toggle").forEach((btn) => {
+      btn.setAttribute("data-state", theme);
 
-    // Remove transition class after animation
-    setTimeout(() => {
-      element.classList.remove("theme-transition");
-    }, 300);
+      // Update Accessible Label
+      let label = "Toggle Theme (Current: Auto)";
+      if (theme === "light") label = "Toggle Theme (Current: Light)";
+      if (theme === "dark") label = "Toggle Theme (Current: Dark)";
+      btn.setAttribute("aria-label", label);
+    });
   };
 
-  const toggles = document.querySelectorAll(".theme-toggle");
-  toggles.forEach((toggle) => {
-    toggle.addEventListener("click", handleToggleClick);
-  });
+  const handleToggleClick = () => {
+    const currentTheme = window.getTheme();
+    const currentIndex = states.indexOf(currentTheme);
+    const nextIndex = (currentIndex + 1) % states.length;
+    const nextTheme = states[nextIndex];
+
+    // Update Storage
+    if (nextTheme === "auto") {
+      localStorage.removeItem("theme");
+    } else {
+      localStorage.setItem("theme", nextTheme);
+    }
+
+    // Apply
+    window.applyTheme(nextTheme);
+    updateToggleUI(nextTheme);
+  };
+
+  // Init
+  const initThemeToggle = () => {
+    const theme = window.getTheme();
+    updateToggleUI(theme);
+
+    const toggles = document.querySelectorAll(".theme-toggle");
+    toggles.forEach((toggle) => {
+      // Remove old listeners to prevent duplicates if using View Transitions
+      toggle.removeEventListener("click", handleToggleClick);
+      toggle.addEventListener("click", handleToggleClick);
+    });
+  };
+
+  // Run on load and after swap
+  document.addEventListener("astro:page-load", initThemeToggle);
+  // Also run immediately for first load
+  initThemeToggle();
 </script>

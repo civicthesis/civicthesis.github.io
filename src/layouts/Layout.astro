@@ -50,11 +50,13 @@ const socialImageURL = new URL(image, Astro.url);
 		/>
 
 		<!-- Google AdSense -->
-		<meta name="google-adsense-account" content="ca-pub-7993314093599705">
+		<meta name="google-adsense-account" content="ca-pub-7993314093599705" />
 
 		<!-- Google AdSense -->
-		<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7993314093599705"
-     crossorigin="anonymous"></script>
+		<script
+			async
+			src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7993314093599705"
+			crossorigin="anonymous"></script>
 
 		<!-- Open Graph / Facebook -->
 		<meta property="og:type" content={type} />
@@ -103,25 +105,48 @@ const socialImageURL = new URL(image, Astro.url);
 
 		<!-- Theme Script to prevent FOUC -->
 		<script is:inline>
-			const theme = (() => {
+			window.getTheme = () => {
 				if (
 					typeof localStorage !== "undefined" &&
 					localStorage.getItem("theme")
 				) {
 					return localStorage.getItem("theme");
 				}
-				if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-					return "dark";
-				}
-				return "light";
-			})();
+				return "auto";
+			};
 
-			if (theme === "dark") {
-				document.documentElement.setAttribute("data-theme", "dark");
-			} else {
-				document.documentElement.setAttribute("data-theme", "light");
-			}
-			window.localStorage.setItem("theme", theme);
+			window.applyTheme = (theme) => {
+				if (theme === "auto") {
+					if (
+						window.matchMedia("(prefers-color-scheme: dark)")
+							.matches
+					) {
+						document.documentElement.setAttribute(
+							"data-theme",
+							"dark",
+						);
+					} else {
+						document.documentElement.setAttribute(
+							"data-theme",
+							"light",
+						);
+					}
+				} else {
+					document.documentElement.setAttribute("data-theme", theme);
+				}
+			};
+
+			const theme = window.getTheme();
+			window.applyTheme(theme);
+
+			// Listen for system changes if in auto mode
+			window
+				.matchMedia("(prefers-color-scheme: dark)")
+				.addEventListener("change", (e) => {
+					if (window.getTheme() === "auto") {
+						window.applyTheme("auto");
+					}
+				});
 		</script>
 		<script>
 			if ("serviceWorker" in navigator) {
