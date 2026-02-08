@@ -513,4 +513,19 @@ const chartData = {
     .chart-area :global(.race-bar-group[data-status="exiting"]) {
         opacity: 0;
     }
+
+    @media (max-width: 600px) {
+        .chart-area :global(.race-label) {
+            width: 80px;
+            font-size: 0.8rem;
+            padding-right: 8px;
+        }
+        .chart-area :global(.race-value) {
+            font-size: 0.75rem;
+            margin-left: 4px;
+        }
+        .current-step {
+            font-size: 1.5rem;
+        }
+    }
 </style>

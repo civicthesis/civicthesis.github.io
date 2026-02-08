@@ -148,8 +148,10 @@ const uniqueId = `sankey-${Math.random().toString(36).substr(2, 9)}`;
         }
 
         // Simple Sankey Layout Algorithm
-        computeSankeyLayout(data, width, height) {
+        computeSankeyLayout(data, width, height, margin, nodeWidth) {
             const { nodes: rawNodes, links: rawLinks } = data;
+            // ... (rest of logic same until margin/width usage)
+
             const nodeMap = new Map();
             const nodes = rawNodes.map((n, i) => {
                 const node = {
@@ -184,19 +186,7 @@ const uniqueId = `sankey-${Math.random().toString(36).substr(2, 9)}`;
                 );
             });
 
-            // 2. Assign Columns (Depth) - Simple Iterative Approach
-            // Initialize with root nodes (no targets)
-            let currentLayer = nodes.filter((n) => n.targetLinks.length === 0);
-            if (currentLayer.length === 0 && nodes.length > 0)
-                currentLayer = [nodes[0]]; // Fallback for circular
-
-            let layers = [];
-            const seen = new Set();
-
-            // Assign remaining
-            // Actually, let's use a simpler "x" coordinate based on topology sort or just inputs
-            // For simplicity in this specialized component, let's assume a DAG and just do a quick depth calculation
-
+            // 2. Assign Depth (Columns)
             const computeDepth = (node, depth = 0) => {
                 if (node.depth !== undefined && node.depth >= depth) return;
                 node.depth = depth;
@@ -205,7 +195,6 @@ const uniqueId = `sankey-${Math.random().toString(36).substr(2, 9)}`;
                 });
             };
 
-            // Find roots
             const roots = nodes.filter((n) => n.targetLinks.length === 0);
             if (roots.length === 0 && nodes.length > 0) computeDepth(nodes[0]);
             else roots.forEach((r) => computeDepth(r));
@@ -213,11 +202,12 @@ const uniqueId = `sankey-${Math.random().toString(36).substr(2, 9)}`;
             const maxDepth = Math.max(...nodes.map((n) => n.depth || 0));
 
             // 3. Assign Coordinates
-            const margin = { top: 20, right: 100, bottom: 20, left: 20 };
+            // margin and nodeWidth are passed in
             const contentWidth = width - margin.left - margin.right;
             const contentHeight = height - margin.top - margin.bottom;
-            const nodeWidth = 20;
-            const layerWidth = contentWidth / maxDepth;
+
+            // Adjust layer width based on available space
+            const layerWidth = contentWidth / (maxDepth || 1);
             const k =
                 contentHeight /
                 (nodes.reduce((sum, n) => sum + n.value, 0) * 0.5); // heuristic scale? No, better per layer
@@ -315,10 +305,18 @@ const uniqueId = `sankey-${Math.random().toString(36).substr(2, 9)}`;
             if (!height || height === 0)
                 height = this.el.offsetHeight || this.el.clientHeight || 500;
 
+            const isMobile = width < 600;
+            const nodeWidth = isMobile ? 15 : 20;
+            const margin = isMobile
+                ? { top: 20, right: 10, bottom: 20, left: 10 }
+                : { top: 20, right: 100, bottom: 20, left: 20 };
+
             const { nodes, links } = this.computeSankeyLayout(
                 JSON.parse(JSON.stringify(data)),
                 width,
                 height,
+                margin,
+                nodeWidth,
             );
 
             const svg = document.createElementNS(

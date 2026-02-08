@@ -330,7 +330,12 @@ const endYear = sortedData[sortedData.length - 1]?.year;
 
             this.width = width;
             this.height = height;
-            this.padding = { top: 20, right: 20, bottom: 40, left: 50 };
+
+            if (width < 600) {
+                this.padding = { top: 20, right: 10, bottom: 40, left: 35 };
+            } else {
+                this.padding = { top: 20, right: 20, bottom: 40, left: 50 };
+            }
 
             const svg = document.createElementNS(
                 "http://www.w3.org/2000/svg",
@@ -348,7 +353,8 @@ const endYear = sortedData[sortedData.length - 1]?.year;
 
         drawAxes() {
             // Simple Grid
-            const steps = 5;
+            let steps = 5;
+            if (this.width < 600) steps = 3;
             for (let i = 0; i <= steps; i++) {
                 // X Grid (Vertical lines)
                 const x = this.mapX(

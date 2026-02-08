@@ -300,6 +300,13 @@ const endYear = years[years.length - 1];
             this.width = width;
             this.height = height;
 
+            // Responsive padding
+            if (width < 600) {
+                this.padding = { top: 20, right: 30, bottom: 40, left: 35 }; // Tighter left/right
+            } else {
+                this.padding = { top: 20, right: 100, bottom: 40, left: 50 };
+            }
+
             this.setupScales(width, height);
 
             const svg = document.createElementNS(
@@ -347,13 +354,15 @@ const endYear = years[years.length - 1];
                         this.width - this.padding.right,
                         y,
                         "grid",
+                        "rgba(255,255,255,0.1)", // Default fallback
                     );
                 }
             }
 
             // X Labels (Years)
             const { years } = this.config;
-            const stepYear = Math.ceil(years.length / 6);
+            let stepYear = Math.ceil(years.length / 6);
+            if (this.width < 600) stepYear = Math.ceil(years.length / 3); // Fewer ticks on mobile
             for (let i = 0; i < years.length; i += stepYear) {
                 const year = years[i];
                 const x = this.xScale(year);
